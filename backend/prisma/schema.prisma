@@ -2,10 +2,91 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin", "linux-arm64-openssl-1.1.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  User
+  Admin
+}
+
+// These models are for NextAuth, allowing us to use OAuth providers for login
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// NextAuth User model, but with our additional extensions
+model User {
+  id             String          @id @default(cuid())
+  name           String?
+  email          String?         @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  bio            String?
+  twitter        String?
+  visitorId      String          @unique // comes from fingerprintjs 
+  paymentMethods PaymentMethod[]
+  grants         Grant[]
+  contributions  Contribution[]
+  role           Role
+  flagged        Boolean // To track if a user is flagged for malicious activity
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Grant {
+  id             String          @id @default(cuid())
+  name           String
+  description    String
+  image          String
+  twitter        String
+  website        String
+  location       String
+  paymentAccount PaymentAccount
+  matchingRounds MatchingRound[]
+  team           User[]
+  fundingGoal    Int
+  contributions  Contribution[]
+  verified       Boolean
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
