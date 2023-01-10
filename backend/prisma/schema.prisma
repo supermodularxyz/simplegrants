@@ -63,7 +63,7 @@ model User {
   sessions         Session[]
   bio              String?
   twitter          String?
-  visitorId        String             @unique // comes from fingerprintjs 
+  visitorId        String // Comes from fingerprintjs
   paymentMethods   PaymentMethod[]
   grants           Grant[]
   contributions    Contribution[]
