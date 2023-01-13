@@ -69,10 +69,10 @@ model User {
   grants           Grant[]
   contributions    Contribution[]
   role             Role?
+  ecosystemBuilder EcosystemBuilder[]
   flagged          Boolean            @default(false) // To track if a user is flagged for malicious activity
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  ecosystemBuilder EcosystemBuilder[]
 }
 
 model Grant {
