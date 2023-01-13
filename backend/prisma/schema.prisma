@@ -3,6 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
   binaryTargets = ["native", "darwin", "linux-arm64-openssl-1.1.x"]
 }
 
@@ -63,15 +64,15 @@ model User {
   sessions         Session[]
   bio              String?
   twitter          String?
-  visitorId        String // Comes from fingerprintjs
+  visitorId        String? // Comes from fingerprintjs
   paymentMethods   PaymentMethod[]
   grants           Grant[]
   contributions    Contribution[]
-  role             Role
-  flagged          Boolean // To track if a user is flagged for malicious activity
+  role             Role?
+  ecosystemBuilder EcosystemBuilder[]
+  flagged          Boolean            @default(false) // To track if a user is flagged for malicious activity
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  ecosystemBuilder EcosystemBuilder[]
 }
 
 model Grant {

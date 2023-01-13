@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "visitorId" DROP NOT NULL,
+ALTER COLUMN "role" DROP NOT NULL,
+ALTER COLUMN "flagged" SET DEFAULT false;
