@@ -13,7 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "generate": "npx prisma generate && rsync prisma/schema.prisma ../frontend/prisma",
+    "generate": "npx prisma generate && rsync prisma/schema.prisma ../frontend/prisma && npx --prefix ../frontend prisma generate",
     "migrate": "prisma migrate deploy",
     "docker:dev:up": "docker compose -f docker-compose.dev.yml up -d",
     "docker:dev:build": "docker compose -f docker-compose.dev.yml build",
