@@ -11,12 +11,21 @@ import {
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { UsersService } from './users.service';
 import { RequestWithUser, UpdateUserDto, UserProfile } from './users.interface';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({
+    description: 'Retrieves the user profile based on the user session cookies',
+  })
+  @ApiOkResponse({
+    description: 'The user profile',
+    type: UserProfile,
+  })
   @UseGuards(NextAuthGuard)
   @Get('profile')
   async getProfile(@Request() req: RequestWithUser) {
@@ -25,6 +34,13 @@ export class UsersController {
     );
   }
 
+  @ApiOperation({
+    description: 'Updates the user profile',
+  })
+  @ApiOkResponse({
+    description: 'Updated user profile',
+    type: UserProfile,
+  })
   @UseGuards(NextAuthGuard)
   @Patch('profile')
   async updateProfile(
