@@ -68,7 +68,7 @@ model User {
   paymentMethods   PaymentMethod[]
   grants           Grant[]
   contributions    Contribution[]
-  role             Role?
+  role             Role               @default(User)
   ecosystemBuilder EcosystemBuilder[]
   flagged          Boolean            @default(false) // To track if a user is flagged for malicious activity
   createdAt        DateTime           @default(now())
