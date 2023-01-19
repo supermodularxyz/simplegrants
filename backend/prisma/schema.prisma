@@ -104,6 +104,8 @@ model PaymentAccount {
   contribution     Contribution[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+
+  @@unique([recipientAddress, providerId])
 }
 
 model PaymentMethod {
