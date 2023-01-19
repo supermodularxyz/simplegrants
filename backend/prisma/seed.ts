@@ -38,10 +38,36 @@ async function main() {
         },
       },
       fundingGoal: 10000,
-      verified: false,
+      verified: true,
     },
   });
-  console.log({ firstGrant });
+
+  const secondGrant = await prisma.grant.upsert({
+    where: { id: 'cld2ilh7t000008l3g1qe3nla' },
+    update: {},
+    create: {
+      id: 'cld2ilh7t000008l3g1qe3nla',
+      name: 'Second Grant',
+      description: 'This is the second grant in SimpleGrants',
+      image: 'https://picsum.photos/200/300',
+      twitter: 'testing2',
+      website: 'https://google.com',
+      location: 'United States',
+      paymentAccount: {
+        create: {
+          recipientAddress: 'sample_stripe_id2',
+          provider: {
+            connect: {
+              id: stripeProvider.id,
+            },
+          },
+        },
+      },
+      fundingGoal: 20000,
+      verified: true,
+    },
+  });
+  console.log({ firstGrant, secondGrant });
 }
 main()
   .then(async () => {
