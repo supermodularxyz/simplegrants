@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   Body,
+  CacheInterceptor,
 } from '@nestjs/common';
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { UsersService } from './users.service';
@@ -15,7 +16,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('User')
 @Controller('users')
-@UseInterceptors(ClassSerializerInterceptor)
+@UseInterceptors(CacheInterceptor, ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
