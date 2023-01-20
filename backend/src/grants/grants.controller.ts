@@ -2,10 +2,12 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
   Post,
   Put,
   Query,
+  Request,
   ValidationPipe,
 } from '@nestjs/common';
 import { GrantsService } from './grants.service';
@@ -14,7 +16,6 @@ import {
   CreateGrantDto,
   GetGrantQueryDto,
   GetGrantResponse,
-  ResubmitGrantDto,
   UpdateGrantDto,
 } from './grants.interface';
 
@@ -50,23 +51,29 @@ export class GrantsController {
 
   /**
    * TODO:
-   * Add grant
    * Validate grant (only for admins)
-   * Edit grants
+   * Search grants
    */
+
   @Post()
   async createGrant(@Body() body: CreateGrantDto) {
     return await this.grantsService.createGrant(body);
   }
 
+  @Get(':id')
+  async getGrant(@Param('id') id: string, @Request() req) {
+    return await this.grantsService.getGrant(id, req.user);
+  }
+
+  // TODO: Ensure grants can only be edited/resubmitted by owner/team member
   /**
    * This route is only used when editing a verified grant
    * @param body
    * @returns
    */
-  @Patch()
-  async updateGrant(@Body() body: UpdateGrantDto) {
-    return await this.grantsService.updateGrant(body);
+  @Patch(':id')
+  async updateGrant(@Param('id') id: string, @Body() body: UpdateGrantDto) {
+    return await this.grantsService.updateGrant(id, body);
   }
 
   /**
@@ -74,8 +81,8 @@ export class GrantsController {
    * @param body
    * @returns
    */
-  @Put()
-  async resubmitGrant(@Body() body: ResubmitGrantDto) {
-    return await this.grantsService.updateGrant(body);
+  @Put(':id')
+  async resubmitGrant(@Param('id') id: string, @Body() body: CreateGrantDto) {
+    return await this.grantsService.updateGrant(id, body);
   }
 }

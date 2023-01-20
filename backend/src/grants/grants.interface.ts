@@ -37,7 +37,7 @@ export class GetGrantDto {
   filter?: string;
 }
 
-class EditableGrantFields {
+export class UpdateGrantDto {
   @ApiProperty({
     type: String,
   })
@@ -75,7 +75,7 @@ class EditableGrantFields {
   description: string;
 }
 
-export class CreateGrantDto extends EditableGrantFields {
+export class CreateGrantDto extends UpdateGrantDto {
   @ApiProperty({
     type: Number,
   })
@@ -87,22 +87,6 @@ export class CreateGrantDto extends EditableGrantFields {
   })
   @IsString()
   paymentAccount: string;
-}
-
-export class ResubmitGrantDto extends CreateGrantDto {
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  id: string;
-}
-
-export class UpdateGrantDto extends EditableGrantFields {
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  id: string;
 }
 
 export class GetGrantResponse {

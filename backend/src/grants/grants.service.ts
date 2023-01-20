@@ -1,11 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Grant, Prisma } from '@prisma/client';
+import { Grant, Prisma, Role, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateGrantDto,
   GetGrantDto,
   GrantSortOptions,
-  ResubmitGrantDto,
   UpdateGrantDto,
 } from './grants.interface';
 import { ProviderService } from 'src/provider/provider.service';
@@ -53,12 +52,36 @@ export class GrantsService {
     });
   }
 
-  async getGrantById(id: string): Promise<Grant> {
+  async getGrantById(id: string) {
     return await this.prisma.grant.findUnique({
       where: {
         id,
       },
+      include: {
+        contributions: true,
+        team: true,
+      },
     });
+  }
+
+  async getGrant(id: string, user: User) {
+    const grant = await this.getGrantById(id);
+
+    /**
+     * If a grant is not verified, we need to do a few checks:
+     * 1. Only admins can view unverified grants
+     * 2. Only the grant owner can view their own unverified grant
+     */
+    if (!grant.verified) {
+      if (
+        user.role !== Role.Admin ||
+        !grant.team.some((member) => member.id === user.id)
+      )
+        throw new HttpException('Grant not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Otherwise, we can return it
+    return grant;
   }
 
   async createGrant(data: CreateGrantDto) {
@@ -90,19 +113,19 @@ export class GrantsService {
     });
   }
 
-  async updateGrant(data: UpdateGrantDto) {
+  async updateGrant(id: string, data: UpdateGrantDto) {
     return await this.prisma.grant.update({
       data: {
         ...data,
       },
       where: {
-        id: data.id,
+        id,
       },
     });
   }
 
-  async resubmitGrant(data: ResubmitGrantDto) {
-    const grant = await this.getGrantById(data.id);
+  async resubmitGrant(id: string, data: CreateGrantDto) {
+    const grant = await this.getGrantById(id);
 
     /**
      * If a grant doesn't exist or is already verified,
@@ -139,7 +162,7 @@ export class GrantsService {
         },
       },
       where: {
-        id: data.id,
+        id,
       },
     });
   }
