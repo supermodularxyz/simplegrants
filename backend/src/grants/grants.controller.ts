@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
+  Put,
   Query,
   ValidationPipe,
 } from '@nestjs/common';
@@ -12,6 +14,8 @@ import {
   CreateGrantDto,
   GetGrantQueryDto,
   GetGrantResponse,
+  ResubmitGrantDto,
+  UpdateGrantDto,
 } from './grants.interface';
 
 @ApiTags('Grants')
@@ -52,6 +56,16 @@ export class GrantsController {
    */
   @Post()
   async createGrant(@Body() body: CreateGrantDto) {
-    return await this.createGrant(body);
+    return await this.grantsService.createGrant(body);
+  }
+
+  /**
+   * This route is only used when editing a verified grant
+   * @param body
+   * @returns
+   */
+  @Patch()
+  async updateGrant(@Body() body: UpdateGrantDto) {
+    return await this.grantsService.updateGrant(body);
   }
 }

@@ -5,6 +5,7 @@ import {
   CreateGrantDto,
   GetGrantDto,
   GrantSortOptions,
+  UpdateGrantDto,
 } from './grants.interface';
 import { ProviderService } from 'src/provider/provider.service';
 
@@ -74,6 +75,17 @@ export class GrantsService {
             },
           },
         },
+      },
+    });
+  }
+
+  async updateGrant(data: UpdateGrantDto) {
+    return await this.prisma.grant.update({
+      data: {
+        ...data,
+      },
+      where: {
+        id: data.id,
       },
     });
   }
