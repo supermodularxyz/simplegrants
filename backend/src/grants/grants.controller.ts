@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Query, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
 import { GrantsService } from './grants.service';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetGrantQueryDto, GetGrantResponse } from './grants.interface';
+import {
+  CreateGrantDto,
+  GetGrantQueryDto,
+  GetGrantResponse,
+} from './grants.interface';
 
 @ApiTags('Grants')
 @Controller('grants')
@@ -39,6 +50,8 @@ export class GrantsController {
    * Validate grant (only for admins)
    * Edit grants
    */
-  //   @Post()
-  //   async createGrant() {}
+  @Post()
+  async createGrant(@Body() body: CreateGrantDto) {
+    return await this.createGrant(body);
+  }
 }

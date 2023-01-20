@@ -1,5 +1,11 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export enum GrantSortOptions {
   NEWEST = 'newest',
@@ -29,6 +35,56 @@ export class GetGrantDto {
   isVerified?: boolean;
   sort?: string;
   filter?: string;
+}
+
+export class CreateGrantDto {
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  location: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  twitter: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsUrl()
+  website: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsUrl()
+  image: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  description: string;
+
+  @ApiProperty({
+    type: Number,
+  })
+  @IsPositive()
+  fundingGoal: number;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  paymentAccount: string;
 }
 
 export class GetGrantResponse {

@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Grant, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GetGrantDto, GrantSortOptions } from './grants.interface';
+import {
+  CreateGrantDto,
+  GetGrantDto,
+  GrantSortOptions,
+} from './grants.interface';
+import { ProviderService } from 'src/provider/provider.service';
 
 @Injectable()
 export class GrantsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly providerService: ProviderService,
+  ) {}
 
   parseSorting(sort: string): Prisma.GrantOrderByWithRelationInput {
     switch (sort) {
@@ -38,6 +46,35 @@ export class GrantsService {
         verified: isVerified,
       },
       orderBy: this.parseSorting(sort),
+    });
+  }
+
+  async createGrant(data: CreateGrantDto) {
+    const paymentProvider = await this.providerService.getProvider();
+
+    return await this.prisma.grant.create({
+      data: {
+        ...data,
+        verified: false,
+        paymentAccount: {
+          connectOrCreate: {
+            create: {
+              recipientAddress: data.paymentAccount,
+              provider: {
+                connect: {
+                  id: paymentProvider.id,
+                },
+              },
+            },
+            where: {
+              recipientAddress_providerId: {
+                recipientAddress: data.paymentAccount,
+                providerId: paymentProvider.id,
+              },
+            },
+          },
+        },
+      },
     });
   }
 }
