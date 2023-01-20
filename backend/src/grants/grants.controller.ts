@@ -68,4 +68,14 @@ export class GrantsController {
   async updateGrant(@Body() body: UpdateGrantDto) {
     return await this.grantsService.updateGrant(body);
   }
+
+  /**
+   * This route is only used when resubmitting an unverified grant
+   * @param body
+   * @returns
+   */
+  @Put()
+  async resubmitGrant(@Body() body: ResubmitGrantDto) {
+    return await this.grantsService.updateGrant(body);
+  }
 }
