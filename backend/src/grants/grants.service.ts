@@ -84,13 +84,24 @@ export class GrantsService {
     return grant;
   }
 
-  async createGrant(data: CreateGrantDto) {
+  /**
+   * Creates a grant with the provided data
+   * @param data
+   * @param user The owner to tie this grant to
+   * @returns
+   */
+  async createGrant(data: CreateGrantDto, user: User) {
     const paymentProvider = await this.paymentProvider;
 
     return await this.prisma.grant.create({
       data: {
         ...data,
         verified: false,
+        team: {
+          connect: {
+            id: user.id,
+          },
+        },
         paymentAccount: {
           connectOrCreate: {
             create: {
@@ -113,7 +124,15 @@ export class GrantsService {
     });
   }
 
-  async updateGrant(id: string, data: UpdateGrantDto) {
+  async updateGrant(id: string, data: UpdateGrantDto, user: User) {
+    // Ensure only a team member can edit this grant
+    const grant = await this.getGrantById(id);
+
+    if (!grant)
+      throw new HttpException('Grant not found', HttpStatus.NOT_FOUND);
+    if (!grant.team.some((member) => member.id === user.id))
+      throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
+
     return await this.prisma.grant.update({
       data: {
         ...data,
@@ -124,7 +143,7 @@ export class GrantsService {
     });
   }
 
-  async resubmitGrant(id: string, data: CreateGrantDto) {
+  async resubmitGrant(id: string, data: CreateGrantDto, user: User) {
     const grant = await this.getGrantById(id);
 
     /**
@@ -136,6 +155,8 @@ export class GrantsService {
         'Grant cannot be resubmitted',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
+    if (!grant.team.some((member) => member.id === user.id))
+      throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
 
     const paymentProvider = await this.paymentProvider;
 
@@ -160,6 +181,29 @@ export class GrantsService {
             },
           },
         },
+      },
+      where: {
+        id,
+      },
+    });
+  }
+
+  /**
+   * Only an admin can execute this function
+   * The Admin role check should already be done by the guard,
+   * but adding another check here in case the guard was bypassed
+   * @param id
+   * @param user
+   * @returns
+   */
+  async reviewGrant(id: string, user: User) {
+    // First we validate if the user is an admin
+    if (user.role !== Role.Admin)
+      throw new HttpException('Unauthorized Access', HttpStatus.UNAUTHORIZED);
+
+    return await this.prisma.grant.update({
+      data: {
+        verified: true,
       },
       where: {
         id,

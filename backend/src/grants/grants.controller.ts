@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   Request,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { GrantsService } from './grants.service';
@@ -18,6 +19,9 @@ import {
   GetGrantResponse,
   UpdateGrantDto,
 } from './grants.interface';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { Role } from '@prisma/client';
+import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 
 @ApiTags('Grants')
 @Controller('grants')
@@ -51,13 +55,20 @@ export class GrantsController {
 
   /**
    * TODO:
-   * Validate grant (only for admins)
    * Search grants
    */
 
   @Post()
-  async createGrant(@Body() body: CreateGrantDto) {
-    return await this.grantsService.createGrant(body);
+  @UseGuards(NextAuthGuard)
+  async createGrant(@Body() body: CreateGrantDto, @Request() req) {
+    return await this.grantsService.createGrant(body, req.user);
+  }
+
+  @Post('verify/:id')
+  @Roles(Role.Admin)
+  @UseGuards(NextAuthGuard)
+  async reviewGrant(@Param('id') id: string, @Request() req) {
+    return await this.grantsService.reviewGrant(id, req.user);
   }
 
   @Get(':id')
@@ -65,15 +76,19 @@ export class GrantsController {
     return await this.grantsService.getGrant(id, req.user);
   }
 
-  // TODO: Ensure grants can only be edited/resubmitted by owner/team member
   /**
    * This route is only used when editing a verified grant
    * @param body
    * @returns
    */
   @Patch(':id')
-  async updateGrant(@Param('id') id: string, @Body() body: UpdateGrantDto) {
-    return await this.grantsService.updateGrant(id, body);
+  @UseGuards(NextAuthGuard)
+  async updateGrant(
+    @Param('id') id: string,
+    @Body() body: UpdateGrantDto,
+    @Request() req,
+  ) {
+    return await this.grantsService.updateGrant(id, body, req.user);
   }
 
   /**
@@ -82,7 +97,12 @@ export class GrantsController {
    * @returns
    */
   @Put(':id')
-  async resubmitGrant(@Param('id') id: string, @Body() body: CreateGrantDto) {
-    return await this.grantsService.updateGrant(id, body);
+  @UseGuards(NextAuthGuard)
+  async resubmitGrant(
+    @Param('id') id: string,
+    @Body() body: CreateGrantDto,
+    @Request() req,
+  ) {
+    return await this.grantsService.resubmitGrant(id, body, req.user);
   }
 }
