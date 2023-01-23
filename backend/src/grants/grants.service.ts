@@ -3,6 +3,7 @@ import { Grant, Prisma, Role, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateGrantDto,
+  ExtendedGrant,
   GetGrantDto,
   GrantSortOptions,
   UpdateGrantDto,
@@ -18,6 +19,23 @@ export class GrantsService {
 
   private paymentProvider = this.providerService.getProvider();
 
+  /**
+   * Throws error if not a member, otherwise returns true
+   * @param grant
+   * @param user
+   * @returns `true` if is a team member
+   */
+  checkGrantOwnership(grant: ExtendedGrant, user: User) {
+    if (!grant.team.some((member) => member.id === user.id))
+      throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
+    return true;
+  }
+
+  /**
+   * Converts a basic sorting string to something Prisma can understand
+   * @param sort Sorting option
+   * @returns Prisma orderBy query object
+   */
   parseSorting(sort: string): Prisma.GrantOrderByWithRelationInput {
     switch (sort) {
       case GrantSortOptions.NEWEST:
@@ -41,6 +59,11 @@ export class GrantsService {
     }
   }
 
+  /**
+   * To retrieve all grants from public route
+   * @param data
+   * @returns
+   */
   async getAllGrants(data: GetGrantDto): Promise<Grant[]> {
     const { isVerified, sort, filter } = data;
 
@@ -48,11 +71,21 @@ export class GrantsService {
       where: {
         verified: isVerified,
       },
+      include: {
+        contributions: true,
+        team: true,
+      },
       orderBy: this.parseSorting(sort),
     });
   }
 
-  async getGrantById(id: string) {
+  /**
+   * For internal use.
+   * @note Also retrieves unverified grants
+   * @param id ID of the grant to retrieve
+   * @returns
+   */
+  async getGrantById(id: string): Promise<ExtendedGrant> {
     return await this.prisma.grant.findUnique({
       where: {
         id,
@@ -64,8 +97,18 @@ export class GrantsService {
     });
   }
 
+  /**
+   * Retrieve a grant by ID
+   * @param id
+   * @param user Used to check if the caller is the owner in the event
+   * that the grant is still unverified to prevent leaking private info
+   * @returns
+   */
   async getGrant(id: string, user: User) {
     const grant = await this.getGrantById(id);
+
+    if (!grant)
+      throw new HttpException('Grant not found', HttpStatus.NOT_FOUND);
 
     /**
      * If a grant is not verified, we need to do a few checks:
@@ -73,11 +116,10 @@ export class GrantsService {
      * 2. Only the grant owner can view their own unverified grant
      */
     if (!grant.verified) {
-      if (
-        user.role !== Role.Admin ||
-        !grant.team.some((member) => member.id === user.id)
-      )
-        throw new HttpException('Grant not found', HttpStatus.NOT_FOUND);
+      if (!user)
+        throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
+      if (user.role !== Role.Admin && !this.checkGrantOwnership(grant, user))
+        throw new HttpException('Forbidden resource', HttpStatus.FORBIDDEN);
     }
 
     // Otherwise, we can return it
@@ -124,14 +166,22 @@ export class GrantsService {
     });
   }
 
+  /**
+   * Updates a grant
+   * @param id
+   * @param data
+   * @param user Checks if caller is a team member that can edit this grant
+   * @returns
+   */
   async updateGrant(id: string, data: UpdateGrantDto, user: User) {
     // Ensure only a team member can edit this grant
     const grant = await this.getGrantById(id);
 
     if (!grant)
       throw new HttpException('Grant not found', HttpStatus.NOT_FOUND);
-    if (!grant.team.some((member) => member.id === user.id))
-      throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
+
+    // Check if grant owner is calling this function
+    this.checkGrantOwnership(grant, user);
 
     return await this.prisma.grant.update({
       data: {
@@ -143,6 +193,14 @@ export class GrantsService {
     });
   }
 
+  /**
+   * Resubmit a grant for verification
+   * @note Even the funding goal & payment account can be changed
+   * @param id
+   * @param data
+   * @param user
+   * @returns
+   */
   async resubmitGrant(id: string, data: CreateGrantDto, user: User) {
     const grant = await this.getGrantById(id);
 
@@ -155,14 +213,16 @@ export class GrantsService {
         'Grant cannot be resubmitted',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
-    if (!grant.team.some((member) => member.id === user.id))
-      throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
+
+    // Check if grant owner is calling this function
+    this.checkGrantOwnership(grant, user);
 
     const paymentProvider = await this.paymentProvider;
 
     return await this.prisma.grant.update({
       data: {
         ...data,
+        verified: false, // Explicitly ensure the grant is in an unverified state
         paymentAccount: {
           connectOrCreate: {
             create: {
