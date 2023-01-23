@@ -8,6 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
+  // Temporarily enable cors for testing
+  app.enableCors();
+
   /** Swagger (OpenAPI) for documentation */
   const config = new DocumentBuilder()
     .setTitle('SimpleGrants API')
