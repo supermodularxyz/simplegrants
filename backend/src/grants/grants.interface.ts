@@ -16,6 +16,11 @@ export enum GrantSortOptions {
   MOST_BACKED = 'most_backed',
 }
 
+export enum GrantFilterOptions {
+  FUNDED = 'funded',
+  UNDERFUNDED = 'underfunded',
+}
+
 class Contribution {
   @ApiResponseProperty({
     type: String,
@@ -81,19 +86,23 @@ export class GetGrantQueryDto {
   @IsOptional()
   sort?: string;
 
-  // @ApiProperty({
-  //   enum: GrantFilterOptions,
-  // })
-  // @IsEnum(GrantFilterOptions)
-  @IsString()
+  @ApiProperty({
+    enum: GrantFilterOptions,
+  })
+  @IsEnum(GrantFilterOptions)
   @IsOptional()
   filter?: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  search?: string;
 }
 
-export class GetGrantDto {
+export class GetGrantDto extends GetGrantQueryDto {
   isVerified?: boolean;
-  sort?: string;
-  filter?: string;
 }
 
 export class UpdateGrantDto {

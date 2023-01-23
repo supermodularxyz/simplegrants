@@ -5,6 +5,7 @@ import {
   CreateGrantDto,
   ExtendedGrant,
   GetGrantDto,
+  GrantFilterOptions,
   GrantSortOptions,
   UpdateGrantDto,
 } from './grants.interface';
@@ -60,16 +61,38 @@ export class GrantsService {
   }
 
   /**
+   * Converts a basic sorting string to something Prisma can understand
+   * @param filter Filtering option
+   * @returns Prisma orderBy query object
+   */
+  parseFiltering(filter: string): Prisma.GrantOrderByWithRelationInput {
+    switch (filter) {
+      case GrantFilterOptions.FUNDED:
+        return {
+          createdAt: 'desc',
+        };
+      case GrantFilterOptions.UNDERFUNDED:
+        return {
+          createdAt: 'asc',
+        };
+    }
+  }
+
+  /**
    * To retrieve all grants from public route
    * @param data
    * @returns
    */
   async getAllGrants(data: GetGrantDto): Promise<Grant[]> {
-    const { isVerified, sort, filter } = data;
+    const { isVerified, sort, filter, search } = data;
 
     return await this.prisma.grant.findMany({
       where: {
         verified: isVerified,
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
       },
       include: {
         contributions: true,

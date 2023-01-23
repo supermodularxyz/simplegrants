@@ -59,8 +59,7 @@ export class GrantsController {
   ) {
     return await this.grantsService.getAllGrants({
       isVerified: true,
-      sort: queries.sort,
-      filter: queries.filter,
+      ...queries,
     });
   }
 
