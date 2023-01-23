@@ -47,33 +47,15 @@ export class GrantsService {
         return {
           createdAt: 'asc',
         };
-      case GrantSortOptions.MOST_FUNDED: //TODO
-        return {
-          createdAt: 'desc',
-        };
+      // case GrantSortOptions.MOST_FUNDED: // Currently quite difficult with prisma
+      //   return {
+      //     createdAt: 'desc',
+      //   };
       case GrantSortOptions.MOST_BACKED:
         return {
           contributions: {
             _count: 'desc',
           },
-        };
-    }
-  }
-
-  /**
-   * Converts a basic sorting string to something Prisma can understand
-   * @param filter Filtering option
-   * @returns Prisma orderBy query object
-   */
-  parseFiltering(filter: string): Prisma.GrantOrderByWithRelationInput {
-    switch (filter) {
-      case GrantFilterOptions.FUNDED:
-        return {
-          createdAt: 'desc',
-        };
-      case GrantFilterOptions.UNDERFUNDED:
-        return {
-          createdAt: 'asc',
         };
     }
   }
@@ -86,7 +68,7 @@ export class GrantsService {
   async getAllGrants(data: GetGrantDto): Promise<Grant[]> {
     const { isVerified, sort, filter, search } = data;
 
-    return await this.prisma.grant.findMany({
+    let grants = await this.prisma.grant.findMany({
       where: {
         verified: isVerified,
         name: {
@@ -100,6 +82,46 @@ export class GrantsService {
       },
       orderBy: this.parseSorting(sort),
     });
+
+    // Apply filtering first. Currently no Prisma based solution, so it's a workaround
+    switch (filter) {
+      case GrantFilterOptions.FUNDED:
+        grants = grants.filter((grant) => {
+          const total = grant.contributions.reduce(
+            (acc, contribution) => acc + contribution.amountUsd,
+            0,
+          );
+          return total >= grant.fundingGoal;
+        });
+        break;
+      case GrantFilterOptions.UNDERFUNDED:
+        grants = grants.filter((grant) => {
+          const total = grant.contributions.reduce(
+            (acc, contribution) => acc + contribution.amountUsd,
+            0,
+          );
+          return total < grant.fundingGoal;
+        });
+        break;
+    }
+
+    // Due to Prisma limitations, this is a workaround
+    if (sort === GrantSortOptions.MOST_FUNDED) {
+      grants = grants.sort((a, b) => {
+        const aTotal = a.contributions.reduce(
+          (acc, contribution) => acc + contribution.amountUsd,
+          0,
+        );
+        const bTotal = b.contributions.reduce(
+          (acc, contribution) => acc + contribution.amountUsd,
+          0,
+        );
+
+        // Sort in descending order
+        return bTotal - aTotal;
+      });
+    }
+    return grants;
   }
 
   /**
