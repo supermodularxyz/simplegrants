@@ -1,5 +1,5 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-import { Grant, Contribution } from '@prisma/client';
+import { Grant } from '@prisma/client';
 import {
   IsEnum,
   IsOptional,
@@ -14,6 +14,63 @@ export enum GrantSortOptions {
   OLDEST = 'oldest',
   MOST_FUNDED = 'most_funded',
   MOST_BACKED = 'most_backed',
+}
+
+class Contribution {
+  @ApiResponseProperty({
+    type: String,
+  })
+  id: string;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  userId: string;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amount: number;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  denomination: string;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amountUsd: number;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  paymentAccountId: string;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  grantId: string | null;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  matchingRoundId: string | null;
+
+  @ApiResponseProperty({
+    type: Boolean,
+  })
+  flagged: boolean;
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  createdAt: Date;
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  updatedAt: Date;
 }
 
 export class GetGrantQueryDto {
@@ -160,9 +217,9 @@ export class GrantDetailResponse extends GrantResponse {
   team: UserProfile[];
 
   @ApiResponseProperty({
-    type: Date,
+    type: [Contribution],
   })
-  contributions: Date;
+  contributions: Contribution[];
 }
 
 export type ExtendedGrant = Grant & {
