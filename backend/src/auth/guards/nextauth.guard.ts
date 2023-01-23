@@ -28,6 +28,19 @@ export class NextAuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
+    let user;
+    if (session) {
+      // Get user data based on session
+      user = await this.prisma.user.findUnique({
+        where: {
+          id: (session.user as any).id,
+        },
+      });
+
+      // Append the user to the request to retrieve
+      req.user = user;
+    }
+
     // If route is made public, we do not care about the session
     if (isPublic) {
       return true;
@@ -35,16 +48,6 @@ export class NextAuthGuard implements CanActivate {
 
     // If route is not public and no session exists, we deny entry
     if (!session) return false;
-
-    // Get user data based on session
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: (session.user as any).id,
-      },
-    });
-
-    // Append the user to the request to retrieve
-    req.user = user;
 
     const validSession = !!session && new Date() < new Date(session.expires);
 
