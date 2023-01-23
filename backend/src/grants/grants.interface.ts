@@ -1,4 +1,5 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { Grant, Contribution } from '@prisma/client';
 import {
   IsEnum,
   IsOptional,
@@ -6,6 +7,7 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
+import { UserProfile } from 'src/users/users.interface';
 
 export enum GrantSortOptions {
   NEWEST = 'newest',
@@ -89,7 +91,7 @@ export class CreateGrantDto extends UpdateGrantDto {
   paymentAccount: string;
 }
 
-export class GetGrantResponse {
+export class GrantResponse {
   @ApiResponseProperty({
     type: String,
   })
@@ -150,3 +152,20 @@ export class GetGrantResponse {
   })
   updatedAt: Date;
 }
+
+export class GrantDetailResponse extends GrantResponse {
+  @ApiResponseProperty({
+    type: [UserProfile],
+  })
+  team: UserProfile[];
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  contributions: Date;
+}
+
+export type ExtendedGrant = Grant & {
+  contributions: Contribution[];
+  team: UserProfile[];
+};

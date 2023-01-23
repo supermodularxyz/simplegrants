@@ -12,16 +12,27 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GrantsService } from './grants.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
 import {
   CreateGrantDto,
   GetGrantQueryDto,
-  GetGrantResponse,
+  GrantDetailResponse,
+  GrantResponse,
   UpdateGrantDto,
 } from './grants.interface';
-import { Roles } from 'src/auth/roles/roles.decorator';
+import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
+import { Public } from 'src/auth/decorator/public.decorator';
 
 @ApiTags('Grants')
 @Controller('grants')
@@ -33,7 +44,7 @@ export class GrantsController {
   })
   @ApiOkResponse({
     description: 'Retrieved all verified grants',
-    type: [GetGrantResponse],
+    type: [GrantResponse],
   })
   @Get()
   async getAllGrants(
@@ -58,12 +69,29 @@ export class GrantsController {
    * Search grants
    */
 
+  @ApiOperation({
+    description: 'Create a grant',
+  })
+  @ApiCreatedResponse({
+    description: 'Created a grant with the submitted data',
+    type: [GrantResponse],
+  })
   @Post()
   @UseGuards(NextAuthGuard)
   async createGrant(@Body() body: CreateGrantDto, @Request() req) {
     return await this.grantsService.createGrant(body, req.user);
   }
 
+  @ApiOperation({
+    description: 'Verify a grant',
+  })
+  @ApiCreatedResponse({
+    description: 'Grant verified state is set to `true`',
+    type: [GrantResponse],
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not an admin',
+  })
   @Post('verify/:id')
   @Roles(Role.Admin)
   @UseGuards(NextAuthGuard)
@@ -71,7 +99,25 @@ export class GrantsController {
     return await this.grantsService.reviewGrant(id, req.user);
   }
 
+  @ApiOperation({
+    description: 'Get a specific grant by ID',
+  })
+  @ApiOkResponse({
+    description: 'Full details about the grant including team & contributions',
+    type: [GrantDetailResponse],
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User has to be logged in to view an unverified grant',
+  })
+  @ApiForbiddenResponse({
+    description: 'User is not an admin or team member',
+  })
+  @ApiNotFoundResponse({
+    description: 'Grant with given ID cannot be found',
+  })
   @Get(':id')
+  @Public()
+  @UseGuards(NextAuthGuard)
   async getGrant(@Param('id') id: string, @Request() req) {
     return await this.grantsService.getGrant(id, req.user);
   }
@@ -81,6 +127,20 @@ export class GrantsController {
    * @param body
    * @returns
    */
+  @ApiOperation({
+    description:
+      "Update a grant by ID. Only works if you're a team member of the grant",
+  })
+  @ApiCreatedResponse({
+    description: 'Updated grant information',
+    type: [GrantResponse],
+  })
+  @ApiForbiddenResponse({
+    description: 'User is a team member of this grant',
+  })
+  @ApiNotFoundResponse({
+    description: 'Grant with given ID cannot be found',
+  })
   @Patch(':id')
   @UseGuards(NextAuthGuard)
   async updateGrant(
@@ -96,6 +156,21 @@ export class GrantsController {
    * @param body
    * @returns
    */
+  @ApiOperation({
+    description:
+      "Resubmit a grant by ID. Only works if you're a team member of the grant & the grant is unverified",
+  })
+  @ApiCreatedResponse({
+    description: 'Updated grant information',
+    type: [GrantResponse],
+  })
+  @ApiForbiddenResponse({
+    description: 'User is a team member of this grant',
+  })
+  @ApiUnprocessableEntityResponse({
+    description:
+      'Grant with given ID cannot be found or grant is already verified',
+  })
   @Put(':id')
   @UseGuards(NextAuthGuard)
   async resubmitGrant(
