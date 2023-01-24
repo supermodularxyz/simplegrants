@@ -1,6 +1,21 @@
 import { PrismaClient } from '@prisma/client';
+import {
+  randCatchPhrase,
+  randCountry,
+  randImg,
+  randNumber,
+  randQuote,
+  randText,
+  randUrl,
+  randUser,
+  randUserName,
+  randUuid,
+} from '@ngneat/falso';
+import * as chalk from 'chalk';
+
 const prisma = new PrismaClient();
 async function main() {
+  console.log(chalk.blue('\nSeeding PaymentProvider...'));
   const stripeProvider = await prisma.paymentProvider.upsert({
     where: { id: 'cld1ehocw000008k0a2u1e3z6' },
     update: {},
@@ -16,58 +31,199 @@ async function main() {
     },
   });
 
-  const firstGrant = await prisma.grant.upsert({
+  console.log({ stripeProvider });
+
+  console.log(chalk.blue('\nSeeding Users...'));
+  /**
+   * Generate a random user to test with
+   */
+  const userData = randUser();
+  const user = await prisma.user.upsert({
+    where: { id: 'cld9wbart000008mm079n9xpn' },
+    update: {},
+    create: {
+      id: 'cld9wbart000008mm079n9xpn',
+      name: `${userData.firstName} ${userData.lastName}`,
+      email: userData.email,
+      image: userData.img,
+      bio: randQuote(),
+      twitter: userData.username,
+    },
+  });
+
+  const userPaymentMethod = await prisma.paymentMethod.upsert({
+    where: { id: 'clda27mam000408l7hznt28wp' },
+    update: {},
+    create: {
+      id: 'clda27mam000408l7hznt28wp',
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
+      uniqueId: randUuid(),
+      denomination: 'USD',
+      provider: {
+        connect: {
+          id: stripeProvider.id,
+        },
+      },
+      metadata: {},
+    },
+  });
+
+  /**
+   * Give admin privilege to a real user (aka me)
+   */
+  const admin = await prisma.user.upsert({
+    where: { email: 'echai2905@gmail.com' },
+    update: {
+      role: 'Admin',
+    },
+    create: {
+      email: 'echai2905@gmail.com',
+      role: 'Admin',
+    },
+  });
+  console.log({ user, admin });
+
+  console.log(chalk.blue('\nSeeding Grants...'));
+  const emptyGrant = await prisma.grant.upsert({
     where: { id: 'cld1dnt1y000008m97yakhtrf' },
     update: {},
     create: {
       id: 'cld1dnt1y000008m97yakhtrf',
-      name: 'First Grant',
-      description: 'This is the first grant in SimpleGrants',
-      image: 'https://picsum.photos/200/300',
-      twitter: 'testing',
-      website: 'https://google.com',
-      location: 'Malaysia',
+      name: randCatchPhrase(),
+      description: randText(),
+      image: randImg(),
+      twitter: randUserName(),
+      website: randUrl(),
+      location: randCountry(),
       paymentAccount: {
-        create: {
-          recipientAddress: 'sample_stripe_id',
-          provider: {
-            connect: {
-              id: stripeProvider.id,
+        connectOrCreate: {
+          create: {
+            recipientAddress: 'sample_stripe_id',
+            provider: {
+              connect: {
+                id: stripeProvider.id,
+              },
+            },
+          },
+          where: {
+            recipientAddress_providerId: {
+              recipientAddress: 'sample_stripe_id',
+              providerId: stripeProvider.id,
             },
           },
         },
       },
-      fundingGoal: 10000,
+      team: {
+        connect: {
+          id: admin.id,
+        },
+      },
+      fundingGoal: randNumber({ min: 1000, max: 50000 }),
       verified: true,
     },
   });
 
-  const secondGrant = await prisma.grant.upsert({
+  const contributedGrant = await prisma.grant.upsert({
     where: { id: 'cld2ilh7t000008l3g1qe3nla' },
     update: {},
     create: {
       id: 'cld2ilh7t000008l3g1qe3nla',
-      name: 'Second Grant',
-      description: 'This is the second grant in SimpleGrants',
-      image: 'https://picsum.photos/200/300',
-      twitter: 'testing2',
-      website: 'https://google.com',
-      location: 'United States',
+      name: randCatchPhrase(),
+      description: randText(),
+      image: randImg(),
+      twitter: randUserName(),
+      website: randUrl(),
+      location: randCountry(),
       paymentAccount: {
-        create: {
-          recipientAddress: 'sample_stripe_id2',
-          provider: {
-            connect: {
-              id: stripeProvider.id,
+        connectOrCreate: {
+          create: {
+            recipientAddress: 'sample_stripe_id',
+            provider: {
+              connect: {
+                id: stripeProvider.id,
+              },
+            },
+          },
+          where: {
+            recipientAddress_providerId: {
+              recipientAddress: 'sample_stripe_id',
+              providerId: stripeProvider.id,
             },
           },
         },
       },
-      fundingGoal: 20000,
+      team: {
+        connect: [
+          {
+            id: user.id,
+          },
+          {
+            id: admin.id,
+          },
+        ],
+      },
+      contributions: {
+        createMany: {
+          data: [
+            {
+              userId: user.id,
+              amount: 1000,
+              denomination: 'USD',
+              amountUsd: 1000,
+              paymentMethodId: userPaymentMethod.id,
+              flagged: false,
+            },
+          ],
+        },
+      },
+      fundingGoal: randNumber({ min: 1000, max: 50000 }),
       verified: true,
     },
   });
-  console.log({ firstGrant, secondGrant });
+
+  const unverifiedGrant = await prisma.grant.upsert({
+    where: { id: 'clda3184o000008mg5bqobymn' },
+    update: {},
+    create: {
+      id: 'clda3184o000008mg5bqobymn',
+      name: randCatchPhrase(),
+      description: randText(),
+      image: randImg(),
+      twitter: randUserName(),
+      website: randUrl(),
+      location: randCountry(),
+      paymentAccount: {
+        connectOrCreate: {
+          create: {
+            recipientAddress: 'sample_stripe_id',
+            provider: {
+              connect: {
+                id: stripeProvider.id,
+              },
+            },
+          },
+          where: {
+            recipientAddress_providerId: {
+              recipientAddress: 'sample_stripe_id',
+              providerId: stripeProvider.id,
+            },
+          },
+        },
+      },
+      team: {
+        connect: {
+          id: user.id,
+        },
+      },
+      fundingGoal: randNumber({ min: 1000, max: 50000 }),
+      verified: false,
+    },
+  });
+  console.log({ emptyGrant, contributedGrant, unverifiedGrant });
 }
 main()
   .then(async () => {
