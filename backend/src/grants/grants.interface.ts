@@ -50,7 +50,7 @@ class Contribution {
   @ApiResponseProperty({
     type: String,
   })
-  paymentAccountId: string;
+  paymentMethodId: string;
 
   @ApiResponseProperty({
     type: String,
