@@ -83,7 +83,7 @@ model Grant {
   twitter          String
   website          String
   location         String
-  paymentAccountId String          @unique
+  paymentAccountId String
   paymentAccount   PaymentAccount  @relation(fields: [paymentAccountId], references: [id])
   matchingRounds   MatchingRound[]
   team             User[]
@@ -97,11 +97,10 @@ model Grant {
 
 model PaymentAccount {
   id               String          @id @default(cuid())
-  grant            Grant?
+  grant            Grant[]
   recipientAddress String
   providerId       String
   provider         PaymentProvider @relation(fields: [providerId], references: [id])
-  contribution     Contribution[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -109,17 +108,18 @@ model PaymentAccount {
 }
 
 model PaymentMethod {
-  id           String          @id @default(cuid())
-  userId       String
-  user         User            @relation(fields: [userId], references: [id])
-  uniqueId     String
-  displayInfo  String?
-  denomination String
-  providerId   String
-  provider     PaymentProvider @relation(fields: [providerId], references: [id])
-  metadata     Json
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id            String          @id @default(cuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id])
+  uniqueId      String
+  displayInfo   String?
+  denomination  String
+  providerId    String
+  provider      PaymentProvider @relation(fields: [providerId], references: [id])
+  contributions Contribution[]
+  metadata      Json
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model PaymentProvider {
@@ -138,21 +138,21 @@ model PaymentProvider {
 }
 
 model Contribution {
-  id               String         @id @default(cuid())
-  userId           String
-  user             User           @relation(fields: [userId], references: [id])
-  amount           Float
-  denomination     String
-  amountUsd        Float
-  paymentAccountId String
-  paymentMethod    PaymentAccount @relation(fields: [paymentAccountId], references: [id])
-  grantId          String?
-  grant            Grant?         @relation(fields: [grantId], references: [id])
-  matchingRoundId  String?
-  matchingRound    MatchingRound? @relation(fields: [matchingRoundId], references: [id])
-  flagged          Boolean
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  amount          Float
+  denomination    String
+  amountUsd       Float
+  paymentMethodId String
+  paymentMethod   PaymentMethod  @relation(fields: [paymentMethodId], references: [id])
+  grantId         String?
+  grant           Grant?         @relation(fields: [grantId], references: [id])
+  matchingRoundId String?
+  matchingRound   MatchingRound? @relation(fields: [matchingRoundId], references: [id])
+  flagged         Boolean
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model MatchingRound {
