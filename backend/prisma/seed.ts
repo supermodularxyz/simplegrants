@@ -73,15 +73,20 @@ async function main() {
   });
 
   /**
-   * Give admin privilege to a real user (aka me)
+   * Create admin strictly for testing
+   * This account can never be logged in due to the way NextAuth works.
    */
+  const adminData = randUser();
   const admin = await prisma.user.upsert({
-    where: { email: 'echai2905@gmail.com' },
-    update: {
-      role: 'Admin',
-    },
+    where: { id: 'clda4z7rt000308l88i3i6ajs' },
+    update: {},
     create: {
-      email: 'echai2905@gmail.com',
+      id: 'clda4z7rt000308l88i3i6ajs',
+      name: `${adminData.firstName} ${adminData.lastName}`,
+      email: adminData.email,
+      image: adminData.img,
+      bio: randQuote(),
+      twitter: adminData.username,
       role: 'Admin',
     },
   });
