@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { IsString } from 'class-validator';
+import { Contribution } from 'src/contributions/contributions.interface';
+import { GrantResponse } from 'src/grants/grants.interface';
 
 export interface User {
   id: string;
@@ -22,7 +24,7 @@ export interface RequestWithUser {
   user: User;
 }
 
-export class UserProfile {
+export class User {
   @ApiProperty({
     type: String,
   })
@@ -79,7 +81,24 @@ export class UserProfile {
   })
   updatedAt: Date;
 
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
+}
+
+export class UserProfile extends User {
+  @ApiProperty({
+    type: [Contribution],
+  })
+  contributions: Contribution[];
+
+  @ApiProperty({
+    type: [GrantResponse],
+  })
+  grants: GrantResponse[];
+
   constructor(partial: Partial<UserProfile>) {
+    super(partial);
     Object.assign(this, partial);
   }
 }
