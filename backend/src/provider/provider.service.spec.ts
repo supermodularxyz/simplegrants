@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProviderService } from './provider.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
 import * as cuid from 'cuid';
 import { PaymentProvider } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 describe('ProviderService', () => {
   let service: ProviderService;
+  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,6 +17,7 @@ describe('ProviderService', () => {
     }).compile();
 
     service = module.get<ProviderService>(ProviderService);
+    prisma = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
@@ -23,7 +26,7 @@ describe('ProviderService', () => {
 
   it('should return the default provider', async () => {
     // Creating a mock result
-    const result: PaymentProvider = {
+    const mockResult: PaymentProvider = {
       id: cuid(),
       name: 'Default Provider',
       type: 'CARD',
@@ -37,9 +40,11 @@ describe('ProviderService', () => {
     };
 
     jest
-      .spyOn(service, 'getProvider')
-      .mockImplementation(async () => await result);
+      .spyOn(prisma.paymentProvider, 'findFirst')
+      .mockResolvedValue(mockResult);
 
-    expect(await service.getProvider()).toBe(result);
+    const result = await service.getProvider();
+    expect(prisma.paymentProvider.findFirst).toHaveBeenCalled();
+    expect(result).toBe(mockResult);
   });
 });
