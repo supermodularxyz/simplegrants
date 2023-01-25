@@ -163,8 +163,7 @@ export class GrantsService {
     if (!grant.verified) {
       if (!user)
         throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
-      if (user.role !== Role.Admin && !this.checkGrantOwnership(grant, user))
-        throw new HttpException('Forbidden resource', HttpStatus.FORBIDDEN);
+      if (user.role !== Role.Admin) this.checkGrantOwnership(grant, user);
     }
 
     // Otherwise, we can return it

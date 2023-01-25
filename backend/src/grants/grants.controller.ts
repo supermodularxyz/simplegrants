@@ -73,7 +73,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Created a grant with the submitted data',
-    type: [GrantResponse],
+    type: GrantResponse,
   })
   @Post()
   @UseGuards(NextAuthGuard)
@@ -86,7 +86,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Grant verified state is set to `true`',
-    type: [GrantResponse],
+    type: GrantResponse,
   })
   @ApiUnauthorizedResponse({
     description: 'User is not an admin',
@@ -103,7 +103,7 @@ export class GrantsController {
   })
   @ApiOkResponse({
     description: 'Full details about the grant including team & contributions',
-    type: [GrantDetailResponse],
+    type: GrantDetailResponse,
   })
   @ApiUnauthorizedResponse({
     description: 'User has to be logged in to view an unverified grant',
@@ -132,7 +132,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Updated grant information',
-    type: [GrantResponse],
+    type: GrantResponse,
   })
   @ApiForbiddenResponse({
     description: 'User is a team member of this grant',
@@ -161,7 +161,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Updated grant information',
-    type: [GrantResponse],
+    type: GrantResponse,
   })
   @ApiForbiddenResponse({
     description: 'User is a team member of this grant',
