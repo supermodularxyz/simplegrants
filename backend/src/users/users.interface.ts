@@ -5,21 +5,6 @@ import { IsString } from 'class-validator';
 import { Contribution } from 'src/contributions/contributions.interface';
 import { GrantResponse } from 'src/grants/grants.interface';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified?: Date;
-  image: string;
-  bio?: string;
-  twitter?: string;
-  visitorId?: string;
-  role: Role;
-  flagged: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface RequestWithUser {
   user: User;
 }
@@ -42,8 +27,9 @@ export class User {
 
   @ApiProperty({
     type: Date,
+    nullable: true,
   })
-  emailVerified?: Date;
+  emailVerified: Date | null;
 
   @ApiProperty({
     type: String,
@@ -52,16 +38,18 @@ export class User {
 
   @ApiProperty({
     type: String,
+    nullable: true,
   })
-  bio?: string;
+  bio: string | null;
 
   @ApiProperty({
     type: String,
+    nullable: true,
   })
-  twitter?: string;
+  twitter: string | null;
 
   @Exclude()
-  visitorId?: string;
+  visitorId: string | null;
 
   @ApiProperty({
     enum: Role,
