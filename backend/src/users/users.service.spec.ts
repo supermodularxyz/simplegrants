@@ -69,7 +69,7 @@ describe('UsersService', () => {
   });
 
   describe('retrieveUserProfile', () => {
-    it('should retrieve a unique user by ID', async () => {
+    it('should call prisma appropriately', async () => {
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockResult);
       const result = await service.retrieveUserProfile(userId);
 
@@ -79,7 +79,7 @@ describe('UsersService', () => {
   });
 
   describe('updateUserProfile', () => {
-    it('should update a user by ID', async () => {
+    it('should call prisma appropriately', async () => {
       jest.spyOn(prisma.user, 'update').mockResolvedValue(mockResult);
       const result = await service.updateUserProfile(userId, {
         name: 'Testing name',

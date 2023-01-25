@@ -71,7 +71,7 @@ describe('UsersController', () => {
   });
 
   describe('retrieveUserProfile', () => {
-    it('should retrieve the user based on request', async () => {
+    it('should call the service function appropriately', async () => {
       jest
         .spyOn(service, 'retrieveUserProfile')
         .mockImplementation(async () => mockResult);
@@ -85,7 +85,7 @@ describe('UsersController', () => {
   });
 
   describe('updateProfile', () => {
-    it('should update the user based on request and body', async () => {
+    it('should call the service function appropriately', async () => {
       jest
         .spyOn(service, 'updateUserProfile')
         .mockImplementation(async () => mockResult);

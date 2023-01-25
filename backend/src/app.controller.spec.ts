@@ -15,8 +15,10 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "Status: OK" with the current timestamp', () => {
+      expect(appController.getHello()).toBe(
+        `Status: OK\nLast Report: [ ${new Date()} ]`,
+      );
     });
   });
 });
