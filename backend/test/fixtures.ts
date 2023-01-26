@@ -147,4 +147,9 @@ const providerService = {
   }),
 };
 
-export { users, grants, prismaService, providerService };
+const usersService = {
+  retrieveUserProfile: jest.fn().mockResolvedValue(users[0]),
+  updateUserProfile: jest.fn().mockResolvedValue(users[0]),
+};
+
+export { users, grants, prismaService, providerService, usersService };

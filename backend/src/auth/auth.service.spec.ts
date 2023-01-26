@@ -1,92 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { CacheModule, HttpException, HttpStatus } from '@nestjs/common';
-import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { randUser, randUuid, randQuote } from '@ngneat/falso';
 import { Role } from '@prisma/client';
-import * as cuid from 'cuid';
 import { UserProfile } from 'src/users/users.interface';
-
-// Creating a mock result
-const userData = randUser();
-const userId = cuid();
-const mockResult: UserProfile = {
-  id: userId,
-  name: `${userData.firstName} ${userData.lastName}`,
-  email: userData.email,
-  emailVerified: null,
-  visitorId: randUuid(),
-  role: Role.User,
-  flagged: false,
-  image: userData.img,
-  bio: randQuote(),
-  twitter: userData.username,
-  contributions: [
-    {
-      id: cuid(),
-      userId: cuid(),
-      grantId: cuid(),
-      matchingRoundId: null,
-      amount: 1000,
-      denomination: 'USD',
-      amountUsd: 1000,
-      paymentMethodId: cuid(),
-      flagged: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
-  grants: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { contributions, grants, ...userContext } = mockResult;
-
-const adminData = randUser();
-const adminId = cuid();
-const admin: UserProfile = {
-  id: adminId,
-  name: `${adminData.firstName} ${adminData.lastName}`,
-  email: adminData.email,
-  emailVerified: null,
-  visitorId: randUuid(),
-  role: Role.Admin,
-  flagged: false,
-  image: adminData.img,
-  bio: randQuote(),
-  twitter: adminData.username,
-  contributions: [],
-  grants: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { contributions: _c, grants: _g, ...adminContext } = admin;
+import { prismaService, users } from 'test/fixtures';
 
 describe('AuthService', () => {
   let service: AuthService;
   let prisma: PrismaService;
+  let user: UserProfile;
+  let admin: UserProfile;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        PrismaModule,
         CacheModule.register({
           isGlobal: true,
         }),
       ],
-      providers: [AuthService],
-      exports: [AuthService],
+      providers: [
+        {
+          provide: PrismaService,
+          useValue: prismaService,
+        },
+        AuthService,
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     prisma = module.get<PrismaService>(PrismaService);
-
-    jest.spyOn(prisma.user, 'update').mockResolvedValue(mockResult);
+    [user, admin] = users;
   });
 
   it('should be defined', () => {
@@ -94,17 +38,33 @@ describe('AuthService', () => {
   });
 
   describe('grantAdminPrivilege', () => {
-    it('should allow admin to call the function', async () => {
-      const result = await service.grantAdminPrivilege(adminId, adminContext);
+    afterEach(() => {
+      // Cleanup spies
+      jest.clearAllMocks();
+    });
 
-      expect(prisma.user.update).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+    it('should allow admin to call the function appropriately', async () => {
+      await service.grantAdminPrivilege(admin.id, admin);
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        data: {
+          role: Role.Admin,
+        },
+        where: {
+          id: admin.id,
+        },
+      });
+    });
+
+    it('should return the correct value', async () => {
+      // Change the function to return the admin value instead of user
+      jest.spyOn(service, 'grantAdminPrivilege').mockResolvedValue(admin);
+      const result = await service.grantAdminPrivilege(admin.id, admin);
+      expect(result).toEqual(admin);
     });
 
     it('should not allow user to call the function', async () => {
-      await expect(
-        service.grantAdminPrivilege(userId, userContext),
-      ).rejects.toEqual(
+      await expect(service.grantAdminPrivilege(user.id, user)).rejects.toEqual(
         new HttpException('Not enough permissions', HttpStatus.FORBIDDEN),
       );
       expect(prisma.user.update).not.toHaveBeenCalled();
@@ -112,17 +72,33 @@ describe('AuthService', () => {
   });
 
   describe('revokeAdminPrivilege', () => {
-    it('should allow admin to call the function', async () => {
-      const result = await service.revokeAdminPrivilege(adminId, adminContext);
+    afterEach(() => {
+      // Cleanup spies
+      jest.clearAllMocks();
+    });
 
-      expect(prisma.user.update).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+    it('should allow admin to call the function appropriately', async () => {
+      await service.revokeAdminPrivilege(admin.id, admin);
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        data: {
+          role: Role.User,
+        },
+        where: {
+          id: admin.id,
+        },
+      });
+    });
+
+    it('should return the correct value', async () => {
+      // Change the function to return the admin value instead of user
+      jest.spyOn(service, 'revokeAdminPrivilege').mockResolvedValue(admin);
+      const result = await service.revokeAdminPrivilege(admin.id, admin);
+      expect(result).toEqual(admin);
     });
 
     it('should not allow user to call the function', async () => {
-      await expect(
-        service.revokeAdminPrivilege(userId, userContext),
-      ).rejects.toEqual(
+      await expect(service.revokeAdminPrivilege(user.id, user)).rejects.toEqual(
         new HttpException('Not enough permissions', HttpStatus.FORBIDDEN),
       );
       expect(prisma.user.update).not.toHaveBeenCalled();

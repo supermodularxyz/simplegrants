@@ -1,69 +1,44 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { CacheModule } from '@nestjs/common';
-import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersService } from './users.service';
-import { randUser, randUuid, randQuote } from '@ngneat/falso';
-import { Role } from '@prisma/client';
-import * as cuid from 'cuid';
+import { prismaService, users, usersService } from 'test/fixtures';
 import { UserProfile } from './users.interface';
-
-// Creating a mock result
-const userData = randUser();
-const userId = cuid();
-const mockResult: UserProfile = {
-  id: userId,
-  name: `${userData.firstName} ${userData.lastName}`,
-  email: userData.email,
-  emailVerified: null,
-  visitorId: randUuid(),
-  role: Role.User,
-  flagged: false,
-  image: userData.img,
-  bio: randQuote(),
-  twitter: userData.username,
-  contributions: [
-    {
-      id: cuid(),
-      userId: cuid(),
-      grantId: cuid(),
-      matchingRoundId: null,
-      amount: 1000,
-      denomination: 'USD',
-      amountUsd: 1000,
-      paymentMethodId: cuid(),
-      flagged: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
-  grants: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { contributions, grants, ...userContext } = mockResult;
+import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
+  let user: UserProfile;
+  let userContext;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        PrismaModule,
         CacheModule.register({
           isGlobal: true,
         }),
       ],
       controllers: [UsersController],
-      providers: [UsersService],
-      exports: [UsersService],
+      providers: [
+        {
+          provide: PrismaService,
+          useValue: prismaService,
+        },
+        {
+          provide: UsersService,
+          useValue: usersService,
+        },
+      ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);
+    [user] = users;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { contributions, grants, ...context } = user;
+    userContext = context;
   });
 
   it('should be defined', () => {
@@ -72,36 +47,50 @@ describe('UsersController', () => {
 
   describe('retrieveUserProfile', () => {
     it('should call the service function appropriately', async () => {
-      jest
-        .spyOn(service, 'retrieveUserProfile')
-        .mockImplementation(async () => mockResult);
-      const result = await controller.getProfile({
+      await controller.getProfile({
         user: userContext,
       });
 
-      expect(service.retrieveUserProfile).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+      expect(service.retrieveUserProfile).toHaveBeenCalledWith(userContext.id);
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.getProfile({
+        user: userContext,
+      });
+      expect(result).toEqual(user);
     });
   });
 
   describe('updateProfile', () => {
+    const data = {
+      name: 'Testing name',
+      bio: 'New bio',
+      twitter: 'newtwitter',
+    };
+
     it('should call the service function appropriately', async () => {
-      jest
-        .spyOn(service, 'updateUserProfile')
-        .mockImplementation(async () => mockResult);
+      await controller.updateProfile(
+        {
+          user: userContext,
+        },
+        data,
+      );
+
+      expect(service.updateUserProfile).toHaveBeenCalledWith(
+        userContext.id,
+        data,
+      );
+    });
+
+    it('should return the correct value', async () => {
       const result = await controller.updateProfile(
         {
           user: userContext,
         },
-        {
-          name: 'Testing name',
-          bio: 'New bio',
-          twitter: 'newtwitter',
-        },
+        data,
       );
-
-      expect(service.updateUserProfile).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+      expect(result).toEqual(user);
     });
   });
 });

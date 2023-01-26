@@ -1,5 +1,4 @@
 import { Injectable, Logger, LoggerService } from '@nestjs/common';
-import { User } from '.prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto, UserProfile } from './users.interface';
 
