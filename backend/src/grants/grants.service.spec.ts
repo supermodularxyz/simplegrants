@@ -1,147 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { GrantsService } from './grants.service';
 import { CacheModule, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
-  ExtendedGrant,
+  CreateGrantDto,
   GrantFilterOptions,
   GrantSortOptions,
+  UpdateGrantDto,
 } from './grants.interface';
-import {
-  randText,
-  randImg,
-  randUserName,
-  randUrl,
-  randCountry,
-  randUuid,
-  randUser,
-  randQuote,
-} from '@ngneat/falso';
-import { Role } from '@prisma/client';
-import * as cuid from 'cuid';
 import { UserProfile } from 'src/users/users.interface';
 import { ProviderService } from 'src/provider/provider.service';
-
-const userData = randUser();
-const userId = cuid();
-const mockUser: UserProfile = {
-  id: userId,
-  name: `${userData.firstName} ${userData.lastName}`,
-  email: userData.email,
-  emailVerified: null,
-  visitorId: randUuid(),
-  role: Role.User,
-  flagged: false,
-  image: userData.img,
-  bio: randQuote(),
-  twitter: userData.username,
-  contributions: [
-    {
-      id: cuid(),
-      userId: cuid(),
-      grantId: cuid(),
-      matchingRoundId: null,
-      amount: 1000,
-      denomination: 'USD',
-      amountUsd: 1000,
-      paymentMethodId: cuid(),
-      flagged: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
-  grants: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const anotherMockUser = {
-  ...mockUser,
-  id: 'anotheruser',
-};
-
-const mockGrants: ExtendedGrant[] = [
-  {
-    id: 'cld1dnt1y000008m97yakhtrf',
-    name: 'test one',
-    description: randText(),
-    image: randImg(),
-    twitter: randUserName(),
-    website: randUrl(),
-    location: randCountry(),
-    paymentAccountId: randUuid(),
-    fundingGoal: 100,
-    contributions: [
-      {
-        id: randUuid(),
-        userId: randUuid(),
-        amount: 100,
-        denomination: 'USD',
-        amountUsd: 100,
-        grantId: 'cld1dnt1y000008m97yakhtrf',
-        matchingRoundId: null,
-        paymentMethodId: randUuid(),
-        flagged: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-    team: [mockUser],
-    verified: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: 'cld1dnt1y000008m97yakhtrj',
-    name: 'test two',
-    description: randText(),
-    image: randImg(),
-    twitter: randUserName(),
-    website: randUrl(),
-    location: randCountry(),
-    paymentAccountId: randUuid(),
-    fundingGoal: 100,
-    contributions: [
-      {
-        id: randUuid(),
-        userId: randUuid(),
-        amount: 50,
-        denomination: 'USD',
-        amountUsd: 50,
-        grantId: 'cld1dnt1y000008m97yakhtrj',
-        matchingRoundId: null,
-        paymentMethodId: randUuid(),
-        flagged: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-    team: [],
-    verified: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
-const unverifiedGrant: ExtendedGrant = {
-  id: 'cld1dnt1y000008m97yakhtrl',
-  name: 'test one',
-  description: randText(),
-  image: randImg(),
-  twitter: randUserName(),
-  website: randUrl(),
-  location: randCountry(),
-  paymentAccountId: randUuid(),
-  fundingGoal: 100,
-  contributions: [],
-  team: [anotherMockUser],
-  verified: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { contributions, grants, ...userContext } = mockUser;
+import { grants, prismaService, providerService, users } from 'test/fixtures';
+import * as _ from 'lodash';
 
 const grantQuery = {
   sort: GrantSortOptions.NEWEST,
@@ -149,24 +20,14 @@ const grantQuery = {
   search: 'test',
 };
 
-const prismaService = {
-  grant: {
-    findMany: jest.fn().mockResolvedValue(mockGrants),
-    findUnique: jest.fn().mockResolvedValue(mockGrants[0]),
-    create: jest.fn().mockResolvedValue(mockGrants[0]),
-    update: jest.fn().mockResolvedValue(mockGrants[0]),
-  },
-};
-
-const providerService = {
-  getProvider: jest.fn().mockResolvedValue({
-    id: '1',
-  }),
-};
-
 describe('GrantsService', () => {
   let service: GrantsService;
   let prisma: PrismaService;
+  let userA: UserProfile;
+  let admin: UserProfile;
+  let userB: UserProfile;
+  let createGrant: CreateGrantDto;
+  let updateGrant: UpdateGrantDto;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -190,6 +51,28 @@ describe('GrantsService', () => {
 
     service = module.get<GrantsService>(GrantsService);
     prisma = module.get<PrismaService>(PrismaService);
+
+    // Prep parameter data
+    const [grant] = grants;
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      contributions,
+      team,
+      verified,
+      ...createGrantBody
+    } = grant;
+
+    createGrant = {
+      ...createGrantBody,
+      paymentAccount: createGrantBody.paymentAccountId,
+    };
+
+    const { fundingGoal, paymentAccount, ...updateGrantBody } = createGrant;
+    updateGrant = updateGrantBody;
+
+    [userA, admin, userB] = users;
   });
 
   it('should be defined', () => {
@@ -198,14 +81,12 @@ describe('GrantsService', () => {
 
   describe('checkGrantOwnership', () => {
     it('should show that user is team member of grant', () => {
-      expect(service.checkGrantOwnership(mockGrants[0], mockUser)).toEqual(
-        true,
-      );
+      expect(service.checkGrantOwnership(grants[0], userA)).toEqual(true);
     });
 
     it('should throw error as user is not team member of grant', async () => {
       await expect(async () =>
-        service.checkGrantOwnership(mockGrants[1], mockUser),
+        service.checkGrantOwnership(grants[1], userB),
       ).rejects.toEqual(
         new HttpException('No edit rights', HttpStatus.FORBIDDEN),
       );
@@ -245,6 +126,11 @@ describe('GrantsService', () => {
   });
 
   describe('getAllGrants', () => {
+    afterEach(() => {
+      // Cleanup spies
+      jest.clearAllMocks();
+    });
+
     it('should call prisma with the correct parameters', async () => {
       await service.getAllGrants({
         ...grantQuery,
@@ -276,7 +162,7 @@ describe('GrantsService', () => {
         search: '',
         isVerified: true,
       });
-      expect(result).toEqual(mockGrants);
+      expect(result).toEqual(grants);
     });
 
     it('should filter the grants by funded', async () => {
@@ -284,7 +170,7 @@ describe('GrantsService', () => {
         ...grantQuery,
         isVerified: true,
       });
-      expect(result).toEqual([mockGrants[0]]);
+      expect(result).toEqual([grants[0]]);
     });
 
     it('should filter the grants by underfunded', async () => {
@@ -293,7 +179,7 @@ describe('GrantsService', () => {
         filter: GrantFilterOptions.UNDERFUNDED,
         isVerified: true,
       });
-      expect(result).toEqual([mockGrants[1]]);
+      expect(result).toEqual([grants[1], grants[2]]);
     });
 
     it('should sort the grants by most funded', async () => {
@@ -302,30 +188,38 @@ describe('GrantsService', () => {
         filter: '',
         isVerified: true,
       });
-      expect(result).toEqual(mockGrants);
+      expect(result).toEqual(grants);
     });
   });
 
   describe('getGrantById', () => {
     it('should call all functions appropriately', async () => {
-      const result = await service.getGrantById('cld1dnt1y000008m97yakhtrf');
+      const result = await service.getGrantById(grants[0].id);
 
       expect(prisma.grant.findUnique).toBeCalled();
-      expect(result).toEqual(mockGrants[0]);
+      expect(result).toEqual(grants[0]);
     });
   });
 
   describe('getGrant', () => {
+    beforeEach(() => {
+      jest.spyOn(service, 'getGrantById').mockResolvedValue(grants[2]);
+    });
+
+    afterEach(() => {
+      // Cleanup spies
+      jest.clearAllMocks();
+    });
+
     it('should call all functions appropriately', async () => {
-      jest.spyOn(service, 'getGrantById').mockResolvedValue(mockGrants[0]);
+      jest.spyOn(service, 'getGrantById').mockResolvedValue(grants[0]);
 
       const result = await service.getGrant('cld1dnt1y000008m97yakhtrf', {
-        ...userContext,
+        ...userA,
       });
 
       expect(service.getGrantById).toBeCalled();
-      expect(prisma.grant.findUnique).toBeCalled();
-      expect(result).toEqual(mockGrants[0]);
+      expect(result).toEqual(grants[0]);
     });
 
     it('should handle NOT_FOUND appropriately', async () => {
@@ -333,126 +227,77 @@ describe('GrantsService', () => {
 
       await expect(
         service.getGrant('random', {
-          ...userContext,
+          ...userA,
         }),
       ).rejects.toEqual(
         new HttpException('Grant not found', HttpStatus.NOT_FOUND),
       );
       expect(service.getGrantById).toBeCalled();
-      expect(prisma.grant.findUnique).toBeCalled();
     });
 
     it('should handle unauthorized access for unverified grant with basic user', async () => {
-      jest.spyOn(service, 'getGrantById').mockResolvedValue(unverifiedGrant);
-
       await expect(service.getGrant('random', undefined)).rejects.toEqual(
         new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED),
       );
       expect(service.getGrantById).toBeCalled();
-      expect(prisma.grant.findUnique).toBeCalled();
     });
 
     it('should handle forbidden access for unverified grant with basic user', async () => {
-      jest.spyOn(service, 'getGrantById').mockResolvedValue(unverifiedGrant);
-
       await expect(
         service.getGrant('random', {
-          ...userContext,
+          ...userA,
         }),
       ).rejects.toEqual(
         new HttpException('No edit rights', HttpStatus.FORBIDDEN),
       );
       expect(service.getGrantById).toBeCalled();
-      expect(prisma.grant.findUnique).toBeCalled();
     });
 
     it('should allow admin to view an unverified grant', async () => {
-      jest.spyOn(service, 'getGrantById').mockResolvedValue(unverifiedGrant);
-
       expect(
         await service.getGrant('random', {
-          ...userContext,
-          role: Role.Admin,
+          ...admin,
         }),
-      ).toEqual(unverifiedGrant);
+      ).toEqual(grants[2]);
       expect(service.getGrantById).toBeCalled();
-      expect(prisma.grant.findUnique).toBeCalled();
     });
 
     it('should allow team member to view their own unverified grant', async () => {
-      jest.spyOn(service, 'getGrantById').mockResolvedValue(unverifiedGrant);
-
       expect(
         await service.getGrant('random', {
-          ...userContext,
-          id: 'anotheruser',
+          ...userB,
         }),
-      ).toEqual(unverifiedGrant);
+      ).toEqual(grants[2]);
       expect(service.getGrantById).toBeCalled();
-      expect(prisma.grant.findUnique).toBeCalled();
     });
   });
 
   describe('createGrant', () => {
     it('should return the expected value', async () => {
       expect(
-        await service.createGrant(
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-            paymentAccount: randUuid(),
-            fundingGoal: 100,
-          },
-          {
-            ...userContext,
-          },
-        ),
-      ).toEqual(mockGrants[0]);
+        await service.createGrant(createGrant, {
+          ...userA,
+        }),
+      ).toEqual(grants[0]);
     });
   });
 
   describe('updateGrant', () => {
     it('should return the expected value', async () => {
       expect(
-        await service.updateGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-          },
-          {
-            ...userContext,
-          },
-        ),
-      ).toEqual(mockGrants[0]);
+        await service.updateGrant('id', createGrant, {
+          ...userA,
+        }),
+      ).toEqual(grants[0]);
     });
 
     it("should throw error if grant doesn't exist", async () => {
       jest.spyOn(service, 'getGrantById').mockResolvedValue(null);
 
       await expect(
-        service.updateGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-          },
-          {
-            ...userContext,
-          },
-        ),
+        service.updateGrant('id', updateGrant, {
+          ...userA,
+        }),
       ).rejects.toThrow(
         new HttpException('Grant not found', HttpStatus.NOT_FOUND),
       );
@@ -460,21 +305,10 @@ describe('GrantsService', () => {
 
     it('should not allow non team member to edit grant', async () => {
       await expect(
-        service.updateGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-          },
-          {
-            ...userContext,
-            id: 'randomuser',
-          },
-        ),
+        service.updateGrant('1', updateGrant, {
+          ...userA,
+          id: 'randomuser',
+        }),
       ).rejects.toThrow(
         new HttpException('No edit rights', HttpStatus.FORBIDDEN),
       );
@@ -482,52 +316,31 @@ describe('GrantsService', () => {
   });
 
   describe('resubmitGrant', () => {
+    afterEach(() => {
+      // Cleanup spies
+      jest.clearAllMocks();
+    });
+
     it('should return the expected value', async () => {
       jest.spyOn(service, 'getGrantById').mockResolvedValue({
-        ...mockGrants[0],
+        ...grants[0],
         verified: false,
       });
 
       expect(
-        await service.resubmitGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-            paymentAccount: randUuid(),
-            fundingGoal: 100,
-          },
-          {
-            ...userContext,
-          },
-        ),
-      ).toEqual(mockGrants[0]);
+        await service.resubmitGrant('1', createGrant, {
+          ...userA,
+        }),
+      ).toEqual(grants[0]);
     });
 
     it("should throw error if grant doesn't exist", async () => {
       jest.spyOn(service, 'getGrantById').mockResolvedValue(null);
 
       await expect(
-        service.resubmitGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-            paymentAccount: randUuid(),
-            fundingGoal: 100,
-          },
-          {
-            ...userContext,
-          },
-        ),
+        service.resubmitGrant('1', createGrant, {
+          ...userA,
+        }),
       ).rejects.toThrow(
         new HttpException(
           'Grant cannot be resubmitted',
@@ -538,22 +351,9 @@ describe('GrantsService', () => {
 
     it("should throw error if grant doesn't exist", async () => {
       await expect(
-        service.resubmitGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-            paymentAccount: randUuid(),
-            fundingGoal: 100,
-          },
-          {
-            ...userContext,
-          },
-        ),
+        service.resubmitGrant('1', createGrant, {
+          ...userA,
+        }),
       ).rejects.toThrow(
         new HttpException(
           'Grant cannot be resubmitted',
@@ -564,28 +364,15 @@ describe('GrantsService', () => {
 
     it('should not allow non team member to resubmit grant', async () => {
       jest.spyOn(service, 'getGrantById').mockResolvedValue({
-        ...mockGrants[0],
+        ...grants[0],
         verified: false,
       });
 
       await expect(
-        service.resubmitGrant(
-          '1',
-          {
-            name: 'test one',
-            description: randText(),
-            image: randImg(),
-            twitter: randUserName(),
-            website: randUrl(),
-            location: randCountry(),
-            paymentAccount: randUuid(),
-            fundingGoal: 100,
-          },
-          {
-            ...userContext,
-            id: 'randomuser',
-          },
-        ),
+        service.resubmitGrant('1', createGrant, {
+          ...userA,
+          id: 'randomuser',
+        }),
       ).rejects.toThrow(
         new HttpException('No edit rights', HttpStatus.FORBIDDEN),
       );
@@ -596,7 +383,7 @@ describe('GrantsService', () => {
     it('should allow not allow basic user to review', async () => {
       await expect(
         service.reviewGrant('1', {
-          ...userContext,
+          ...userA,
         }),
       ).rejects.toThrow(
         new HttpException('Unauthorized Access', HttpStatus.UNAUTHORIZED),
@@ -606,10 +393,9 @@ describe('GrantsService', () => {
     it('should allow admin to review', async () => {
       expect(
         await service.reviewGrant('1', {
-          ...userContext,
-          role: Role.Admin,
+          ...admin,
         }),
-      ).toEqual(mockGrants[0]);
+      ).toEqual(grants[0]);
     });
   });
 });

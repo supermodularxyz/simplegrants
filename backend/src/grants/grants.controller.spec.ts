@@ -1,110 +1,50 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Test, TestingModule } from '@nestjs/testing';
 import { GrantsController } from './grants.controller';
 import { CacheModule } from '@nestjs/common';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { ProviderModule } from 'src/provider/provider.module';
 import { GrantsService } from './grants.service';
-import { GrantDetailResponse, GrantResponse } from './grants.interface';
 import {
-  randCatchPhrase,
-  randText,
-  randImg,
-  randUserName,
-  randUrl,
-  randCountry,
-  randNumber,
-  randUuid,
-  randQuote,
-  randUser,
-} from '@ngneat/falso';
-import { Role } from '@prisma/client';
-import * as cuid from 'cuid';
+  CreateGrantDto,
+  GrantFilterOptions,
+  UpdateGrantDto,
+} from './grants.interface';
 import { UserProfile } from 'src/users/users.interface';
-
-// Mock result
-const mockResult: GrantResponse = {
-  id: 'cld1dnt1y000008m97yakhtrf',
-  name: randCatchPhrase(),
-  description: randText(),
-  image: randImg(),
-  twitter: randUserName(),
-  website: randUrl(),
-  location: randCountry(),
-  paymentAccountId: randUuid(),
-  fundingGoal: randNumber({ min: 1000, max: 50000 }),
-  verified: true,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const extendedMockResult: GrantDetailResponse = {
-  ...mockResult,
-  contributions: [],
-  team: [],
-};
-
-const userData = randUser();
-const userId = cuid();
-const mockUser: UserProfile = {
-  id: userId,
-  name: `${userData.firstName} ${userData.lastName}`,
-  email: userData.email,
-  emailVerified: null,
-  visitorId: randUuid(),
-  role: Role.User,
-  flagged: false,
-  image: userData.img,
-  bio: randQuote(),
-  twitter: userData.username,
-  contributions: [
-    {
-      id: cuid(),
-      userId: cuid(),
-      grantId: cuid(),
-      matchingRoundId: null,
-      amount: 1000,
-      denomination: 'USD',
-      amountUsd: 1000,
-      paymentMethodId: cuid(),
-      flagged: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ],
-  grants: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { contributions, grants, ...userContext } = mockUser;
-
-const serviceImplementation = {
-  getAllGrants: jest.fn().mockImplementation(() => [mockResult]),
-  createGrant: jest.fn().mockImplementation(() => mockResult),
-  reviewGrant: jest.fn().mockImplementation(() => mockResult),
-  getGrant: jest.fn().mockImplementation(() => extendedMockResult),
-  updateGrant: jest.fn().mockImplementation(() => mockResult),
-  resubmitGrant: jest.fn().mockImplementation(() => mockResult),
-};
+import {
+  grants,
+  grantsService,
+  prismaService,
+  providerService,
+  users,
+} from 'test/fixtures';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ProviderService } from 'src/provider/provider.service';
 
 describe('GrantsController', () => {
   let controller: GrantsController;
   let service: GrantsService;
+  let user: UserProfile;
+  let createGrant: CreateGrantDto;
+  let updateGrant: UpdateGrantDto;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        PrismaModule,
-        ProviderModule,
         CacheModule.register({
           isGlobal: true,
         }),
       ],
       providers: [
         {
+          provide: PrismaService,
+          useValue: prismaService,
+        },
+        {
           provide: GrantsService,
-          useValue: serviceImplementation,
+          useValue: grantsService,
+        },
+        {
+          provide: ProviderService,
+          useValue: providerService,
         },
       ],
       controllers: [GrantsController],
@@ -112,6 +52,28 @@ describe('GrantsController', () => {
 
     controller = module.get<GrantsController>(GrantsController);
     service = module.get<GrantsService>(GrantsService);
+
+    // Prep parameter data
+    const [grant] = grants;
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      contributions,
+      team,
+      verified,
+      ...createGrantBody
+    } = grant;
+
+    createGrant = {
+      ...createGrantBody,
+      paymentAccount: createGrantBody.paymentAccountId,
+    };
+
+    const { fundingGoal, paymentAccount, ...updateGrantBody } = createGrant;
+    updateGrant = updateGrantBody;
+
+    [user] = users;
   });
 
   it('should be defined', () => {
@@ -119,106 +81,123 @@ describe('GrantsController', () => {
   });
 
   describe('getAllGrants', () => {
-    it('should call the service function appropriately', async () => {
-      const result = await controller.getAllGrants({
-        sort: '',
-        filter: '',
-        search: '',
-      });
+    const queries = {
+      sort: '',
+      filter: GrantFilterOptions.FUNDED,
+      search: '',
+    };
 
-      expect(service.getAllGrants).toHaveBeenCalled();
-      expect(result).toEqual([mockResult]);
+    it('should call the service function appropriately', async () => {
+      await controller.getAllGrants(queries);
+
+      expect(service.getAllGrants).toHaveBeenCalledWith({
+        ...queries,
+        isVerified: true,
+      });
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.getAllGrants(queries);
+
+      expect(result).toEqual(grants);
     });
   });
 
   describe('createGrant', () => {
     it('should call the service function appropriately', async () => {
-      const result = await controller.createGrant(
-        {
-          name: randCatchPhrase(),
-          description: randText(),
-          image: randImg(),
-          twitter: randUserName(),
-          website: randUrl(),
-          location: randCountry(),
-          paymentAccount: randUuid(),
-          fundingGoal: randNumber({ min: 1000, max: 50000 }),
-        },
-        {
-          user: userContext,
-        },
-      );
+      await controller.createGrant(createGrant, {
+        user,
+      });
 
-      expect(service.createGrant).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+      expect(service.createGrant).toHaveBeenCalledWith(createGrant, user);
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.createGrant(createGrant, {
+        user,
+      });
+
+      expect(result).toEqual(grants[0]);
     });
   });
 
   describe('reviewGrant', () => {
     it('should call the service function appropriately', async () => {
-      const result = await controller.reviewGrant('grantId', {
-        user: userContext,
+      await controller.reviewGrant(grants[0].id, {
+        user,
       });
 
-      expect(service.reviewGrant).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+      expect(service.reviewGrant).toHaveBeenCalledWith(grants[0].id, user);
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.reviewGrant(grants[0].id, {
+        user,
+      });
+
+      expect(result).toEqual(grants[0]);
     });
   });
 
   describe('getGrant', () => {
     it('should call the service function appropriately', async () => {
-      const result = await controller.getGrant('grant ID', {
-        user: userContext,
+      await controller.getGrant(grants[0].id, {
+        user,
       });
 
-      expect(service.getGrant).toHaveBeenCalled();
-      expect(result).toEqual(extendedMockResult);
+      expect(service.getGrant).toHaveBeenCalledWith(grants[0].id, user);
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.getGrant(grants[0].id, {
+        user,
+      });
+
+      expect(result).toEqual(grants[0]);
     });
   });
 
   describe('updateGrant', () => {
     it('should call the service function appropriately', async () => {
-      const result = await controller.updateGrant(
-        'grant ID',
-        {
-          name: randCatchPhrase(),
-          description: randText(),
-          image: randImg(),
-          twitter: randUserName(),
-          website: randUrl(),
-          location: randCountry(),
-        },
-        {
-          user: userContext,
-        },
-      );
+      await controller.updateGrant(grants[0].id, updateGrant, {
+        user,
+      });
 
-      expect(service.updateGrant).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+      expect(service.updateGrant).toHaveBeenCalledWith(
+        grants[0].id,
+        updateGrant,
+        user,
+      );
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.updateGrant(grants[0].id, updateGrant, {
+        user,
+      });
+
+      expect(result).toEqual(grants[0]);
     });
   });
 
   describe('resubmitGrant', () => {
     it('should call the service function appropriately', async () => {
-      const result = await controller.resubmitGrant(
-        'grant ID',
-        {
-          name: randCatchPhrase(),
-          description: randText(),
-          image: randImg(),
-          twitter: randUserName(),
-          website: randUrl(),
-          location: randCountry(),
-          paymentAccount: randUuid(),
-          fundingGoal: randNumber({ min: 1000, max: 50000 }),
-        },
-        {
-          user: userContext,
-        },
-      );
+      await controller.resubmitGrant(grants[0].id, createGrant, {
+        user,
+      });
 
-      expect(service.resubmitGrant).toHaveBeenCalled();
-      expect(result).toEqual(mockResult);
+      expect(service.resubmitGrant).toHaveBeenCalledWith(
+        grants[0].id,
+        createGrant,
+        user,
+      );
+    });
+
+    it('should return the correct value', async () => {
+      const result = await controller.resubmitGrant(grants[0].id, createGrant, {
+        user,
+      });
+
+      expect(result).toEqual(grants[0]);
     });
   });
 });

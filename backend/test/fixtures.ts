@@ -23,7 +23,7 @@ const users: UserProfile[] = [...Array(3)].map((_, index) => {
     email: userData.email,
     emailVerified: null,
     visitorId: randUuid(),
-    role: index % 2 === 0 ? Role.Admin : Role.User, // Every odd user is an admin
+    role: index % 2 === 0 ? Role.User : Role.Admin, // Every odd user is an admin
     flagged: false,
     image: userData.img,
     bio: randQuote(),
@@ -152,4 +152,26 @@ const usersService = {
   updateUserProfile: jest.fn().mockResolvedValue(users[0]),
 };
 
-export { users, grants, prismaService, providerService, usersService };
+const authService = {
+  grantAdminPrivilege: jest.fn().mockResolvedValue(users[0]),
+  revokeAdminPrivilege: jest.fn().mockResolvedValue(users[0]),
+};
+
+const grantsService = {
+  getAllGrants: jest.fn().mockImplementation(() => grants),
+  createGrant: jest.fn().mockImplementation(() => grants[0]),
+  reviewGrant: jest.fn().mockImplementation(() => grants[0]),
+  getGrant: jest.fn().mockImplementation(() => grants[0]),
+  updateGrant: jest.fn().mockImplementation(() => grants[0]),
+  resubmitGrant: jest.fn().mockImplementation(() => grants[0]),
+};
+
+export {
+  users,
+  grants,
+  prismaService,
+  providerService,
+  usersService,
+  authService,
+  grantsService,
+};

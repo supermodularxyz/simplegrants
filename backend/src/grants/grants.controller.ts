@@ -63,11 +63,6 @@ export class GrantsController {
     });
   }
 
-  /**
-   * TODO:
-   * Search grants
-   */
-
   @ApiOperation({
     description: 'Create a grant',
   })
