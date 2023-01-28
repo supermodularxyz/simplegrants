@@ -44,14 +44,14 @@ describe('AuthService', () => {
     });
 
     it('should allow admin to call the function appropriately', async () => {
-      await service.grantAdminPrivilege(admin.id, admin);
+      await service.grantAdminPrivilege(admin.email, admin);
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         data: {
           role: Role.Admin,
         },
         where: {
-          id: admin.id,
+          email: admin.email,
         },
       });
     });
@@ -59,12 +59,14 @@ describe('AuthService', () => {
     it('should return the correct value', async () => {
       // Change the function to return the admin value instead of user
       jest.spyOn(service, 'grantAdminPrivilege').mockResolvedValue(admin);
-      const result = await service.grantAdminPrivilege(admin.id, admin);
+      const result = await service.grantAdminPrivilege(admin.email, admin);
       expect(result).toEqual(admin);
     });
 
     it('should not allow user to call the function', async () => {
-      await expect(service.grantAdminPrivilege(user.id, user)).rejects.toEqual(
+      await expect(
+        service.grantAdminPrivilege(user.email, user),
+      ).rejects.toEqual(
         new HttpException('Not enough permissions', HttpStatus.FORBIDDEN),
       );
       expect(prisma.user.update).not.toHaveBeenCalled();
@@ -78,14 +80,14 @@ describe('AuthService', () => {
     });
 
     it('should allow admin to call the function appropriately', async () => {
-      await service.revokeAdminPrivilege(admin.id, admin);
+      await service.revokeAdminPrivilege(admin.email, admin);
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         data: {
           role: Role.User,
         },
         where: {
-          id: admin.id,
+          email: admin.email,
         },
       });
     });
@@ -93,12 +95,14 @@ describe('AuthService', () => {
     it('should return the correct value', async () => {
       // Change the function to return the admin value instead of user
       jest.spyOn(service, 'revokeAdminPrivilege').mockResolvedValue(admin);
-      const result = await service.revokeAdminPrivilege(admin.id, admin);
+      const result = await service.revokeAdminPrivilege(admin.email, admin);
       expect(result).toEqual(admin);
     });
 
     it('should not allow user to call the function', async () => {
-      await expect(service.revokeAdminPrivilege(user.id, user)).rejects.toEqual(
+      await expect(
+        service.revokeAdminPrivilege(user.email, user),
+      ).rejects.toEqual(
         new HttpException('Not enough permissions', HttpStatus.FORBIDDEN),
       );
       expect(prisma.user.update).not.toHaveBeenCalled();

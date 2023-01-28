@@ -44,20 +44,23 @@ describe('AuthController', () => {
     it('should call the service function appropriately', async () => {
       await controller.grantAdminPrivilege(
         {
-          id: user.id,
+          email: user.email,
         },
         {
           user,
         },
       );
 
-      expect(service.grantAdminPrivilege).toHaveBeenCalledWith(user.id, user);
+      expect(service.grantAdminPrivilege).toHaveBeenCalledWith(
+        user.email,
+        user,
+      );
     });
 
     it('should return the correct value', async () => {
       const result = await controller.grantAdminPrivilege(
         {
-          id: user.id,
+          email: user.email,
         },
         {
           user,
@@ -72,20 +75,23 @@ describe('AuthController', () => {
     it('should call the service function appropriately', async () => {
       await controller.revokeAdminPrivilege(
         {
-          id: user.id,
+          email: user.email,
         },
         {
           user,
         },
       );
 
-      expect(service.revokeAdminPrivilege).toHaveBeenCalledWith(user.id, user);
+      expect(service.revokeAdminPrivilege).toHaveBeenCalledWith(
+        user.email,
+        user,
+      );
     });
 
     it('should return the correct value', async () => {
       const result = await controller.grantAdminPrivilege(
         {
-          id: user.id,
+          email: user.email,
         },
         {
           user,
