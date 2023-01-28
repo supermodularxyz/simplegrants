@@ -35,14 +35,45 @@ $ npm run docker:up
 
 ## Test ✅
 
+Testing is an essential part of software development, and this project includes several types of tests to ensure that the application is working as expected.
+
+### Unit Tests
+
+Unit tests are used to test the individual components and functions of the application. These tests are focused on the implementation details of the code and ensure that the code is working as expected.
+
+To run unit tests, use the following command:
+
 ```bash
-# unit tests
 $ npm run test
+```
 
-# e2e tests
+### Integration Tests
+
+Integration tests are used to test how different components and functions of the application work together. These tests ensure that the application is working as expected when all the different parts are put together.
+
+To run integration tests, use the following command:
+
+```bash
+$ npm run test:integration
+```
+
+### End-to-End (E2E) Tests
+
+E2E tests are used to test the application as a whole, simulating how a user would interact with the application. These tests ensure that the application is working as expected from the user's perspective.
+
+To run e2e tests, use the following command:
+
+```bash
 $ npm run test:e2e
+```
 
-# test coverage
+### Test Coverage
+
+Test coverage is a measure of how much of the code is being tested. It helps to identify areas of the code that are not being tested and need more coverage.
+
+To check test coverage, use the following command:
+
+```bash
 $ npm run test:cov
 ```
 
