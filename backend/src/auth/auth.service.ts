@@ -8,11 +8,11 @@ export class AuthService {
 
   /**
    * Grant admin privilege for a user
-   * @param id ID of the user to escalate
+   * @param email ID of the user to escalate
    * @param user User calling this function
    * @returns
    */
-  async grantAdminPrivilege(id: string, user: User) {
+  async grantAdminPrivilege(email: string, user: User) {
     // Just do another check to ensure only an admin can call this
     if (user.role !== Role.Admin)
       throw new HttpException('Not enough permissions', HttpStatus.FORBIDDEN);
@@ -22,18 +22,18 @@ export class AuthService {
         role: Role.Admin,
       },
       where: {
-        id,
+        email,
       },
     });
   }
 
   /**
    * Revoke admin privilege for a user
-   * @param id ID of the user to revoke
+   * @param email ID of the user to revoke
    * @param user User calling this function
    * @returns
    */
-  async revokeAdminPrivilege(id: string, user: User) {
+  async revokeAdminPrivilege(email: string, user: User) {
     // Just do another check to ensure only an admin can call this
     if (user.role !== Role.Admin)
       throw new HttpException('Not enough permissions', HttpStatus.FORBIDDEN);
@@ -43,7 +43,7 @@ export class AuthService {
         role: Role.User,
       },
       where: {
-        id,
+        email,
       },
     });
   }

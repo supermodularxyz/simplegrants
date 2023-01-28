@@ -31,7 +31,7 @@ export class AuthController {
   @Roles(Role.Admin)
   @UseGuards(NextAuthGuard)
   async grantAdminPrivilege(@Body() body: AdminPrivilegeDto, @Request() req) {
-    return this.authService.grantAdminPrivilege(body.id, req.user);
+    return this.authService.grantAdminPrivilege(body.email, req.user);
   }
 
   @ApiOperation({
@@ -49,6 +49,6 @@ export class AuthController {
   @Roles(Role.Admin)
   @UseGuards(NextAuthGuard)
   async revokeAdminPrivilege(@Body() body: AdminPrivilegeDto, @Request() req) {
-    return this.authService.revokeAdminPrivilege(body.id, req.user);
+    return this.authService.revokeAdminPrivilege(body.email, req.user);
   }
 }

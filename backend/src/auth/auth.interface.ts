@@ -6,5 +6,5 @@ export class AdminPrivilegeDto {
     type: String,
   })
   @IsString()
-  id: string;
+  email: string;
 }
