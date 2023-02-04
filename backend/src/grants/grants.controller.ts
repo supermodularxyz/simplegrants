@@ -23,6 +23,7 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import {
+  CheckoutGrantsDto,
   CreateGrantDto,
   GetGrantQueryDto,
   GrantDetailResponse,
@@ -173,5 +174,11 @@ export class GrantsController {
     @Request() req,
   ) {
     return await this.grantsService.resubmitGrant(id, body, req.user);
+  }
+
+  @Post('checkout')
+  @UseGuards(NextAuthGuard)
+  async checkoutGrants(@Body() body: CheckoutGrantsDto, @Request() req) {
+    return await this.grantsService.checkoutGrants(body.grants, req.user);
   }
 }

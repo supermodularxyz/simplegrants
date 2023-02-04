@@ -2,9 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Grant, Prisma, Role, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
+  CheckoutGrantsDto,
   CreateGrantDto,
   ExtendedGrant,
   GetGrantDto,
+  GrantCheckout,
   GrantFilterOptions,
   GrantSortOptions,
   UpdateGrantDto,
@@ -313,5 +315,48 @@ export class GrantsService {
         id,
       },
     });
+  }
+
+  /**
+   * Retrieve the grants that the user wants to checkout
+   * @param grants The grants to checkout
+   * @param user User making the purchase
+   */
+  async checkoutGrants(grants: GrantCheckout[], user: User) {
+    /**
+     * What we should do is to actually create a payment intent for each grant.
+     * In order to do that, we need to go through each grant and receive their payment info
+     */
+    const ids = grants.map((grant) => grant.id);
+    const data = await this.prisma.grant.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      include: {
+        paymentAccount: true,
+      },
+    });
+
+    // Creating a lookup table to reduce time complexity of the grants merging to O(n)
+    const amountLookup = grants.reduce((acc, grant) => {
+      acc[grant.id] = grant.amount;
+      return acc;
+    }, {});
+
+    // Here it is only O(n) rather than O(n^2) if we have a nested loop
+    const grantWithFunding = data.map((grant) => {
+      return {
+        ...grant,
+        amount: amountLookup[grant.id] || 0,
+      };
+    });
+
+    // Pass to the payment provider to create a payment session
+    return await this.providerService.createPaymentSession(
+      grantWithFunding,
+      user,
+    );
   }
 }

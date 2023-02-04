@@ -1,5 +1,5 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-import { Grant } from '@prisma/client';
+import { Grant, PaymentAccount } from '@prisma/client';
 import {
   IsEnum,
   IsOptional,
@@ -179,3 +179,29 @@ export type ExtendedGrant = Grant & {
   contributions: Contribution[];
   team: User[];
 };
+
+export class GrantCheckout {
+  id: string;
+  amount: number;
+}
+
+export class CheckoutGrantsDto {
+  grants: GrantCheckout[];
+}
+
+export class GrantWithFunding {
+  amount: number;
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  twitter: string;
+  website: string;
+  location: string;
+  paymentAccountId: string;
+  fundingGoal: number;
+  verified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  paymentAccount: PaymentAccount;
+}
