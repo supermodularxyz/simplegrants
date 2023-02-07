@@ -82,6 +82,26 @@ export class StripeProvider implements PaymentProviderAdapter {
   private logger: LoggerService = new Logger(StripeProvider.name);
 
   /**
+   * TODO: Perhaps find a way to dynamically change Stripe fees based on country
+   * Right now it is hardcoded to the US fees of 2.9% + 30c
+   * @param amount
+   * @returns The Stripe fees needed to pay
+   */
+  getStripeFee(amount: number): number {
+    const fixedFee = 0.3;
+    const percentFee = 0.029;
+
+    // Using epsilon for precision errors
+    const fees =
+      Math.round(
+        ((amount + fixedFee) / (1 - percentFee) - amount + Number.EPSILON) *
+          100,
+      ) / 100;
+
+    return fees;
+  }
+
+  /**
    * We can assume that in v1, we can only have 1 payment provider
    * @returns Default payment provider
    */
@@ -98,6 +118,10 @@ export class StripeProvider implements PaymentProviderAdapter {
   async createPayment(grantWithFunding: GrantWithFunding[], user: User) {
     const provider = await this.getDetails();
     const transferGroup = cuid();
+    const totalDonation = grantWithFunding.reduce(
+      (acc, grant) => acc + grant.amount,
+      0,
+    );
 
     for await (const grant of grantWithFunding) {
       if (grant.amount > 0) {
@@ -124,19 +148,32 @@ export class StripeProvider implements PaymentProviderAdapter {
     const session = await this.stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      line_items: grantWithFunding.map((grant) => {
-        return {
+      line_items: [
+        ...grantWithFunding.map((grant) => {
+          return {
+            price_data: {
+              currency: provider.denominations[0],
+              product_data: {
+                name: grant.name,
+                description: grant.description,
+              },
+              unit_amount: grant.amount * 100,
+            },
+            quantity: 1,
+          };
+        }),
+        {
           price_data: {
             currency: provider.denominations[0],
             product_data: {
-              name: grant.name,
-              description: grant.description,
+              name: 'Stripe Fees',
+              description: 'Processing fees taken by Stripe',
             },
-            unit_amount: grant.amount * 100,
+            unit_amount: this.getStripeFee(totalDonation) * 100,
           },
           quantity: 1,
-        };
-      }),
+        },
+      ],
       payment_intent_data: {
         transfer_group: transferGroup,
         metadata: {
@@ -242,16 +279,14 @@ export class StripeProvider implements PaymentProviderAdapter {
     this.logger.log('Creating transfers...');
 
     for await (const checkout of checkoutsToProcess) {
-      const a = await this.stripe.transfers.create({
+      await this.stripe.transfers.create({
         amount: checkout.amount * 100, // multiply 100 because of the way stripe calculates
         currency: checkout.denomination,
         destination: checkout.grant.paymentAccount.recipientAddress,
         transfer_group: transferGroup,
       });
-      console.log({ a });
     }
 
-    console.log('last');
     this.logger.log('Transfers made!');
 
     /**
