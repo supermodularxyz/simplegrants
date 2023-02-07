@@ -113,7 +113,7 @@ model PaymentMethod {
   id            String          @id @default(cuid())
   userId        String
   user          User            @relation(fields: [userId], references: [id])
-  uniqueId      String
+  uniqueId      String          @unique
   displayInfo   String?
   denomination  String
   providerId    String
@@ -205,7 +205,6 @@ model Checkout {
   user         User     @relation(fields: [userId], references: [id])
   amount       Float
   denomination String
-  amountUsd    Float
   grantId      String?
   grant        Grant?   @relation(fields: [grantId], references: [id])
   groupId      String //transfer_group for Stripe or tx ID or any other 
