@@ -30,4 +30,16 @@ export class ProviderService {
   async createPaymentSession(grantWithFunding: GrantWithFunding[], user: User) {
     return await this.paymentProvider.createPayment(grantWithFunding, user);
   }
+
+  /**
+   * Call the function to handle the payment webhook
+   * If the adapter doesn't have a webhook, it just skips this function
+   * @param data
+   * @returns
+   */
+  async handlePaymentWebhook(data: any) {
+    if (data && this.paymentProvider.handleWebhook) {
+      return await this.paymentProvider.handleWebhook(data);
+    }
+  }
 }
