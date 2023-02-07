@@ -10,4 +10,5 @@ export interface PaymentProviderConstructorProps {
 export interface PaymentProviderAdapter {
   getDetails(): Promise<PaymentProvider>;
   createPayment(grantWithFunding: GrantWithFunding[], user: User): any;
+  handleWebhook?(data: any): Promise<void>;
 }
