@@ -243,13 +243,15 @@ export class StripeProvider implements PaymentProviderAdapter {
 
     for await (const checkout of checkoutsToProcess) {
       const a = await this.stripe.transfers.create({
-        amount: checkout.amount,
+        amount: checkout.amount * 100, // multiply 100 because of the way stripe calculates
         currency: checkout.denomination,
         destination: checkout.grant.paymentAccount.recipientAddress,
         transfer_group: transferGroup,
       });
+      console.log({ a });
     }
 
+    console.log('last');
     this.logger.log('Transfers made!');
 
     /**
