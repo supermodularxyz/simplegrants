@@ -7,7 +7,13 @@ import Stripe from 'stripe';
 import { PaymentProvider, Prisma, User } from '@prisma/client';
 import * as cuid from 'cuid';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Logger, LoggerService } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Logger,
+  LoggerService,
+} from '@nestjs/common';
+import { SuccessfulCheckoutInfo } from '../provider.interface';
 
 export interface PaymentIntentEventWebhookBody {
   id: string;
@@ -355,5 +361,32 @@ export class StripeProvider implements PaymentProviderAdapter {
 
     this.logger.log('Contributions saved to database!');
     this.logger.log('Webhook run complete ✅');
+  }
+
+  async retrieveCheckoutInfo(
+    sessionId: string,
+  ): Promise<SuccessfulCheckoutInfo> {
+    try {
+      const data = await this.stripe.checkout.sessions.listLineItems(sessionId);
+
+      const checkoutInfo = data.data.reduce(
+        (acc, item) => {
+          if (item.description !== 'Stripe Fees') {
+            acc.donated += item.amount_total / 100;
+            acc.numberOfGrants += 1;
+          }
+          return acc;
+        },
+        { donated: 0, matched: 0, numberOfGrants: 0 },
+      );
+
+      return checkoutInfo;
+    } catch (err) {
+      this.logger.error(err);
+      throw new HttpException(
+        'Unable to retrieve checkout session',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
