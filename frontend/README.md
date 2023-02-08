@@ -4,6 +4,7 @@
 
 - NodeJS (v17.5+)
 - pnpm
+- Prisma CLI
 
 ## Installation & Setup 🧪
 

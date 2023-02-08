@@ -7,6 +7,7 @@
 
 - Docker & `docker compose`
 - NodeJS (v17.5+)
+- Prisma CLI
 
 The backend utilizes Docker for ease of setup & deployment. You should ideally have Docker setup on your machine if you intend to run it locally.
 
