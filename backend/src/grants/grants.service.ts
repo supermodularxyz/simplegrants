@@ -5,6 +5,7 @@ import {
   CheckoutGrantsDto,
   CreateGrantDto,
   ExtendedGrant,
+  FeeAllocationMethod,
   GetGrantDto,
   GrantCheckout,
   GrantFilterOptions,
@@ -322,7 +323,8 @@ export class GrantsService {
    * @param grants The grants to checkout
    * @param user User making the purchase
    */
-  async checkoutGrants(grants: GrantCheckout[], user: User) {
+  async checkoutGrants(body: CheckoutGrantsDto, user: User) {
+    const { grants, feeAllocation } = body;
     /**
      * What we should do is to actually create a payment intent for each grant.
      * In order to do that, we need to go through each grant and receive their payment info
@@ -356,6 +358,7 @@ export class GrantsService {
     // Pass to the payment provider to create a payment session
     return await this.providerService.createPaymentSession(
       grantWithFunding,
+      feeAllocation || FeeAllocationMethod.PASS_TO_GRANT, // By default, we will pass the fees to grants
       user,
     );
   }

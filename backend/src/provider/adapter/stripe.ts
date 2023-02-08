@@ -1,4 +1,7 @@
-import { GrantWithFunding } from 'src/grants/grants.interface';
+import {
+  FeeAllocationMethod,
+  GrantWithFunding,
+} from 'src/grants/grants.interface';
 import { PaymentProviderAdapter } from './types';
 import Stripe from 'stripe';
 import { PaymentProvider, Prisma, User } from '@prisma/client';
@@ -140,7 +143,11 @@ export class StripeProvider implements PaymentProviderAdapter {
    * @param user
    * @returns
    */
-  async createPayment(grantWithFunding: GrantWithFunding[], user: User) {
+  async createPayment(
+    grantWithFunding: GrantWithFunding[],
+    feeAllocation: FeeAllocationMethod,
+    user: User,
+  ) {
     const provider = await this.getDetails();
     const transferGroup = cuid();
     const totalDonation = grantWithFunding.reduce(

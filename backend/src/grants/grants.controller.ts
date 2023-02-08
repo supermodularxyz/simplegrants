@@ -187,6 +187,6 @@ export class GrantsController {
   @Post('checkout')
   @UseGuards(NextAuthGuard)
   async checkoutGrants(@Body() body: CheckoutGrantsDto, @Request() req) {
-    return await this.grantsService.checkoutGrants(body.grants, req.user);
+    return await this.grantsService.checkoutGrants(body, req.user);
   }
 }
