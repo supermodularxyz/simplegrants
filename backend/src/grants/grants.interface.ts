@@ -1,11 +1,16 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Grant, PaymentAccount } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
+  IsArray,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
   IsUrl,
+  ValidateNested,
 } from 'class-validator';
 import { Contribution } from 'src/contributions/contributions.interface';
 import { User, UserProfile } from 'src/users/users.interface';
@@ -20,6 +25,11 @@ export enum GrantSortOptions {
 export enum GrantFilterOptions {
   FUNDED = 'funded',
   UNDERFUNDED = 'underfunded',
+}
+
+export enum FeeAllocationMethod {
+  PASS_TO_CUSTOMER,
+  PASS_TO_GRANT,
 }
 
 export class GetGrantQueryDto {
@@ -181,12 +191,43 @@ export type ExtendedGrant = Grant & {
 };
 
 export class GrantCheckout {
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
   id: string;
+
+  @ApiProperty({
+    type: Number,
+  })
+  @IsNumber()
   amount: number;
 }
 
 export class CheckoutGrantsDto {
+  @ApiProperty({
+    type: [GrantCheckout],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  @Type(() => GrantCheckout)
   grants: GrantCheckout[];
+
+  @ApiProperty({
+    enum: FeeAllocationMethod,
+  })
+  @IsEnum(FeeAllocationMethod)
+  @IsOptional()
+  feeAllocation?: FeeAllocationMethod;
+}
+
+// TODO: Make it agnostic to whichever payment provider
+export class CheckoutGrantsResponse {
+  @ApiResponseProperty({
+    type: String,
+  })
+  url: string;
 }
 
 export class GrantWithFunding {

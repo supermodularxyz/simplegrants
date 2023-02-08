@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import {
   CheckoutGrantsDto,
+  CheckoutGrantsResponse,
   CreateGrantDto,
   GetGrantQueryDto,
   GrantDetailResponse,
@@ -176,6 +177,13 @@ export class GrantsController {
     return await this.grantsService.resubmitGrant(id, body, req.user);
   }
 
+  @ApiOperation({
+    description: 'Checkout selected grants',
+  })
+  @ApiCreatedResponse({
+    description: 'Checkout link/information from the payment provider',
+    type: CheckoutGrantsResponse,
+  })
   @Post('checkout')
   @UseGuards(NextAuthGuard)
   async checkoutGrants(@Body() body: CheckoutGrantsDto, @Request() req) {
