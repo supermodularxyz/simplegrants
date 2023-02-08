@@ -4,6 +4,7 @@ import {
   GrantWithFunding,
 } from 'src/grants/grants.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SuccessfulCheckoutInfo } from '../provider.interface';
 
 export interface PaymentProviderConstructorProps {
   prisma: PrismaService;
@@ -18,5 +19,5 @@ export interface PaymentProviderAdapter {
     user: User,
   ): any;
   handleWebhook?(data: any): Promise<void>;
-  retrieveCheckoutInfo?(sessionId: string);
+  retrieveCheckoutInfo?(sessionId: string): Promise<SuccessfulCheckoutInfo>;
 }

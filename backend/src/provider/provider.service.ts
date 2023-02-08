@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PaymentProvider, User } from '@prisma/client';
 import * as cuid from 'cuid';
-import { GrantWithFunding } from 'src/grants/grants.interface';
+import {
+  FeeAllocationMethod,
+  GrantWithFunding,
+} from 'src/grants/grants.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { StripeProvider } from './adapter/stripe';
 import { PaymentProviderAdapter } from './adapter/types';
@@ -27,8 +30,16 @@ export class ProviderService {
    * @param user
    * @returns
    */
-  async createPaymentSession(grantWithFunding: GrantWithFunding[], user: User) {
-    return await this.paymentProvider.createPayment(grantWithFunding, user);
+  async createPaymentSession(
+    grantWithFunding: GrantWithFunding[],
+    feeAllocation: FeeAllocationMethod,
+    user: User,
+  ) {
+    return await this.paymentProvider.createPayment(
+      grantWithFunding,
+      feeAllocation,
+      user,
+    );
   }
 
   /**
@@ -40,6 +51,17 @@ export class ProviderService {
   async handlePaymentWebhook(data: any) {
     if (data && this.paymentProvider.handleWebhook) {
       return await this.paymentProvider.handleWebhook(data);
+    }
+  }
+
+  /**
+   * Retrieve information about the checkout by session ID
+   * @param sessionId
+   * @returns
+   */
+  async retrieveCheckoutInfo(sessionId: string) {
+    if (this.paymentProvider.retrieveCheckoutInfo) {
+      return await this.paymentProvider.retrieveCheckoutInfo(sessionId);
     }
   }
 }
