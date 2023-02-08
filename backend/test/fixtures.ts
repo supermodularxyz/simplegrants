@@ -128,6 +128,12 @@ const grants: ExtendedGrant[] = [
   },
 ];
 
+const checkoutInfo = {
+  donated: 300,
+  matched: 0,
+  numberOfGrants: 2,
+};
+
 const prismaService = {
   user: {
     findUnique: jest.fn().mockResolvedValue(users[0]),
@@ -145,6 +151,8 @@ const providerService = {
   getProvider: jest.fn().mockResolvedValue({
     id: cuid(),
   }),
+  handlePaymentWebhook: jest.fn().mockResolvedValue(undefined),
+  retrieveCheckoutInfo: jest.fn().mockResolvedValue(checkoutInfo),
 };
 
 const usersService = {
@@ -158,17 +166,21 @@ const authService = {
 };
 
 const grantsService = {
-  getAllGrants: jest.fn().mockImplementation(() => grants),
-  createGrant: jest.fn().mockImplementation(() => grants[0]),
-  reviewGrant: jest.fn().mockImplementation(() => grants[0]),
-  getGrant: jest.fn().mockImplementation(() => grants[0]),
-  updateGrant: jest.fn().mockImplementation(() => grants[0]),
-  resubmitGrant: jest.fn().mockImplementation(() => grants[0]),
+  getAllGrants: jest.fn().mockResolvedValue(grants),
+  createGrant: jest.fn().mockResolvedValue(grants[0]),
+  reviewGrant: jest.fn().mockResolvedValue(grants[0]),
+  getGrant: jest.fn().mockResolvedValue(grants[0]),
+  updateGrant: jest.fn().mockResolvedValue(grants[0]),
+  resubmitGrant: jest.fn().mockResolvedValue(grants[0]),
+  checkoutGrants: jest.fn().mockResolvedValue({
+    url: 'checkoutlink',
+  }),
 };
 
 export {
   users,
   grants,
+  checkoutInfo,
   prismaService,
   providerService,
   usersService,
