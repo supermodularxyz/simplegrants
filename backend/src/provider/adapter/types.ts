@@ -8,7 +8,9 @@ import { SuccessfulCheckoutInfo } from '../provider.interface';
 
 export interface PaymentProviderConstructorProps {
   prisma: PrismaService;
-  apiKey: string;
+  secret: string;
+  /** ISO country code */
+  country: string;
 }
 
 export interface PaymentProviderAdapter {

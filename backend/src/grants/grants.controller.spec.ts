@@ -10,6 +10,7 @@ import {
 } from './grants.interface';
 import { UserProfile } from 'src/users/users.interface';
 import {
+  checkoutItems,
   grants,
   grantsService,
   prismaService,
@@ -202,18 +203,6 @@ describe('GrantsController', () => {
   });
 
   describe('checkoutGrants', () => {
-    const checkoutItems = {
-      grants: [
-        {
-          id: 'cld2ilh7t000008l3g1qe3nla',
-          amount: 100,
-        },
-        {
-          id: 'cld1dnt1y000008m97yakhtrf',
-          amount: 200,
-        },
-      ],
-    };
     it('should call the service function appropriately', async () => {
       await controller.checkoutGrants(checkoutItems, {
         user,

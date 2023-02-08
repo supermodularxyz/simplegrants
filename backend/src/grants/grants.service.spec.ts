@@ -11,7 +11,14 @@ import {
 } from './grants.interface';
 import { UserProfile } from 'src/users/users.interface';
 import { ProviderService } from 'src/provider/provider.service';
-import { grants, prismaService, providerService, users } from 'test/fixtures';
+import {
+  checkoutItems,
+  checkoutPaymentSession,
+  grants,
+  prismaService,
+  providerService,
+  users,
+} from 'test/fixtures';
 import * as _ from 'lodash';
 
 const grantQuery = {
@@ -396,6 +403,33 @@ describe('GrantsService', () => {
           ...admin,
         }),
       ).toEqual(grants[0]);
+    });
+  });
+
+  describe('checkoutGrants', () => {
+    it('should call prisma with the appropriate values', async () => {
+      await service.checkoutGrants(checkoutItems, {
+        ...userA,
+      });
+
+      expect(prisma.grant.findMany).toBeCalledWith({
+        where: {
+          id: {
+            in: checkoutItems.grants.map((grant) => grant.id),
+          },
+        },
+        include: {
+          paymentAccount: true,
+        },
+      });
+    });
+
+    it('should create a payment session', async () => {
+      expect(
+        await service.checkoutGrants(checkoutItems, {
+          ...userA,
+        }),
+      ).toEqual(checkoutPaymentSession);
     });
   });
 });

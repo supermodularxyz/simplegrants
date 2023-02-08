@@ -128,11 +128,26 @@ const grants: ExtendedGrant[] = [
   },
 ];
 
+const checkoutItems = {
+  grants: [
+    {
+      id: 'cld2ilh7t000008l3g1qe3nla',
+      amount: 100,
+    },
+    {
+      id: 'cld1dnt1y000008m97yakhtrf',
+      amount: 200,
+    },
+  ],
+};
+
 const checkoutInfo = {
   donated: 300,
   matched: 0,
   numberOfGrants: 2,
 };
+
+const checkoutPaymentSession = { url: 'checkoutlink' };
 
 const prismaService = {
   user: {
@@ -151,6 +166,7 @@ const providerService = {
   getProvider: jest.fn().mockResolvedValue({
     id: cuid(),
   }),
+  createPaymentSession: jest.fn().mockResolvedValue(checkoutPaymentSession),
   handlePaymentWebhook: jest.fn().mockResolvedValue(undefined),
   retrieveCheckoutInfo: jest.fn().mockResolvedValue(checkoutInfo),
 };
@@ -172,15 +188,15 @@ const grantsService = {
   getGrant: jest.fn().mockResolvedValue(grants[0]),
   updateGrant: jest.fn().mockResolvedValue(grants[0]),
   resubmitGrant: jest.fn().mockResolvedValue(grants[0]),
-  checkoutGrants: jest.fn().mockResolvedValue({
-    url: 'checkoutlink',
-  }),
+  checkoutGrants: jest.fn().mockResolvedValue(checkoutPaymentSession),
 };
 
 export {
   users,
   grants,
+  checkoutItems,
   checkoutInfo,
+  checkoutPaymentSession,
   prismaService,
   providerService,
   usersService,

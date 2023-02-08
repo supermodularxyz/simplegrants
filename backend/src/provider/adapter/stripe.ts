@@ -2,7 +2,10 @@ import {
   FeeAllocationMethod,
   GrantWithFunding,
 } from 'src/grants/grants.interface';
-import { PaymentProviderAdapter } from './types';
+import {
+  PaymentProviderAdapter,
+  PaymentProviderConstructorProps,
+} from './types';
 import Stripe from 'stripe';
 import { PaymentProvider, Prisma, User } from '@prisma/client';
 import * as cuid from 'cuid';
@@ -82,13 +85,21 @@ export interface PaymentIntentEventWebhookBody {
 }
 
 export class StripeProvider implements PaymentProviderAdapter {
-  constructor(private readonly prisma: PrismaService, apiKey: string) {
-    this.stripe = new Stripe(apiKey, {
+  constructor(constructorProps: PaymentProviderConstructorProps) {
+    const { prisma, secret, country } = constructorProps;
+
+    this.prisma = prisma;
+    this.country = country;
+    this.stripe = new Stripe(secret, {
       apiVersion: '2022-11-15',
     });
   }
+  private prisma: PrismaService;
+  private country: string;
   private stripe: Stripe;
   private logger: LoggerService = new Logger(StripeProvider.name);
+  // Technically a payment provider should never be updated during runtime
+  // so we can save and cache information about the payment provider in the class itself
 
   /**
    * Rounds a number to two decimal places

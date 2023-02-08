@@ -12,7 +12,11 @@ import { PaymentProviderAdapter } from './adapter/types';
 @Injectable()
 export class ProviderService {
   constructor(private readonly prisma: PrismaService) {
-    this.paymentProvider = new StripeProvider(prisma, process.env.PAYMENT_KEY);
+    this.paymentProvider = new StripeProvider({
+      prisma,
+      secret: process.env.PAYMENT_KEY,
+      country: 'US',
+    });
   }
   private paymentProvider: PaymentProviderAdapter;
 
