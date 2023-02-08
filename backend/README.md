@@ -13,6 +13,23 @@ The backend utilizes Docker for ease of setup & deployment. You should ideally h
 
 ## Installation & Setup 🧪
 
+### Choosing your Payment Provider 💳
+
+At this point in time, only Stripe is accepted as a payment provider. The available payment providers can be found in the [adapter](./src/provider/adapter/) folder in the backend. In the future, more payment providers will be added.
+To setup your payment provider, all you need to do is to change the payment provider in [`provider.service.ts`](./src/provider/provider.service.ts#L15) to the provider you want to use.
+
+Then, pass in the required constructor values as below:
+
+```typescript
+{
+    prisma: PrismaService,
+    secret: String, // For Stripe, it would be your secret key
+    country: String, // ISO country code. This is needed for calculating the payment provider fees if any
+}
+```
+
+Then, you can begin running your backend:
+
 ```bash
 # To setup
 $ npm install
