@@ -104,27 +104,35 @@ export class StripeProvider implements PaymentProviderAdapter {
     const fixedFee = 0.3;
     const percentFee = 0.029;
 
-    return this.roundNumber((amount + fixedFee) / (1 - percentFee));
+    return this.roundNumber((amount + fixedFee) / (1 - percentFee) - amount);
   }
 
   /**
    * TODO: Perhaps find a way to dynamically change Stripe fees based on country
    * Right now it is hardcoded to the US fees of 2.9% + 30c
    * @param amount
-   * @returns A lookup table for the amount each grant should receive, minus the Stripe fees
+   * @param feeAllocation
+   * @param totalAmount
+   * @returns A lookup table for the amount each grant should receive.
+   * Minus Stripe fees if `feeAllocation` is `PASS_TO_GRANT`
    */
   getGrantTransferAmount(
     grants: GrantWithFunding[],
+    feeAllocation: FeeAllocationMethod,
     totalAmount: number,
   ): { [key: string]: number } {
     const fixedFee = 0.3;
     const percentFee = 0.029;
     const totalFee = totalAmount * percentFee + fixedFee;
 
+    // If the fee allocation method is to pass to grant, we calculate the amount after fees
     return grants.reduce((acc, grant) => {
-      acc[grant.id] = this.roundNumber(
-        grant.amount - (grant.amount / totalAmount) * totalFee,
-      );
+      acc[grant.id] =
+        feeAllocation === FeeAllocationMethod.PASS_TO_GRANT
+          ? this.roundNumber(
+              grant.amount - (grant.amount / totalAmount) * totalFee,
+            )
+          : grant.amount;
       return acc;
     }, {});
   }
@@ -156,6 +164,7 @@ export class StripeProvider implements PaymentProviderAdapter {
     );
     const grantAmountLookup = this.getGrantTransferAmount(
       grantWithFunding,
+      feeAllocation,
       totalDonation,
     );
 
@@ -198,17 +207,19 @@ export class StripeProvider implements PaymentProviderAdapter {
             quantity: 1,
           };
         }),
-        // {
-        //   price_data: {
-        //     currency: provider.denominations[0],
-        //     product_data: {
-        //       name: 'Stripe Fees',
-        //       description: 'Processing fees taken by Stripe',
-        //     },
-        //     unit_amount: this.getCustomerFee(totalDonation) * 100,
-        //   },
-        //   quantity: 1,
-        // },
+        feeAllocation === FeeAllocationMethod.PASS_TO_CUSTOMER
+          ? {
+              price_data: {
+                currency: provider.denominations[0],
+                product_data: {
+                  name: 'Stripe Fees',
+                  description: 'Processing fees taken by Stripe',
+                },
+                unit_amount: this.getCustomerFee(totalDonation) * 100,
+              },
+              quantity: 1,
+            }
+          : undefined,
       ],
       payment_intent_data: {
         transfer_group: transferGroup,

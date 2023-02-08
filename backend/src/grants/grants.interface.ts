@@ -28,8 +28,8 @@ export enum GrantFilterOptions {
 }
 
 export enum FeeAllocationMethod {
-  PASS_TO_CUSTOMER,
-  PASS_TO_GRANT,
+  PASS_TO_CUSTOMER = 'customer',
+  PASS_TO_GRANT = 'grant',
 }
 
 export class GetGrantQueryDto {

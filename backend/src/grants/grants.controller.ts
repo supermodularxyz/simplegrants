@@ -186,7 +186,17 @@ export class GrantsController {
   })
   @Post('checkout')
   @UseGuards(NextAuthGuard)
-  async checkoutGrants(@Body() body: CheckoutGrantsDto, @Request() req) {
+  async checkoutGrants(
+    @Body(
+      new ValidationPipe({
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+        forbidNonWhitelisted: true,
+      }),
+    )
+    body: CheckoutGrantsDto,
+    @Request() req,
+  ) {
     return await this.grantsService.checkoutGrants(body, req.user);
   }
 }

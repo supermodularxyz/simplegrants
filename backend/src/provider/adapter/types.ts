@@ -18,4 +18,5 @@ export interface PaymentProviderAdapter {
     user: User,
   ): any;
   handleWebhook?(data: any): Promise<void>;
+  retrieveCheckoutInfo?(sessionId: string);
 }
