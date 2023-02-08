@@ -200,4 +200,34 @@ describe('GrantsController', () => {
       expect(result).toEqual(grants[0]);
     });
   });
+
+  describe('checkoutGrants', () => {
+    const checkoutItems = {
+      grants: [
+        {
+          id: 'cld2ilh7t000008l3g1qe3nla',
+          amount: 100,
+        },
+        {
+          id: 'cld1dnt1y000008m97yakhtrf',
+          amount: 200,
+        },
+      ],
+    };
+    it('should call the service function appropriately', async () => {
+      await controller.checkoutGrants(checkoutItems, {
+        user,
+      });
+
+      expect(service.checkoutGrants).toHaveBeenCalledWith(checkoutItems, user);
+    });
+
+    it('should return the correct properties', async () => {
+      const result = await controller.checkoutGrants(checkoutItems, {
+        user,
+      });
+
+      expect(result['url']).toBeDefined();
+    });
+  });
 });
