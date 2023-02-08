@@ -82,23 +82,48 @@ export class StripeProvider implements PaymentProviderAdapter {
   private logger: LoggerService = new Logger(StripeProvider.name);
 
   /**
+   * Rounds a number to two decimal places
+   * @param num Number to round
+   * @returns Number rounded to 2 decimal places
+   */
+  roundNumber(num: number): number {
+    // Using epsilon for precision errors
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+  }
+
+  /**
    * TODO: Perhaps find a way to dynamically change Stripe fees based on country
    * Right now it is hardcoded to the US fees of 2.9% + 30c
    * @param amount
-   * @returns The Stripe fees needed to pay
+   * @returns The Stripe fees needed to be added in to the total payment amount
    */
-  getStripeFee(amount: number): number {
+  getCustomerFee(amount: number): number {
     const fixedFee = 0.3;
     const percentFee = 0.029;
 
-    // Using epsilon for precision errors
-    const fees =
-      Math.round(
-        ((amount + fixedFee) / (1 - percentFee) - amount + Number.EPSILON) *
-          100,
-      ) / 100;
+    return this.roundNumber((amount + fixedFee) / (1 - percentFee));
+  }
 
-    return fees;
+  /**
+   * TODO: Perhaps find a way to dynamically change Stripe fees based on country
+   * Right now it is hardcoded to the US fees of 2.9% + 30c
+   * @param amount
+   * @returns A lookup table for the amount each grant should receive, minus the Stripe fees
+   */
+  getGrantTransferAmount(
+    grants: GrantWithFunding[],
+    totalAmount: number,
+  ): { [key: string]: number } {
+    const fixedFee = 0.3;
+    const percentFee = 0.029;
+    const totalFee = totalAmount * percentFee + fixedFee;
+
+    return grants.reduce((acc, grant) => {
+      acc[grant.id] = this.roundNumber(
+        grant.amount - (grant.amount / totalAmount) * totalFee,
+      );
+      return acc;
+    }, {});
   }
 
   /**
@@ -122,6 +147,10 @@ export class StripeProvider implements PaymentProviderAdapter {
       (acc, grant) => acc + grant.amount,
       0,
     );
+    const grantAmountLookup = this.getGrantTransferAmount(
+      grantWithFunding,
+      totalDonation,
+    );
 
     for await (const grant of grantWithFunding) {
       if (grant.amount > 0) {
@@ -132,7 +161,7 @@ export class StripeProvider implements PaymentProviderAdapter {
                 id: user.id,
               },
             },
-            amount: grant.amount,
+            amount: grantAmountLookup[grant.id],
             denomination: provider.denominations[0],
             grant: {
               connect: {
@@ -162,17 +191,17 @@ export class StripeProvider implements PaymentProviderAdapter {
             quantity: 1,
           };
         }),
-        {
-          price_data: {
-            currency: provider.denominations[0],
-            product_data: {
-              name: 'Stripe Fees',
-              description: 'Processing fees taken by Stripe',
-            },
-            unit_amount: this.getStripeFee(totalDonation) * 100,
-          },
-          quantity: 1,
-        },
+        // {
+        //   price_data: {
+        //     currency: provider.denominations[0],
+        //     product_data: {
+        //       name: 'Stripe Fees',
+        //       description: 'Processing fees taken by Stripe',
+        //     },
+        //     unit_amount: this.getCustomerFee(totalDonation) * 100,
+        //   },
+        //   quantity: 1,
+        // },
       ],
       payment_intent_data: {
         transfer_group: transferGroup,
