@@ -13,7 +13,7 @@ The backend utilizes Docker for ease of setup & deployment. You should ideally h
 
 ## Installation & Setup 🧪
 
-### Choosing your Payment Provider 💳
+### Choosing your Payment Provider
 
 At this point in time, only Stripe is accepted as a payment provider. The available payment providers can be found in the [adapter](./src/provider/adapter/) folder in the backend. In the future, more payment providers will be added.
 To setup your payment provider, all you need to do is to change the payment provider in [`provider.service.ts`](./src/provider/provider.service.ts#L15) to the provider you want to use.
@@ -28,7 +28,7 @@ Then, pass in the required constructor values as below:
 }
 ```
 
-Then, you can begin running your backend:
+### Setting up environment variables
 
 ```bash
 # To setup
@@ -36,10 +36,9 @@ $ npm install
 
 # Copy .env over
 $ cp .env.example .env
-
 ```
 
-⚠️ **Make sure to update the .env file with your values!**
+**⚠️ Make sure to update the .env file with your values!**
 
 ## Running the app 🚀
 
@@ -49,7 +48,12 @@ $ npm run docker:dev:up
 
 # production mode
 $ npm run docker:up
+
+# Run the seed and migration
+$ npx prisma migrate deploy && npx prisma db seed
 ```
+
+**⚠️ If you get a connection error 👉 Error: P1001: Can't reach database server at `simplegrants-database`:`5432`, all you need to do is to temporarily change `DATABASE_CONTAINER=localhost` in the .env and rerun the command. Make sure to remember to change it back once you are done!**
 
 ## Test ✅
 

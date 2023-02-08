@@ -27,7 +27,7 @@ $ cp .env.example .env.local
 
 ```bash
 # development mode
-$ pnpm dev
+$ pnpm dev -p 3001
 
 # production mode
 $ pnpm build && pnpm start
