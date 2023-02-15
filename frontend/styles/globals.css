@@ -3,3 +3,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --toastify-color-light: #f5f2f0;
+  --toastify-color-dark: #413a34;
+  --toastify-color-info: #8bcffa;
+  --toastify-color-success: #87cc66;
+  --toastify-color-warning: #ffac66;
+  --toastify-color-error: #ff9985;
+  --toastify-color-transparent: rgba(255, 255, 255, 0.7);
+
+  --toastify-icon-color-info: var(--toastify-color-info);
+  --toastify-icon-color-success: var(--toastify-color-success);
+  --toastify-icon-color-warning: var(--toastify-color-warning);
+  --toastify-icon-color-error: var(--toastify-color-error);
+
+  --toastify-text-color-light: #413a34;
+  --toastify-text-color-dark: #fff;
+}
