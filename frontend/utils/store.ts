@@ -17,18 +17,14 @@ interface CartState {
 export const useCartStore = create<CartState>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         grants: [],
         addToCart: (grant) =>
           set((state) => ({ grants: [...state.grants, grant] })),
         updateCart: (grant) =>
-          set((state) => {
-            const grantIndex = state.grants.findIndex(
-              (data) => data.id === grant.id
-            );
-            state.grants[grantIndex].amount = grant.amount;
-            return { grants: [...state.grants] };
-          }),
+          set((state) => ({
+            grants: state.grants.map((g) => (g.id === grant.id ? grant : g)),
+          })),
         removeFromCart: (grantId) =>
           set((state) => {
             const grants = state.grants.filter((grant) => grant.id !== grantId);
