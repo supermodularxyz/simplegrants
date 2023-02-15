@@ -12,7 +12,7 @@ export default function Button({ children, onClick, className }: IButtonProps) {
     <button
       onClick={onClick}
       className={clsx(
-        "border border-black font-bold text-lg px-8 py-2 w-full",
+        "btn-primary font-bold text-lg px-12 py-3 w-full rounded-full text-sg-900",
         className
       )}
     >
