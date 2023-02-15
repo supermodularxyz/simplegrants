@@ -27,7 +27,42 @@ module.exports = {
         "Noto Color Emoji",
       ],
     },
-    extend: {},
+    extend: {
+      colors: {
+        sg: {
+          primary: "#BBE3FC",
+          secondary: "#413A34",
+          accent: "#FEC89A",
+          neutral: "#BBE3FC",
+          info: "#8BCFFA",
+          success: "#87CC66",
+          warning: "#FFAC66",
+          error: "#FF9985",
+          900: "#413A34",
+          700: "#7D7772",
+          500: "#C0B9B3",
+          200: "#E3DDD7",
+          50: "#F5F2F0",
+        },
+      },
+    },
   },
   plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      {
+        simplegrants: {
+          primary: "#BBE3FC",
+          secondary: "#413A34",
+          accent: "#FEC89A",
+          neutral: "#BBE3FC",
+          "base-100": "#ffffff",
+          info: "#8BCFFA",
+          success: "#87CC66",
+          warning: "#FFAC66",
+          error: "#FF9985",
+        },
+      },
+    ],
+  },
 };
