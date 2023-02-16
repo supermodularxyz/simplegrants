@@ -162,6 +162,11 @@ export class GrantResponse {
   fundingGoal: number;
 
   @ApiResponseProperty({
+    type: Number,
+  })
+  amountRaised: number;
+
+  @ApiResponseProperty({
     type: Boolean,
   })
   verified: boolean;

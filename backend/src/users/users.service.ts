@@ -8,22 +8,39 @@ export class UsersService {
   private logger: LoggerService = new Logger(UsersService.name);
 
   async retrieveUserProfile(id: string): Promise<UserProfile> {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
       include: {
         contributions: true,
-        grants: true,
+        grants: {
+          include: {
+            contributions: true,
+          },
+        },
       },
     });
+
+    return {
+      ...user,
+      grants: user.grants.map((grant) => {
+        return {
+          ...grant,
+          amountRaised: grant.contributions.reduce(
+            (acc, contribution) => acc + contribution.amountUsd,
+            0,
+          ),
+        };
+      }),
+    };
   }
 
   async updateUserProfile(
     userId: string,
     data: UpdateUserDto,
   ): Promise<UserProfile> {
-    return await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       data: {
         ...data,
       },
@@ -32,8 +49,25 @@ export class UsersService {
       },
       include: {
         contributions: true,
-        grants: true,
+        grants: {
+          include: {
+            contributions: true,
+          },
+        },
       },
     });
+
+    return {
+      ...user,
+      grants: user.grants.map((grant) => {
+        return {
+          ...grant,
+          amountRaised: grant.contributions.reduce(
+            (acc, contribution) => acc + contribution.amountUsd,
+            0,
+          ),
+        };
+      }),
+    };
   }
 }

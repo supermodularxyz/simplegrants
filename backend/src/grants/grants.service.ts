@@ -124,7 +124,15 @@ export class GrantsService {
         return bTotal - aTotal;
       });
     }
-    return grants;
+    return grants.map((grant) => {
+      return {
+        ...grant,
+        amountRaised: grant.contributions.reduce(
+          (acc, contribution) => acc + contribution.amountUsd,
+          0,
+        ),
+      };
+    });
   }
 
   /**
@@ -170,7 +178,13 @@ export class GrantsService {
     }
 
     // Otherwise, we can return it
-    return grant;
+    return {
+      ...grant,
+      amountRaised: grant.contributions.reduce(
+        (acc, contribution) => acc + contribution.amountUsd,
+        0,
+      ),
+    };
   }
 
   /**
