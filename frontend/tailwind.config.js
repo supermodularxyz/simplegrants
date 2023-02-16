@@ -45,6 +45,9 @@ module.exports = {
           50: "#F5F2F0",
         },
       },
+      boxShadow: {
+        card: "0px 4px 8px rgba(227, 221, 215, 0.5)",
+      },
     },
   },
   plugins: [require("daisyui")],
