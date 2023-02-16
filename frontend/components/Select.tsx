@@ -26,10 +26,7 @@ interface ISelectItemProps {
 }
 
 const SelectItem = React.forwardRef<HTMLDivElement, ISelectItemProps>(
-  (
-    { children, className, position, onValueChange, value, ...props },
-    forwardedRef
-  ) => {
+  ({ children, className, position, onValueChange, value }, forwardedRef) => {
     return (
       <Selection.Item
         className={clsx(
@@ -51,6 +48,8 @@ const SelectItem = React.forwardRef<HTMLDivElement, ISelectItemProps>(
     );
   }
 );
+
+SelectItem.displayName = "SelectItem";
 
 const Select = ({ label, options, className, onValueChange }: ISelectProps) => (
   <Selection.Root onValueChange={onValueChange}>
