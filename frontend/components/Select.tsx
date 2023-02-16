@@ -16,17 +16,24 @@ interface ISelectProps {
 
 interface ISelectItemProps {
   children: ReactNode;
-  className?: string;
   value: string;
+  position?: "first" | "last";
+  className?: string;
   disabled?: boolean;
 }
 
 const SelectItem = React.forwardRef<HTMLDivElement, ISelectItemProps>(
-  ({ children, className, ...props }, forwardedRef) => {
+  ({ children, className, position, ...props }, forwardedRef) => {
     return (
       <Selection.Item
         className={clsx(
-          "text-[13px] leading-none text-sg-900 rounded-[3px] flex items-center h-[25px] pr-[35px] pl-[25px] relative select-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:outline-none data-[highlighted]:bg-violet9 data-[highlighted]:text-violet1",
+          "leading-none text-sg-900 flex items-center px-5 py-2 relative select-none data-[highlighted]:outline-none data-[highlighted]:bg-sg-primary",
+          "data-[state='checked']:bg-sg-primary",
+          position === "first"
+            ? "data-[state='checked']:border-b data-[state='checked']:border-sg-900"
+            : position === "last"
+            ? "data-[state='checked']:border-t data-[state='checked']:border-sg-900"
+            : "data-[state='checked']:border-y data-[state='checked']:border-sg-900",
           className
         )}
         {...props}
@@ -42,7 +49,7 @@ const Select = ({ label, options, className }: ISelectProps) => (
   <Selection.Root>
     <Selection.Trigger
       className={clsx(
-        "inline-flex items-center justify-center rounded-lg px-[15px] text-[13px] leading-none h-[35px] gap-[5px] bg-white text-sg-900 hover:bg-mauve3 focus:shadow-[0_0_0_2px] border border-sg-900  data-[placeholder]:text-violet9 outline-none",
+        "inline-flex items-center justify-between rounded-lg p-2 pl-5 leading-none gap-x-4 bg-white text-sg-900 hover:bg-sg-50 focus:shadow-[0_0_0_2px] border border-sg-900 outline-none max-w-sm data-[placeholder]:text-sg-900 w-36 data-[state='open']:rounded-b-none",
         className
       )}
       aria-label={label}
@@ -53,22 +60,36 @@ const Select = ({ label, options, className }: ISelectProps) => (
       </Selection.Icon>
     </Selection.Trigger>
     <Selection.Portal>
-      <Selection.Content className="overflow-hidden bg-white rounded-md shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)]">
-        <Selection.ScrollUpButton className="flex items-center justify-center h-[25px] bg-white text-sg-900 cursor-default">
+      <Selection.Content
+        className="overflow-hidden bg-white border border-sg-900 rounded-lg data-[state='open']:rounded-t-none"
+        position="popper"
+        sideOffset={-1}
+      >
+        <Selection.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-sg-900 cursor-default">
           <TriangleUpIcon />
         </Selection.ScrollUpButton>
-        <Selection.Viewport className="p-[5px]">
-          <Selection.Group>
-            {/* <Selection.Label className="px-[25px] text-xs leading-[25px] text-mauve11">
+        <Selection.Viewport className="">
+          <Selection.Group className="w-36">
+            {/* <Selection.Label className="text-sm font-bold text-sg-900 px-5 py-1">
               {label}
             </Selection.Label> */}
-            <SelectItem value="">{label}</SelectItem>
-            {options.map((option) => (
-              <SelectItem value={option.value}>{option.label}</SelectItem>
+            {options.map((option, index) => (
+              <SelectItem
+                value={option.value}
+                position={
+                  index === 0
+                    ? "first"
+                    : index === options.length - 1
+                    ? "last"
+                    : undefined
+                }
+              >
+                {option.label}
+              </SelectItem>
             ))}
           </Selection.Group>
         </Selection.Viewport>
-        <Selection.ScrollDownButton className="flex items-center justify-center h-[25px] bg-white text-sg-900 cursor-default">
+        <Selection.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-sg-900 cursor-default">
           <TriangleDownIcon />
         </Selection.ScrollDownButton>
       </Selection.Content>
