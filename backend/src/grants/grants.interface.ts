@@ -1,4 +1,8 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiResponseProperty,
+} from '@nestjs/swagger';
 import { Grant, PaymentAccount } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
@@ -33,21 +37,21 @@ export enum FeeAllocationMethod {
 }
 
 export class GetGrantQueryDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: GrantSortOptions,
   })
   @IsEnum(GrantSortOptions)
   @IsOptional()
   sort?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: GrantFilterOptions,
   })
   @IsEnum(GrantFilterOptions)
   @IsOptional()
   filter?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
   })
   @IsString()
