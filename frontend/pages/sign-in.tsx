@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Head from "next/head";
 import React from "react";
+import MainLayout from "../layouts/MainLayout";
+import Button from "../components/Button";
 
 export default function SignIn({
   providers,
@@ -19,22 +21,22 @@ export default function SignIn({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col min-w-screen min-h-screen w-full h-full items-center justify-center">
-        <div className="flex flex-col items-center justify-between h-full border border-black p-8">
+      <MainLayout className="items-center justify-center">
+        <div className="flex flex-col items-center justify-between h-full rounded-lg bg-white p-8 shadow-card">
           <h1 className="font-bold text-xl mb-16">Sign In / Sign Up</h1>
           <div className="flex flex-col items-center justify-center gap-y-5">
             {Object.values(providers).map((provider) => (
-              <button
+              <Button
                 key={provider.name}
                 onClick={() => signIn(provider.id)}
-                className="border border-black font-bold text-xl px-16 py-3 w-full"
+                className="px-16 py-3 text-xl"
               >
                 Sign In With {provider.name}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
-      </main>
+      </MainLayout>
     </div>
   );
 }
