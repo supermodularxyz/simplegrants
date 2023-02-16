@@ -49,7 +49,7 @@ const Select = ({ label, options, className }: ISelectProps) => (
   <Selection.Root>
     <Selection.Trigger
       className={clsx(
-        "inline-flex items-center justify-between rounded-lg p-2 pl-5 leading-none gap-x-4 bg-white text-sg-900 hover:bg-sg-50 focus:shadow-[0_0_0_2px] border border-sg-900 outline-none max-w-sm data-[placeholder]:text-sg-900 w-36 data-[state='open']:rounded-b-none",
+        "inline-flex items-center justify-between rounded-lg p-2 pl-5 leading-none gap-x-4 text-sg-900 hover:bg-sg-200 focus:shadow-[0_0_0_2px] border border-sg-900 outline-none max-w-sm data-[placeholder]:text-sg-900 w-36 data-[state='open']:rounded-b-none",
         className
       )}
       aria-label={label}
@@ -61,11 +61,11 @@ const Select = ({ label, options, className }: ISelectProps) => (
     </Selection.Trigger>
     <Selection.Portal>
       <Selection.Content
-        className="overflow-hidden bg-white border border-sg-900 rounded-lg data-[state='open']:rounded-t-none"
+        className="overflow-hidden border border-sg-900 rounded-lg data-[state='open']:rounded-t-none"
         position="popper"
         sideOffset={-1}
       >
-        <Selection.ScrollUpButton className="flex items-center justify-center h-6 bg-white text-sg-900 cursor-default">
+        <Selection.ScrollUpButton className="flex items-center justify-center h-6 text-sg-900 cursor-default">
           <TriangleUpIcon />
         </Selection.ScrollUpButton>
         <Selection.Viewport className="">
@@ -89,7 +89,7 @@ const Select = ({ label, options, className }: ISelectProps) => (
             ))}
           </Selection.Group>
         </Selection.Viewport>
-        <Selection.ScrollDownButton className="flex items-center justify-center h-6 bg-white text-sg-900 cursor-default">
+        <Selection.ScrollDownButton className="flex items-center justify-center h-6 text-sg-900 cursor-default">
           <TriangleDownIcon />
         </Selection.ScrollDownButton>
       </Selection.Content>

@@ -3,12 +3,14 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import React, { PropsWithChildren, ReactNode } from "react";
 import Link from "next/link";
 import { useCartStore } from "../utils/store";
+import clsx from "clsx";
 
 interface INavbarProps {
   children: ReactNode;
+  className?: string;
 }
 
-export default function Navbar({ children }: INavbarProps) {
+export default function Navbar({ children, className }: INavbarProps) {
   const { data: session } = useSession();
   const { grants } = useCartStore();
 
@@ -17,7 +19,7 @@ export default function Navbar({ children }: INavbarProps) {
     .toFixed(2);
 
   return (
-    <div className="navbar bg-base-100">
+    <div className={clsx("navbar", className)}>
       <div className="flex-1">
         <Link className="btn btn-ghost normal-case text-xl" href="/">
           SimpleGrants
