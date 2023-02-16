@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { GrantResponse } from "../types/grants";
+import { GrantResponse } from "../types/grant";
 
 interface ICardProps {
   grant: GrantResponse;
@@ -9,7 +9,7 @@ interface ICardProps {
 
 const Card = ({ grant, onClick }: ICardProps) => (
   <div
-    className="flex flex-col w-full max-w-[350px] bg-white rounded-lg overflow-hidden cursor-pointer shadow-card"
+    className="flex flex-col w-full min-w-[240px] lg:min-w-[350px] max-w-[350px] bg-white rounded-lg overflow-hidden cursor-pointer shadow-card"
     key={grant.id}
     onClick={onClick}
   >
