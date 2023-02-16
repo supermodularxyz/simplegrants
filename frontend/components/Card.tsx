@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { GrantResponse } from "../types/grant";
+import FundingBar from "./Progress";
 
 interface ICardProps {
   grant: GrantResponse;
@@ -25,11 +26,11 @@ const Card = ({ grant, onClick }: ICardProps) => (
         </p>
       </div>
       <div className="flex flex-col w-full mt-8">
-        <progress
-          className="progress progress-success w-full h-3 border border-sg-900 mb-3"
+        <FundingBar
           value={grant.amountRaised}
           max={grant.fundingGoal}
-        ></progress>
+          className="mb-3"
+        />
         <p className="font-bold text-lg">
           ${" "}
           {grant.amountRaised.toLocaleString("en-US", {
