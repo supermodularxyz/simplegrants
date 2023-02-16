@@ -1,4 +1,3 @@
-import { Role } from "@prisma/client";
 import { GrantResponse } from "./grant";
 import { Contribution } from "./contributions";
 
@@ -11,7 +10,7 @@ export interface User {
   bio: string | null;
   twitter: string | null;
   visitorId: string | null;
-  role: Role;
+  // role: Role;
   flagged: boolean;
   createdAt: Date;
   updatedAt: Date;
