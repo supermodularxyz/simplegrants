@@ -1,3 +1,6 @@
+import { Contribution } from "./contributions";
+import { UserProfile } from "./user";
+
 export interface GrantResponse {
   id: string;
   name: string;
@@ -8,9 +11,15 @@ export interface GrantResponse {
   location: string;
   paymentAccountId: string;
   fundingGoal: number;
+  amountRaised: number;
   verified: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface GrantDetailResponse extends GrantResponse {
+  team: UserProfile[];
+  contributions: Contribution[];
 }
 
 export const SortOptions = [
