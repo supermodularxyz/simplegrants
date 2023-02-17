@@ -57,8 +57,6 @@ export default function Grants() {
     getGrants();
   }, [sort, filter, search]);
 
-  console.log(search);
-
   return (
     <div>
       <Head>
@@ -108,7 +106,11 @@ export default function Grants() {
                 className="items-center flex flex-row gap-x-1"
                 type="single"
                 defaultValue="grid"
+                value={view}
                 aria-label="Text alignment"
+                onValueChange={(value: "grid" | "list") => {
+                  if (value) setView(value);
+                }}
               >
                 <ToggleGroup.Item
                   className="data-[state=on]:bg-sg-200 p-2 rounded-lg"
