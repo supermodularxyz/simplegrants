@@ -5,6 +5,7 @@ import { useCartStore } from "../utils/store";
 import clsx from "clsx";
 import Cart from "../components/icons/Cart";
 import Avatar from "../components/icons/Avatar";
+import Image from "next/image";
 
 interface INavbarProps {
   children: ReactNode;
@@ -41,7 +42,12 @@ export default function Navbar({ children, className }: INavbarProps) {
     <div className={clsx("navbar", className)}>
       <div className="flex-1">
         <Link className="btn btn-ghost normal-case text-xl" href="/">
-          SimpleGrants
+          <Image
+            src="/logo.svg"
+            alt="SimpleGrants"
+            width={103.55}
+            height={32}
+          />
         </Link>
       </div>
       <div className="flex-none gap-x-7">
