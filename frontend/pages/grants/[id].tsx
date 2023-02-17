@@ -1,6 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Head from "next/head";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react";
+import { useSession, signIn } from "next-auth/react";
 import React from "react";
 import MainLayout from "../../layouts/MainLayout";
 import Navbar from "../../layouts/Navbar";
@@ -8,27 +8,19 @@ import Button from "../../components/Button";
 import axios from "../../utils/axios";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import {
-  FilterOptions,
-  GrantDetailResponse,
-  GrantResponse,
-  SortOptions,
-} from "../../types/grant";
-import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import { GrantDetailResponse } from "../../types/grant";
 import Image from "next/image";
-import Select from "../../components/Select";
-import Divider from "../../components/Divider";
-import Card from "../../components/Card";
 import { useRouter } from "next/router";
 import FundingBar from "../../components/Progress";
+import { useCartStore } from "../../utils/store";
 
 export default function Grants() {
   const router = useRouter();
+  const { grants, addToCart, removeFromCart } = useCartStore();
   const { id } = router.query;
   const { data: session } = useSession();
   const [data, setData] = React.useState<GrantDetailResponse>();
   const [loading, setLoading] = React.useState(false);
-  console.log(id);
 
   const getGrant = () => {
     setLoading(true);
@@ -78,10 +70,8 @@ export default function Grants() {
               <Button onClick={() => signIn()}>Sign In</Button>
             )}
           </Navbar>
-          <div className="flex flex-col items-center justify-center px-8 my-2 w-full">
-            <Link href="/grants" className="w-full">
-              &lt; Back to grants
-            </Link>
+          <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
+            <Link href="/grants">&lt; Back to grants</Link>
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
               <div className="basis-full md:basis-3/5 px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
@@ -178,7 +168,26 @@ export default function Grants() {
                     })}
                   </p>
                   <p className="mb-4">contributors</p>
-                  <Button className="w-full">Add to cart</Button>
+                  {grants.find((grant) => grant.id === id) ? (
+                    <Button
+                      className="w-full btn-error"
+                      onClick={() => removeFromCart(id as string)}
+                    >
+                      Remove from cart
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full"
+                      onClick={() =>
+                        addToCart({
+                          id: id as string,
+                          amount: 0,
+                        })
+                      }
+                    >
+                      Add to cart
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
