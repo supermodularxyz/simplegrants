@@ -15,6 +15,7 @@ export default function Input({
   className,
   onChange,
 }: IInputProps) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedOnChange = React.useCallback(
     debounce((value) => {
       onChange(value);

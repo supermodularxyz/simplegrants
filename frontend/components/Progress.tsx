@@ -14,6 +14,7 @@ const FundingBar = ({ value, max, className }: IFundingBarProps) => {
   React.useEffect(() => {
     const timer = setTimeout(() => setProgress(value), 500);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
