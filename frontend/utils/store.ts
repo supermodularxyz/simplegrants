@@ -1,16 +1,19 @@
+import { Grant } from "@prisma/client";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 // The info about a grant that will be checked out
 interface GrantCheckoutItem {
   id: string;
+  image: string;
+  name: string;
   amount: number;
 }
 
 interface CartState {
   grants: GrantCheckoutItem[];
-  addToCart: (grant: GrantCheckoutItem) => void;
-  updateCart: (grant: GrantCheckoutItem) => void;
+  addToCart: (grant: Grant) => void;
+  updateCart: (grant: Grant) => void;
   removeFromCart: (grantId: string) => void;
 }
 
@@ -20,10 +23,29 @@ export const useCartStore = create<CartState>()(
       (set, get) => ({
         grants: [],
         addToCart: (grant) =>
-          set((state) => ({ grants: [...state.grants, grant] })),
+          set((state) => ({
+            grants: [
+              ...state.grants,
+              {
+                id: grant.id,
+                image: grant.image,
+                name: grant.name,
+                amount: 0,
+              },
+            ],
+          })),
         updateCart: (grant) =>
           set((state) => ({
-            grants: state.grants.map((g) => (g.id === grant.id ? grant : g)),
+            grants: state.grants.map((g) =>
+              g.id === grant.id
+                ? {
+                    id: grant.id,
+                    image: grant.image,
+                    name: grant.name,
+                    amount: 0,
+                  }
+                : g
+            ),
           })),
         removeFromCart: (grantId) =>
           set((state) => {

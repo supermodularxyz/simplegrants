@@ -12,7 +12,7 @@ import { FilterOptions, GrantResponse, SortOptions } from "../../types/grant";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import Select from "../../components/Select";
 import Divider from "../../components/Divider";
-import Card from "../../components/Card";
+import GrantCard from "../../components/GrantCard";
 import { useRouter } from "next/router";
 import Input from "../../components/Input";
 import Search from "../../components/icons/Search";
@@ -132,7 +132,7 @@ export default function Grants() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-10 w-full my-6">
             {data &&
               data.map((grant) => (
-                <Card
+                <GrantCard
                   grant={grant}
                   onClick={() => router.push(`/grants/${grant.id}`)}
                   key={grant.id}

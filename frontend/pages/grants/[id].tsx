@@ -146,15 +146,7 @@ export default function Grants() {
                       Remove from cart
                     </Button>
                   ) : (
-                    <Button
-                      className="w-full"
-                      onClick={() =>
-                        addToCart({
-                          id: id as string,
-                          amount: 0,
-                        })
-                      }
-                    >
+                    <Button className="w-full" onClick={() => addToCart(data)}>
                       Add to cart
                     </Button>
                   )}
