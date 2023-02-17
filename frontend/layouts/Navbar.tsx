@@ -6,27 +6,12 @@ import clsx from "clsx";
 import Cart from "../components/icons/Cart";
 import Avatar from "../components/icons/Avatar";
 import Image from "next/image";
+import { useHasHydrated } from "../utils/useHydrated";
 
 interface INavbarProps {
   children: ReactNode;
   className?: string;
 }
-
-/**
- * This is needed to prevent hydration issues
- * Workaround due to how zustand stores work asynchronously
- * https://github.com/pmndrs/zustand/issues/324
- * @returns
- */
-const useHasHydrated = () => {
-  const [hasHydrated, setHasHydrated] = React.useState<boolean>(false);
-
-  React.useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  return hasHydrated;
-};
 
 export default function Navbar({ children, className }: INavbarProps) {
   const { data: session } = useSession();
@@ -68,9 +53,11 @@ export default function Navbar({ children, className }: INavbarProps) {
               </span>
               <span className="text-info">Subtotal: ${subtotal}</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">
-                  <Link href="/grants/checkout">View cart</Link>
-                </button>
+                <Link href="/grants/checkout" className="w-full h-full">
+                  <button className="btn btn-primary btn-block">
+                    View cart
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

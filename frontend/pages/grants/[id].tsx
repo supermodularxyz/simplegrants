@@ -17,7 +17,7 @@ import Location from "../../components/icons/Location";
 import Twitter from "../../components/icons/Twitter";
 import Website from "../../components/icons/Website";
 
-export default function Grants() {
+export default function GrantDetails() {
   const router = useRouter();
   const { grants, addToCart, removeFromCart } = useCartStore();
   const { id } = router.query;
@@ -66,9 +66,9 @@ export default function Grants() {
         <MainLayout>
           <Navbar className="p-0">
             {session ? (
-              <Button>
-                <Link href="/grants/create">Create Grant</Link>
-              </Button>
+              <Link href="/grants/create">
+                <Button>Create Grant</Button>
+              </Link>
             ) : (
               <Button onClick={() => signIn()}>Sign In</Button>
             )}
@@ -78,7 +78,7 @@ export default function Grants() {
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
               <div className="basis-full md:basis-3/5 px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
-                  <div className="relative aspect-[3/2] lg:aspect-[3/1] h-full w-full">
+                  <div className="relative aspect-[3/2] lg:aspect-[3/1] h-full w-full rounded-lg overflow-hidden">
                     <Image
                       alt={data.name}
                       src={data.image}

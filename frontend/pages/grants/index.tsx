@@ -71,9 +71,9 @@ export default function Grants() {
       <MainLayout>
         <Navbar className="p-0">
           {session ? (
-            <Button>
-              <Link href="/grants/create">Create Grant</Link>
-            </Button>
+            <Link href="/grants/create">
+              <Button>Create Grant</Button>
+            </Link>
           ) : (
             <Button onClick={() => signIn()}>Sign In</Button>
           )}
