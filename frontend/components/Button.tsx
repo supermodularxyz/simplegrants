@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 interface IButtonProps {
   children: ReactNode;
-  onClick?: () => any;
+  onClick?: (e?: any) => any;
   className?: string;
 }
 
