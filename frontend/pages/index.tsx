@@ -26,6 +26,7 @@ export default function Home() {
     if (session) {
       saveFingerprintData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return (
