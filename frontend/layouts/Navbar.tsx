@@ -68,7 +68,9 @@ export default function Navbar({ children, className }: INavbarProps) {
               </span>
               <span className="text-info">Subtotal: ${subtotal}</span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">View cart</button>
+                <button className="btn btn-primary btn-block">
+                  <Link href="/grants/checkout">View cart</Link>
+                </button>
               </div>
             </div>
           </div>
