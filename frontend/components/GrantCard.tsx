@@ -5,12 +5,12 @@ import FundingBar from "./Progress";
 import { useCartStore } from "../utils/store";
 import Button from "./Button";
 
-interface ICardProps {
+interface IGrantCardProps {
   grant: GrantResponse;
   onClick?: (e?: any) => any;
 }
 
-const Card = ({ grant, onClick }: ICardProps) => {
+const GrantCard = ({ grant, onClick }: IGrantCardProps) => {
   const { grants, addToCart, removeFromCart } = useCartStore();
 
   const addedToCart = React.useMemo(
@@ -69,10 +69,7 @@ const Card = ({ grant, onClick }: ICardProps) => {
               className="w-full"
               onClick={(e) => {
                 e.stopPropagation();
-                addToCart({
-                  id: grant.id,
-                  amount: 0,
-                });
+                addToCart(grant);
               }}
             >
               Add to cart
@@ -84,4 +81,4 @@ const Card = ({ grant, onClick }: ICardProps) => {
   );
 };
 
-export default Card;
+export default GrantCard;
