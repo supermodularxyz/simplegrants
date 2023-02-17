@@ -1,6 +1,5 @@
-import Head from "next/head";
-import { useSession, signIn, signOut } from "next-auth/react";
-import React, { PropsWithChildren, ReactNode } from "react";
+import { useSession, signOut } from "next-auth/react";
+import React, { ReactNode } from "react";
 import Link from "next/link";
 import { useCartStore } from "../utils/store";
 import clsx from "clsx";
@@ -10,13 +9,31 @@ interface INavbarProps {
   className?: string;
 }
 
+/**
+ * This is needed to prevent hydration issues
+ * Workaround due to how zustand stores work asynchronously
+ * https://github.com/pmndrs/zustand/issues/324
+ * @returns
+ */
+const useHasHydrated = () => {
+  const [hasHydrated, setHasHydrated] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setHasHydrated(true);
+  }, []);
+
+  return hasHydrated;
+};
+
 export default function Navbar({ children, className }: INavbarProps) {
   const { data: session } = useSession();
   const { grants } = useCartStore();
+  const hasHydrated = useHasHydrated();
 
-  const subtotal = grants
-    .reduce((acc, grant) => acc + grant.amount, 0)
-    .toFixed(2);
+  const subtotal = React.useMemo(
+    () => grants.reduce((acc, grant) => acc + grant.amount, 0).toFixed(2),
+    [grants]
+  );
 
   return (
     <div className={clsx("navbar", className)}>
@@ -52,7 +69,9 @@ export default function Navbar({ children, className }: INavbarProps) {
             className="mt-3 card card-compact dropdown-content w-52 bg-base-100 shadow"
           >
             <div className="card-body">
-              <span className="font-bold text-lg">{grants.length} Items</span>
+              <span className="font-bold text-lg">
+                {hasHydrated && grants.length} Items
+              </span>
               <span className="text-info">Subtotal: ${subtotal}</span>
               <div className="card-actions">
                 <button className="btn btn-primary btn-block">View cart</button>
