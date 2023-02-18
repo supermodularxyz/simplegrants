@@ -20,7 +20,7 @@ interface CartState {
 export const useCartStore = create<CartState>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         grants: [],
         addToCart: (grant) =>
           set((state) => ({
