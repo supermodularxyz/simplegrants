@@ -51,7 +51,9 @@ export default function Navbar({ children, className }: INavbarProps) {
               <span className="font-bold text-lg">
                 {hasHydrated && grants.length} Items
               </span>
-              <span className="text-info">Subtotal: ${subtotal}</span>
+              <span className="text-info">
+                Subtotal: ${hasHydrated && subtotal}
+              </span>
               <div className="card-actions">
                 <Link href="/grants/checkout" className="w-full h-full">
                   <button className="btn btn-primary btn-block">
