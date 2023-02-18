@@ -15,6 +15,7 @@ interface CartState {
   addToCart: (grant: Grant) => void;
   updateCart: (id: string, amount: number) => void;
   removeFromCart: (grantId: string) => void;
+  clearCart: () => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -50,6 +51,7 @@ export const useCartStore = create<CartState>()(
             const grants = state.grants.filter((grant) => grant.id !== grantId);
             return { grants: grants };
           }),
+        clearCart: () => set(() => ({ grants: [] })),
       }),
       {
         name: "simplegrants-cart-storage",

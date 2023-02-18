@@ -1,19 +1,20 @@
 import Head from "next/head";
 import React from "react";
 import { useRouter } from "next/router";
-import { toast } from "react-toastify";
 import axios from "axios";
 import MainLayout from "../../../layouts/MainLayout";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import Success from "../../../components/icons/Success";
 import Button from "../../../components/Button";
 import Link from "next/link";
+import { useCartStore } from "../../../utils/store";
 
 export default function CheckoutSuccess() {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState<any>();
   const hasHydrated = useHasHydrated();
   const router = useRouter();
+  const { clearCart } = useCartStore();
 
   React.useEffect(() => {
     setLoading(true);
@@ -23,6 +24,8 @@ export default function CheckoutSuccess() {
         .get(`http://localhost:3000/checkout/${router.query.session_id}`)
         .then((res) => {
           setData(res.data);
+          // TODO: Ensure that this only runs if your checkout succeeds, not when you hit this page
+          clearCart();
         })
         .catch((err) => {
           console.log(err);
@@ -30,9 +33,10 @@ export default function CheckoutSuccess() {
         })
         .finally(() => setLoading(false));
     }
-    if (hasHydrated && !router.query.session_id) {
+    if (hasHydrated && !loading && !router.query.session_id) {
       router.push("/grants");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query, hasHydrated, router]);
 
   return (
@@ -44,7 +48,7 @@ export default function CheckoutSuccess() {
       </Head>
 
       <MainLayout>
-        {hasHydrated && data && (
+        {hasHydrated && data && !loading && (
           <div className="flex flex-col w-full min-h-screen h-full items-center justify-center text-center">
             <Success className="fill-sg-success mb-6" />
             <h1 className="font-bold text-3xl mb-3">Congratulations</h1>
