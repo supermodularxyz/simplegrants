@@ -132,7 +132,6 @@ export default function GrantsCheckout() {
                             <p className="text-lg ml-3">USD</p>
                           </div>
                         </div>
-
                         <p
                           className="cursor-pointer h-full items-center justify-center"
                           onClick={() => removeFromCart(grant.id)}

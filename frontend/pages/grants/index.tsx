@@ -18,6 +18,8 @@ import Input from "../../components/Input";
 import Search from "../../components/icons/Search";
 import Grid from "../../components/icons/Grid";
 import List from "../../components/icons/List";
+import Image from "next/image";
+import GrantList from "../../components/GrantList";
 
 export default function Grants() {
   const router = useRouter();
@@ -130,16 +132,29 @@ export default function Grants() {
               </ToggleGroup.Root>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-10 w-full my-6">
-            {data &&
-              data.map((grant) => (
-                <GrantCard
-                  grant={grant}
-                  onClick={() => router.push(`/grants/${grant.id}`)}
-                  key={grant.id}
-                />
-              ))}
-          </div>
+          {view === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-10 w-full my-6">
+              {data &&
+                data.map((grant) => (
+                  <GrantCard
+                    grant={grant}
+                    onClick={() => router.push(`/grants/${grant.id}`)}
+                    key={grant.id}
+                  />
+                ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-y-8 gap-x-10 w-full max-w-7xl my-6">
+              {data &&
+                data.map((grant) => (
+                  <GrantList
+                    grant={grant}
+                    onClick={() => router.push(`/grants/${grant.id}`)}
+                    key={grant.id}
+                  />
+                ))}
+            </div>
+          )}
         </div>
       </MainLayout>
     </div>
