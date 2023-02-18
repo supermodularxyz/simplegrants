@@ -50,7 +50,7 @@ export default function Input({
         type={type}
         value={value}
         placeholder={placeholder}
-        className={clsx(icon ? "pl-4" : "", "outline-none")}
+        className={clsx(icon ? "pl-4" : "", "outline-none w-full")}
         onChange={debounce ? handleChange : (e) => onChange(e.target.value)}
       />
     </div>

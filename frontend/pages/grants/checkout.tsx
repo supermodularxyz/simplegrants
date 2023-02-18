@@ -14,13 +14,15 @@ import Divider from "../../components/Divider";
 import { useHasHydrated } from "../../utils/useHydrated";
 import Input from "../../components/Input";
 import { debounce as debouncer } from "lodash";
+import axios from "../../utils/axios";
+import { toast } from "react-toastify";
 
 export default function GrantsCheckout() {
   const router = useRouter();
   const { grants, addToCart, removeFromCart, updateCart } = useCartStore();
   const { id } = router.query;
   const { data: session, status } = useSession();
-  const [data, setData] = React.useState<GrantDetailResponse>();
+  const [data, setData] = React.useState<any>();
   const [loading, setLoading] = React.useState(false);
   const hasHydrated = useHasHydrated();
 
@@ -30,10 +32,35 @@ export default function GrantsCheckout() {
     }
   }, [status]);
 
+  React.useEffect(() => {
+    if (data) {
+      router.push(data.url);
+    }
+  }, [data]);
+
   const subtotal = React.useMemo(
     () => grants.reduce((acc, grant) => acc + grant.amount, 0),
     [grants]
   );
+
+  const checkoutGrants = () => {
+    setLoading(true);
+    axios
+      .post("/grants/checkout", {
+        grants: grants.map((grant) => ({
+          id: grant.id,
+          amount: grant.amount,
+        })),
+      })
+      .then((res) => setData(res.data))
+      .catch((err) => {
+        console.error({ err });
+        toast.error(err.message || "Something went wrong", {
+          toastId: "checkout-grants-error",
+        });
+      })
+      .finally(() => setLoading(false));
+  };
 
   const updateGrantAmount = (id: string, amount: string) => {
     const num = parseFloat(amount);
@@ -42,7 +69,6 @@ export default function GrantsCheckout() {
     } else {
       updateCart(id, num);
     }
-    console.log(num);
   };
 
   return (
@@ -164,8 +190,9 @@ export default function GrantsCheckout() {
                   </p>
                 </div>
                 <Button
+                  onClick={checkoutGrants}
                   className="w-full"
-                  disabled={hasHydrated && subtotal <= 1}
+                  disabled={(hasHydrated && subtotal <= 1) || loading}
                 >
                   Checkout
                 </Button>
