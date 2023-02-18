@@ -2,19 +2,19 @@
 import Head from "next/head";
 import { useSession, signIn } from "next-auth/react";
 import React from "react";
-import MainLayout from "../../layouts/MainLayout";
-import Navbar from "../../layouts/Navbar";
-import Button from "../../components/Button";
+import MainLayout from "../../../layouts/MainLayout";
+import Navbar from "../../../layouts/Navbar";
+import Button from "../../../components/Button";
 import Link from "next/link";
-import { GrantDetailResponse } from "../../types/grant";
+import { GrantDetailResponse } from "../../../types/grant";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useCartStore } from "../../utils/store";
-import Divider from "../../components/Divider";
-import { useHasHydrated } from "../../utils/useHydrated";
-import Input from "../../components/Input";
+import { useCartStore } from "../../../utils/store";
+import Divider from "../../../components/Divider";
+import { useHasHydrated } from "../../../utils/useHydrated";
+import Input from "../../../components/Input";
 import { debounce as debouncer } from "lodash";
-import axios from "../../utils/axios";
+import axios from "../../../utils/axios";
 import { toast } from "react-toastify";
 
 export default function GrantsCheckout() {
