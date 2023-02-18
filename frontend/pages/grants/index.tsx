@@ -83,6 +83,7 @@ export default function Grants() {
             <Input
               type="text"
               placeholder="Search"
+              debounce
               onChange={setSearch}
               className="px-7 py-4 max-w-xl"
               icon={<Search className="fill-sg-900" />}

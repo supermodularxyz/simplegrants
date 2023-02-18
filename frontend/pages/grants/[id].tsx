@@ -21,7 +21,7 @@ export default function GrantDetails() {
   const router = useRouter();
   const { grants, addToCart, removeFromCart } = useCartStore();
   const { id } = router.query;
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [data, setData] = React.useState<GrantDetailResponse>();
   const [loading, setLoading] = React.useState(false);
 
@@ -46,10 +46,10 @@ export default function GrantDetails() {
   }, [id]);
 
   React.useEffect(() => {
-    if (session && !session?.user) {
+    if (status === "unauthenticated") {
       router.push("/sign-in");
     }
-  }, [session]);
+  }, [status]);
 
   return (
     data && (

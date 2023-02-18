@@ -37,7 +37,7 @@ export default function GrantsCheckout() {
 
   const updateGrantAmount = (id: string, amount: string) => {
     const num = parseFloat(amount);
-    if (isNaN(num)) {
+    if (isNaN(num) || num < 0) {
       updateCart(id, 0);
     } else {
       updateCart(id, num);
@@ -93,7 +93,9 @@ export default function GrantsCheckout() {
                           </p>
                           <div className="flex flex-row items-center">
                             <Input
-                              value={grant.amount || ""}
+                              value={grant.amount
+                                .toString()
+                                .replace(/^0(?=\d)/, "")}
                               type="number"
                               placeholder="Amount"
                               onChange={(amount) =>
@@ -161,7 +163,10 @@ export default function GrantsCheckout() {
                     USD
                   </p>
                 </div>
-                <Button className="w-full" disabled={subtotal <= 0}>
+                <Button
+                  className="w-full"
+                  disabled={hasHydrated && subtotal <= 1}
+                >
                   Checkout
                 </Button>
               </div>
