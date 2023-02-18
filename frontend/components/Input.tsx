@@ -1,10 +1,12 @@
 import React, { ReactNode } from "react";
 import clsx from "clsx";
-import { debounce } from "lodash";
+import { debounce as debouncer } from "lodash";
 
 interface IInputProps {
   icon?: ReactNode;
   type?: React.HTMLInputTypeAttribute;
+  value?: any;
+  debounce?: boolean;
   placeholder?: string;
   className?: string;
   onChange: (value: string) => void;
@@ -14,12 +16,14 @@ export default function Input({
   icon,
   type,
   placeholder,
+  debounce,
   className,
+  value,
   onChange,
 }: IInputProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedOnChange = React.useCallback(
-    debounce((value) => {
+    debouncer((value) => {
       onChange(value);
     }, 300),
     [onChange]
@@ -32,7 +36,7 @@ export default function Input({
   return (
     <div
       className={clsx(
-        "flex flex-row items-center relative w-full input input-bordered px-5 py-4",
+        "flex flex-row items-center relative w-full input input-bordered px-5 py-4 overflow-hidden",
         className
       )}
     >
@@ -44,9 +48,10 @@ export default function Input({
       <input
         id={placeholder}
         type={type}
+        value={value}
         placeholder={placeholder}
         className={clsx(icon ? "pl-4" : "", "outline-none")}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={debounce ? handleChange : (e) => onChange(e.target.value)}
       />
     </div>
   );
