@@ -13,7 +13,7 @@ interface GrantCheckoutItem {
 interface CartState {
   grants: GrantCheckoutItem[];
   addToCart: (grant: Grant) => void;
-  updateCart: (grant: Grant) => void;
+  updateCart: (id: string, amount: number) => void;
   removeFromCart: (grantId: string) => void;
 }
 
@@ -34,15 +34,13 @@ export const useCartStore = create<CartState>()(
               },
             ],
           })),
-        updateCart: (grant) =>
+        updateCart: (id: string, amount: number) =>
           set((state) => ({
             grants: state.grants.map((g) =>
-              g.id === grant.id
+              g.id === id
                 ? {
-                    id: grant.id,
-                    image: grant.image,
-                    name: grant.name,
-                    amount: 0,
+                    ...g,
+                    amount: amount,
                   }
                 : g
             ),
