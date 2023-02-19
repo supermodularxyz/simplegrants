@@ -12,8 +12,6 @@ services:
       - .env
     environment:
       - DEBUG=${DEBUG}
-    expose:
-      - 3001
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     depends_on:
@@ -35,6 +33,5 @@ services:
 volumes:
   simplegrants-backend:
   simplegrants-database:
-
 networks:
   simplegrants:
