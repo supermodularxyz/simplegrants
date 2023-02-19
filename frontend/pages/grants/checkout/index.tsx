@@ -109,7 +109,7 @@ export default function GrantsCheckout() {
                             src={grant.image}
                             width={132}
                             height={98}
-                            className="aspect-[5/4]"
+                            className="aspect-[5/4] object-cover"
                             alt={grant.name}
                           />
                         </div>
@@ -161,9 +161,9 @@ export default function GrantsCheckout() {
                         className="flex flex-row w-full items-center justify-between"
                         key={grant.id}
                       >
-                        <p className="flex flex-1 text-ellipsis truncate justify-start">
-                          {grant.name}
-                        </p>
+                        <div className="flex flex-1 justify-start overflow-hidden">
+                          <p className="truncate">{grant.name}</p>
+                        </div>
                         <p className="flex flex-1 text-ellipsis truncate justify-end">
                           {grant.amount.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
