@@ -1,4 +1,13 @@
-# SimpleGrants Frontend 📱
+# SimpleGrants Frontend 📱 <!-- omit from toc -->
+
+## Table of Contents 📒 <!-- omit from toc -->
+
+- [Requirements 📝](#requirements-%F0%9F%93%9D)
+- [Installation \& Setup 🧪](#installation--setup-%F0%9F%A7%AA)
+- [Running the app 🚀](#running-the-app-%F0%9F%9A%80)
+- [Additional Notes 🧠](#additional-notes-%F0%9F%A7%A0)
+  - [Prisma Schema](#prisma-schema)
+- [Deployment 🚀](#deployment-%F0%9F%9A%80)
 
 ## Requirements 📝
 
