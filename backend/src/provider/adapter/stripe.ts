@@ -245,8 +245,8 @@ export class StripeProvider implements PaymentProviderAdapter {
           denomination: provider.denominations[0],
         },
       },
-      success_url: `${process.env.NEXTAUTH_URL}/grants/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/grants/checkout`,
+      success_url: `${process.env.FRONTEND_URL}/grants/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/grants/checkout`,
     });
 
     return session;
