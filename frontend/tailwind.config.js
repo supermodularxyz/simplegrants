@@ -48,6 +48,9 @@ module.exports = {
       boxShadow: {
         card: "0px 4px 8px rgba(227, 221, 215, 0.5)",
       },
+      scale: {
+        200: "2",
+      },
     },
   },
   plugins: [require("daisyui"), require("@tailwindcss/line-clamp")],
