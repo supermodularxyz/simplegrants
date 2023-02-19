@@ -56,7 +56,7 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
       </div>
       {addedToCart ? (
         <Button
-          className="flex-none w-max h-max btn-error"
+          className="flex-none btn-error"
           onClick={(e) => {
             e.stopPropagation();
             removeFromCart(grant.id);
@@ -66,7 +66,7 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
         </Button>
       ) : (
         <Button
-          className="flex-none w-max h-max"
+          className="flex-none"
           onClick={(e) => {
             e.stopPropagation();
             addToCart(grant);

@@ -56,7 +56,8 @@ const GrantCard = ({ grant, onClick }: IGrantCardProps) => {
           </p>
           {addedToCart ? (
             <Button
-              className="w-full btn-error"
+              width="full"
+              className="btn-error"
               onClick={(e) => {
                 e.stopPropagation();
                 removeFromCart(grant.id);
@@ -66,7 +67,8 @@ const GrantCard = ({ grant, onClick }: IGrantCardProps) => {
             </Button>
           ) : (
             <Button
-              className="w-full"
+              width="full"
+              className=""
               onClick={(e) => {
                 e.stopPropagation();
                 addToCart(grant);

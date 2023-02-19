@@ -136,13 +136,18 @@ export default function GrantDetails() {
                   <p className="mb-4">contributors</p>
                   {grants.find((grant) => grant.id === id) ? (
                     <Button
-                      className="w-full btn-error"
+                      width="full"
+                      className="btn-error"
                       onClick={() => removeFromCart(id as string)}
                     >
                       Remove from cart
                     </Button>
                   ) : (
-                    <Button className="w-full" onClick={() => addToCart(data)}>
+                    <Button
+                      width="full"
+                      className=""
+                      onClick={() => addToCart(data)}
+                    >
                       Add to cart
                     </Button>
                   )}

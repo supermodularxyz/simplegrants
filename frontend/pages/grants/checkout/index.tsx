@@ -186,7 +186,7 @@ export default function GrantsCheckout() {
                 </div>
                 <Button
                   onClick={checkoutGrants}
-                  className="w-full"
+                  width="full"
                   disabled={(hasHydrated && subtotal <= 1) || loading}
                 >
                   Checkout

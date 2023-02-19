@@ -30,6 +30,7 @@ export default function SignIn({
                 key={provider.name}
                 onClick={() => signIn(provider.id)}
                 className="px-16 py-3 text-xl"
+                width="full"
               >
                 Sign In With {provider.name}
               </Button>

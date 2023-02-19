@@ -29,13 +29,13 @@ export default function CheckoutSuccess() {
         })
         .catch((err) => {
           console.log(err);
-          router.push("/grants");
+          // router.push("/grants");
         })
         .finally(() => setLoading(false));
     }
-    if (hasHydrated && !loading && !router.query.session_id) {
-      router.push("/grants");
-    }
+    // if (hasHydrated && !loading && !router.query.session_id) {
+    //   router.push("/grants");
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query, hasHydrated, router]);
 
@@ -75,7 +75,7 @@ export default function CheckoutSuccess() {
               <Button>Copy Link</Button>
             </div>
             <Link href="/grants">
-              <Button className="btn-secondary text-white w-max mt-6">
+              <Button className="mt-6" style="secondary">
                 Back To Grants
               </Button>
             </Link>
