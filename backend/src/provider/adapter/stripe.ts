@@ -219,7 +219,7 @@ export class StripeProvider implements PaymentProviderAdapter {
                 name: grant.name,
                 description: grant.description,
               },
-              unit_amount: grant.amount * 100,
+              unit_amount: this.roundNumber(grant.amount) * 100,
             },
             quantity: 1,
           };
@@ -245,8 +245,8 @@ export class StripeProvider implements PaymentProviderAdapter {
           denomination: provider.denominations[0],
         },
       },
-      success_url: `${process.env.NEXTAUTH_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/cancel`,
+      success_url: `${process.env.NEXTAUTH_URL}/grants/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/grants/checkout`,
     });
 
     return session;
