@@ -1,0 +1,35 @@
+services:
+  simplegrants-backend:
+    container_name: ${BACKEND_CONTAINER}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - DEBUG=${DEBUG}
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    depends_on:
+      - simplegrants-database
+    networks:
+      - simplegrants
+  simplegrants-database:
+    container_name: ${DATABASE_CONTAINER}
+    image: postgres:14
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - simplegrants-database:/var/lib/postgresql/data
+    networks:
+      - simplegrants
+volumes:
+  simplegrants-backend:
+  simplegrants-database:
+networks:
+  simplegrants:

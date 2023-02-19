@@ -34,6 +34,28 @@ This repository is broken down into two folders, `backend` & `frontend` and fold
 2. Navigate to the `backend` folder and follow the installation and setup instructions in the [Backend README](./backend/README.md).
 3. Navigate to the `frontend` folder and follow the installation and setup instructions in the [Frontend README](./frontend/README.md).
 
+### Deployment Configuration 🚀
+
+If you would like to deploy this application, there is a simple script that you can run to help speed up the process slightly.
+
+1. Firstly, ensure you install and setup everything according to the README in each folder as described above. You do not need to run any of the services yet.
+2. Once everything is setup, you may run the command below to instantly spin up all the required services. **Note: This assumes that you would be deploying everything in one server using Docker, rather than hosting on multiple platforms**.
+
+```bash
+# Copy and update your .env
+$ cp .env.example .env
+
+# Update the .env accordingly, based on the values on both your frontend and backend
+# Then, deploy everything in a single server
+$ docker compose up -d
+
+# Run migration and seeds
+$ npm run backend:setup
+```
+
+3. Ensure that your payment provider webhooks are setup accordingly.
+4. Because you are using Docker, it is very important to remember that the containers cannot speak to each other via `localhost`. That means that you should ideally setup NGINX to point to the services and change your environment variables to use the canonical URLs instead.
+
 ## Additional Notes 🧠
 
 This project is intended for developers and entities who want to launch their own instance of this project and deploy it to their own platform.

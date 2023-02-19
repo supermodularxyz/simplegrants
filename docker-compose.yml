@@ -1,0 +1,37 @@
+services:
+  simplegrants-backend:
+    extends:
+      file: ./backend/docker-compose.yml
+      service: simplegrants-backend
+    env_file:
+      - ./backend/.env
+  simplegrants-database:
+    extends:
+      file: ./backend/docker-compose.yml
+      service: simplegrants-database
+    env_file:
+      - ./backend/.env
+  simplegrants-frontend:
+    container_name: simplegrants-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    working_dir: /app
+    restart: on-failure
+    env_file:
+      - ./frontend/.env.production
+    environment:
+      - DEBUG=${DEBUG}
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    depends_on:
+      - simplegrants-backend
+    networks:
+      - simplegrants
+volumes:
+  simplegrants-frontend:
+  simplegrants-backend:
+  simplegrants-database:
+
+networks:
+  simplegrants:
