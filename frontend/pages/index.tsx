@@ -1,9 +1,8 @@
 import Head from "next/head";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react";
 import React from "react";
 import Image from "next/image";
-import MainLayout from "../layouts/MainLayout";
 import LandingNavbar from "../layouts/landing/LandingNavbar";
 import Button from "../components/Button";
 import { useRouter } from "next/router";
@@ -12,6 +11,7 @@ import GrantCard from "../components/GrantCard";
 import { GrantResponse } from "../types/grant";
 import axios from "../utils/axios";
 import { toast } from "react-toastify";
+import Fade from "react-reveal/Fade";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -73,14 +73,17 @@ export default function Home() {
 
       <main className="flex flex-col min-w-screen min-h-screen w-full h-full overflow-x-hidden">
         <LandingNavbar className="z-[2] absolute top-0 left-0" />
-        <div className="flex flex-col w-full items-center justify-center min-h-[60vh] text-center bg-sg-primary px-2">
-          <h1 className="font-bold text-3xl md:text-5xl max-w-2xl md:leading-snug">
-            Empowering the next generation of changemakers
-          </h1>
-          <p className="mt-3 text-lg md:text-xl">
-            Join us in making an impact through quadratic funding.
-          </p>
-        </div>
+        <Fade bottom distance="15px">
+          <div className="flex flex-col w-full items-center justify-center min-h-[60vh] text-center bg-sg-primary px-2">
+            <h1 className="font-bold text-3xl md:text-5xl max-w-2xl md:leading-snug">
+              Empowering the next generation of changemakers
+            </h1>
+            <p className="mt-3 text-lg md:text-xl">
+              Join us in making an impact through quadratic funding.
+            </p>
+          </div>
+        </Fade>
+
         <div className="relative flex w-full -translate-y-[55%]">
           <Image
             src="/assets/abstract.svg"
