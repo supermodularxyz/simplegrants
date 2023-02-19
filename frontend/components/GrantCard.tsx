@@ -36,7 +36,7 @@ const GrantCard = ({ grant, onClick }: IGrantCardProps) => {
         <div className="flex flex-col">
           <p className="font-bold text-[22px]">{grant.name}</p>
           <p className="text-sg-700">by User</p>
-          <p className="text-sm mt-4 overflow-hidden text-ellipsis max-h-16">
+          <p className="text-sm mt-4 overflow-hidden text-ellipsis line-clamp-3">
             {grant.description}
           </p>
         </div>

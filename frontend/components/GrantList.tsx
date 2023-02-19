@@ -33,9 +33,9 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
         />
       </div>
       <div className="flex flex-col w-full h-full justify-between">
-        <div className="flex flex-col mb-4 max-h-28 overflow-hidden text-ellipsis">
+        <div className="flex flex-col mb-4">
           <p className="font-bold text-xl mb-2">{grant.name}</p>
-          <p className="leading-relaxed">{grant.description}</p>
+          <p className="leading-relaxed line-clamp-3">{grant.description}</p>
         </div>
         <div className="flex flex-col">
           <FundingBar
