@@ -1,8 +1,8 @@
 {
-  "name": "backend",
+  "name": "simplegrants-backend",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A super modular, plug-and-play Web2 grants funding system.",
+  "author": "Eason Chai",
   "private": true,
   "license": "GPL-3.0",
   "scripts": {
