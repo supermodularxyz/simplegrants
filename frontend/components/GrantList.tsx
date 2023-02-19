@@ -20,11 +20,11 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
 
   return (
     <div
-      className="flex flex-row w-full bg-white shadow-card py-8 px-6 rounded-lg gap-x-6 cursor-pointer"
+      className="flex flex-col md:flex-row w-full bg-white shadow-card py-8 px-6 rounded-lg gap-x-6 cursor-pointer"
       key={grant.id}
       onClick={onClick}
     >
-      <div className="overflow-hidden rounded-lg aspect-[5/3] h-full max-w-xs w-full relative flex-none">
+      <div className="overflow-hidden rounded-lg aspect-[5/3] h-full max-w-xs w-full relative flex-none mb-4 md:mb-0">
         <Image
           src={grant.image}
           fill
@@ -32,9 +32,10 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
           alt={grant.name}
         />
       </div>
-      <div className="flex flex-col flex-grow w-full justify-between">
+      <div className="flex flex-col flex-grow w-full justify-between mb-4 md:mb-0">
         <div className="flex flex-col mb-4">
-          <p className="font-bold text-xl mb-2">{grant.name}</p>
+          <p className="font-bold text-xl">{grant.name}</p>
+          <p className="text-sg-700 mb-2">by User</p>
           <p className="leading-relaxed line-clamp-3">{grant.description}</p>
         </div>
         <div className="flex flex-col">

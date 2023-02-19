@@ -18,7 +18,7 @@ export default function Button({
     <button
       onClick={onClick}
       className={clsx(
-        "btn-primary font-bold text-lg px-12 py-3 w-full rounded-full text-sg-900 disabled:bg-sg-50 disabled:text-sg-500",
+        "btn-primary font-bold lg:text-lg px-4 md:px-12 py-3 w-full rounded-full text-sg-900 disabled:bg-sg-50 disabled:text-sg-500",
         className
       )}
       disabled={disabled}

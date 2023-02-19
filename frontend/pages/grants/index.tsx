@@ -72,13 +72,9 @@ export default function Grants() {
 
       <MainLayout>
         <Navbar className="p-0">
-          {session ? (
-            <Link href="/grants/create">
-              <Button>Create Grant</Button>
-            </Link>
-          ) : (
-            <Button onClick={() => signIn()}>Sign In</Button>
-          )}
+          <Link href="/grants/create">
+            <Button>Create Grant</Button>
+          </Link>
         </Navbar>
         <div className="flex flex-col items-center justify-center px-8 my-20 w-full">
           <div className="flex flex-row w-full items-center justify-center mb-8">
@@ -91,9 +87,11 @@ export default function Grants() {
               icon={<Search className="fill-sg-900" />}
             />
           </div>
-          <div className="flex flex-row w-full items-center justify-between">
-            <p className="font-bold text-xl">{data.length} Grants</p>
-            <div className="flex flex-row items-center justify-center gap-x-3">
+          <div className="flex flex-col lg:flex-row w-full items-end lg:items-center justify-between gap-y-4">
+            <p className="font-bold text-xl flex-initial">
+              {data.length} Grants
+            </p>
+            <div className="flex flex-row gap-x-3 w-full flex-1 justify-end mr-0 lg:mr-3">
               <Select
                 label="Sort"
                 options={SortOptions}
@@ -104,6 +102,8 @@ export default function Grants() {
                 options={FilterOptions}
                 onValueChange={setFilter}
               />
+            </div>
+            <div className="flex flex-row items-center justify-center gap-x-3 flex-initial">
               <Divider orientation="vertical" />
               <ToggleGroup.Root
                 className="items-center flex flex-row gap-x-1"

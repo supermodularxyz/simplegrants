@@ -84,13 +84,9 @@ export default function GrantsCheckout() {
 
       <MainLayout>
         <Navbar className="p-0">
-          {session ? (
-            <Link href="/grants/create">
-              <Button>Create Grant</Button>
-            </Link>
-          ) : (
-            <Button onClick={() => signIn()}>Sign In</Button>
-          )}
+          <Link href="/grants/create">
+            <Button>Create Grant</Button>
+          </Link>
         </Navbar>
         <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
           <h1 className="font-bold text-2xl my-14 px-4">Checkout Grants</h1>
