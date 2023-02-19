@@ -2,10 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import {
   randCatchPhrase,
   randCountry,
-  randImg,
   randNumber,
   randQuote,
-  randText,
+  randParagraph,
   randUrl,
   randUser,
   randUserName,
@@ -105,15 +104,15 @@ async function main() {
       create: {
         id: 'cld1dnt1y000008m97yakhtrf',
         name: randCatchPhrase(),
-        description: randText(),
-        image: randImg(),
+        description: randParagraph({ length: 3 }).join(' '),
+        image: 'https://picsum.photos/seed/cld1dnt1y000008m97yakhtrf/1000/600',
         twitter: randUserName(),
         website: randUrl(),
         location: randCountry(),
         paymentAccount: {
           connectOrCreate: {
             create: {
-              recipientAddress: 'sample_stripe_id',
+              recipientAddress: 'acct_1MWyVDFcbjBUzcah',
               provider: {
                 connect: {
                   id: stripeProvider.id,
@@ -122,7 +121,7 @@ async function main() {
             },
             where: {
               recipientAddress_providerId: {
-                recipientAddress: 'sample_stripe_id',
+                recipientAddress: 'acct_1MWyVDFcbjBUzcah',
                 providerId: stripeProvider.id,
               },
             },
@@ -144,15 +143,15 @@ async function main() {
       create: {
         id: 'cld2ilh7t000008l3g1qe3nla',
         name: randCatchPhrase(),
-        description: randText(),
-        image: randImg(),
+        description: randParagraph({ length: 3 }).join(' '),
+        image: 'https://picsum.photos/seed/cld2ilh7t000008l3g1qe3nla/1000/600',
         twitter: randUserName(),
         website: randUrl(),
         location: randCountry(),
         paymentAccount: {
           connectOrCreate: {
             create: {
-              recipientAddress: 'sample_stripe_id',
+              recipientAddress: 'acct_1MXdUaAM25Ajy0Ie',
               provider: {
                 connect: {
                   id: stripeProvider.id,
@@ -161,7 +160,7 @@ async function main() {
             },
             where: {
               recipientAddress_providerId: {
-                recipientAddress: 'sample_stripe_id',
+                recipientAddress: 'acct_1MXdUaAM25Ajy0Ie',
                 providerId: stripeProvider.id,
               },
             },
@@ -182,9 +181,9 @@ async function main() {
             data: [
               {
                 userId: user.id,
-                amount: 1000,
+                amount: 3500,
                 denomination: 'USD',
-                amountUsd: 1000,
+                amountUsd: 3500,
                 paymentMethodId: userPaymentMethod.id,
                 flagged: false,
               },
@@ -202,15 +201,15 @@ async function main() {
       create: {
         id: 'clda3184o000008mg5bqobymn',
         name: randCatchPhrase(),
-        description: randText(),
-        image: randImg(),
+        description: randParagraph({ length: 3 }).join(' '),
+        image: 'https://picsum.photos/seed/clda3184o000008mg5bqobymn/1000/600',
         twitter: randUserName(),
         website: randUrl(),
         location: randCountry(),
         paymentAccount: {
           connectOrCreate: {
             create: {
-              recipientAddress: 'sample_stripe_id',
+              recipientAddress: 'acct_1MWsgbKMcPvbzDpI',
               provider: {
                 connect: {
                   id: stripeProvider.id,
@@ -219,7 +218,7 @@ async function main() {
             },
             where: {
               recipientAddress_providerId: {
-                recipientAddress: 'sample_stripe_id',
+                recipientAddress: 'acct_1MWsgbKMcPvbzDpI',
                 providerId: stripeProvider.id,
               },
             },
