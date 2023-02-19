@@ -8,9 +8,10 @@ import Button from "./Button";
 interface IGrantCardProps {
   grant: GrantResponse;
   onClick?: (e?: any) => any;
+  hideButton?: boolean;
 }
 
-const GrantCard = ({ grant, onClick }: IGrantCardProps) => {
+const GrantCard = ({ grant, onClick, hideButton }: IGrantCardProps) => {
   const { grants, addToCart, removeFromCart } = useCartStore();
 
   const addedToCart = React.useMemo(
@@ -54,28 +55,32 @@ const GrantCard = ({ grant, onClick }: IGrantCardProps) => {
             / {((grant.amountRaised / grant.fundingGoal) * 100).toFixed(0)}%
             funded
           </p>
-          {addedToCart ? (
-            <Button
-              width="full"
-              className="btn-error"
-              onClick={(e) => {
-                e.stopPropagation();
-                removeFromCart(grant.id);
-              }}
-            >
-              Remove from cart
-            </Button>
-          ) : (
-            <Button
-              width="full"
-              className=""
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(grant);
-              }}
-            >
-              Add to cart
-            </Button>
+          {!hideButton && (
+            <>
+              {addedToCart ? (
+                <Button
+                  width="full"
+                  className="btn-error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFromCart(grant.id);
+                  }}
+                >
+                  Remove from cart
+                </Button>
+              ) : (
+                <Button
+                  width="full"
+                  className=""
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(grant);
+                  }}
+                >
+                  Add to cart
+                </Button>
+              )}
+            </>
           )}
         </div>
       </div>
