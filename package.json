@@ -1,0 +1,23 @@
+{
+  "name": "simplegrants",
+  "version": "0.0.1",
+  "description": "A super modular, plug-and-play Web2 grants funding system.",
+  "main": "index.js",
+  "author": "Eason Chai",
+  "private": true,
+  "license": "GPL-3.0",
+  "scripts": {
+    "backend:dev": "cd backend && npm run docker:dev:up && stripe listen --forward-to localhost:3000/checkout/webhook",
+    "frontend:dev": "cd frontend && pnpm dev -p 3001",
+    "backend:setup": "cd backend && npm run setup"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easonchai/simplegrants.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/easonchai/simplegrants/issues"
+  },
+  "homepage": "https://github.com/easonchai/simplegrants#readme"
+}
