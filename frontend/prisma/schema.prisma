@@ -73,6 +73,7 @@ model User {
   flagged          Boolean            @default(false) // To track if a user is flagged for malicious activity
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+  checkoutSessions Checkout[]
 }
 
 model Grant {
@@ -93,6 +94,7 @@ model Grant {
   verified         Boolean
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+  checkoutSessions Checkout[]
 }
 
 model PaymentAccount {
@@ -111,7 +113,7 @@ model PaymentMethod {
   id            String          @id @default(cuid())
   userId        String
   user          User            @relation(fields: [userId], references: [id])
-  uniqueId      String
+  uniqueId      String          @unique
   displayInfo   String?
   denomination  String
   providerId    String
@@ -195,4 +197,17 @@ model MatchedFund {
   denomination    String
   amountUsd       Float
   payoutAt        DateTime
+}
+
+model Checkout {
+  id           Int      @id @default(autoincrement())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  amount       Float
+  denomination String
+  grantId      String?
+  grant        Grant?   @relation(fields: [grantId], references: [id])
+  groupId      String //transfer_group for Stripe or tx ID or any other 
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
