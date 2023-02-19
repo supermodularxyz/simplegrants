@@ -1,13 +1,34 @@
-# SimpleGrants Backend 📡
+# SimpleGrants Backend 📡 <!-- omit from toc -->
 
 > ⚠️ **Important Note**:
 > You have to use Node version >= 17.5! This is because the authentication system uses NextAuth which will require fetch (which is available above v17.5)
+
+## Table of Contents 📒 <!-- omit from toc -->
+
+- [Requirements 📝](#requirements-%F0%9F%93%9D)
+- [Installation \& Setup 🧪](#installation--setup-%F0%9F%A7%AA)
+  - [Choosing your Payment Provider](#choosing-your-payment-provider)
+  - [Setting up environment variables](#setting-up-environment-variables)
+- [Running the app 🚀](#running-the-app-%F0%9F%9A%80)
+  - [Local Development 👨🏻‍💻](#local-development-%F0%9F%91%A8%F0%9F%8F%BB%E2%80%8D%F0%9F%92%BB)
+  - [Production Deployment 🔥](#production-deployment-%F0%9F%94%A5)
+- [Test ✅](#test-%E2%9C%85)
+  - [Unit Tests](#unit-tests)
+  - [Integration Tests](#integration-tests)
+  - [End-to-End (E2E) Tests](#end-to-end-e2e-tests)
+  - [Test Coverage](#test-coverage)
+- [Additional Notes 🧠](#additional-notes-%F0%9F%A7%A0)
+  - [Prisma Schema](#prisma-schema)
+  - [Creating Admins](#creating-admins)
+  - [Payment Providers](#payment-providers)
+    - [Stripe](#stripe)
 
 ## Requirements 📝
 
 - Docker & `docker compose`
 - NodeJS (v17.5+)
 - Prisma CLI
+- Stripe CLI (if using Stripe)
 
 The backend utilizes Docker for ease of setup & deployment. You should ideally have Docker setup on your machine if you intend to run it locally.
 
@@ -42,18 +63,44 @@ $ cp .env.example .env
 
 ## Running the app 🚀
 
+There are multiple ways of running this application, each with a slightly different method of setting things up.
+
+### Local Development 👨🏻‍💻
+
+If you are running locally for development, there are a few things to take note of:
+
+1. Because of the way Docker networking works, if you need to run commands like `prisma migrate` or `prisma db seed`, you need to change the `DATABASE_CONTAINER` environment variable to `localhost` temporarily. Make sure you remember to switch it back!
+2. Depending on how you choose to run this application, you may need to update `FRONTEND_URL` and `NEXTAUTH_URL` accordingly.
+3. If you are using Stripe, **remember to configure your webhook**!
+
 ```bash
-# development mode
+# Development mode
 $ npm run docker:dev:up
 
-# production mode
-$ npm run docker:up
-
 # Run the seed and migration
-$ npx prisma migrate deploy && npx prisma db seed
+$ npm run setup
+
+# Listen for incoming webhooks via Stripe (if you are using Stripe)
+$ stripe listen --forward-to localhost:3000/checkout/webhook
 ```
 
 **⚠️ If you get a connection error 👉 Error: P1001: Can't reach database server at `simplegrants-database`:`5432`, all you need to do is to temporarily change `DATABASE_CONTAINER=localhost` in the .env and rerun the command. Make sure to remember to change it back once you are done!**
+
+### Production Deployment 🔥
+
+If you are deploying this application for production, it is slightly easier to setup, but there are still some things to be aware of:
+
+1. The current `docker-compose.yml` assumes that you may be running a database locally. However, this is most likely not the case and you would be connecting to a database that is deployed separately. To achieve this configuration, remove the `simplegrants-database` entry in the `docker-compose.yml` and change `DATABASE_CONTAINER` in your .env to the database's URL.
+2. Your `FRONTEND_URL` and `NEXTAUTH_URL` should point to a registered domain that matches your callback URLs that you configured in your OAuth providers.
+3. If you are using Stripe, **remember to configure your webhook**!
+
+```bash
+# Production mode
+$ npm run docker:up
+
+# Run the seed and migration
+$ npm run setup
+```
 
 ## Test ✅
 
@@ -109,3 +156,9 @@ The backend utilizes NextAuth, which is dependent on the frontend. To ensure tha
 
 Because authentication relies on NextAuth, users will only be created when someone has logged in to the platform. Therefore, the best way to create the first admin is to login to the platform for the first time, and manually change the `Role` for the specific user to an `Admin`.
 Subsequent admin changes can be done using the API, which is documented in Swagger.
+
+### Payment Providers
+
+#### Stripe
+
+If you are using Stripe, it is **extremely important that you remember to configure your webhook**! If you do not do so, your backend will not detect any successful payments being made by your users.
