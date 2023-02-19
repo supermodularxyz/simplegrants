@@ -26,6 +26,9 @@ $ pnpm install
 # Copy .env over
 $ cp .env.example .env.local
 
+# If running for production, use .env.production
+$ cp .env.example .env.production
+
 ```
 
 ⚠️ **Make sure to update the .env.local file with your values!**
