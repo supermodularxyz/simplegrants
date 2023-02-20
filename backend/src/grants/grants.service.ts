@@ -199,6 +199,7 @@ export class GrantsService {
     return await this.prisma.grant.create({
       data: {
         ...data,
+        twitter: data.twitter || '',
         verified: false,
         team: {
           connect: {

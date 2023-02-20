@@ -76,11 +76,12 @@ export class UpdateGrantDto {
   @IsString()
   location: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
   })
   @IsString()
-  twitter: string;
+  @IsOptional()
+  twitter?: string;
 
   @ApiProperty({
     type: String,
