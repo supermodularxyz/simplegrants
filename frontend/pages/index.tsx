@@ -83,8 +83,7 @@ export default function Home() {
             </p>
           </div>
         </Fade>
-
-        <div className="relative flex w-full -translate-y-[55%]">
+        <div className="relative flex w-full -translate-y-[57%]">
           <Image
             src="/assets/abstract.svg"
             width={1920}
@@ -97,7 +96,7 @@ export default function Home() {
           <h2 className="font-bold text-3xl md:text-5xl mt-12 lg:mt-0 mb-5">
             How does SimpleGrants work?
           </h2>
-          <p className="mb-28">
+          <p className="mb-28 max-w-3xl">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
             imperdiet scelerisque augue. In quis posuere nisl. Sed a commodo
             massa. Praesent eu scelerisque libero, sit amet vulputate arcu. Cras
