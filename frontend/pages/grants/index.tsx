@@ -18,8 +18,8 @@ import Input from "../../components/Input";
 import Search from "../../components/icons/Search";
 import Grid from "../../components/icons/Grid";
 import List from "../../components/icons/List";
-import Image from "next/image";
 import GrantList from "../../components/GrantList";
+import { debounce as debouncer } from "lodash";
 
 export default function Grants() {
   const router = useRouter();
@@ -59,6 +59,18 @@ export default function Grants() {
     getGrants();
   }, [sort, filter, search]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedOnChange = React.useCallback(
+    debouncer((value) => {
+      setSearch(value);
+    }, 500),
+    [setSearch]
+  );
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedOnChange(event.target.value);
+  };
+
   return (
     <div>
       <Head>
@@ -81,9 +93,8 @@ export default function Grants() {
             <Input
               type="text"
               placeholder="Search"
-              debounce
-              onChange={setSearch}
-              className="px-7 py-4 max-w-xl"
+              onChange={handleChange}
+              className="max-w-xl"
               icon={<Search className="fill-sg-900" />}
             />
           </div>

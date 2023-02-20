@@ -13,7 +13,6 @@ import { useCartStore } from "../../../utils/store";
 import Divider from "../../../components/Divider";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import Input from "../../../components/Input";
-import { debounce as debouncer } from "lodash";
 import axios from "../../../utils/axios";
 import { toast } from "react-toastify";
 
@@ -120,8 +119,10 @@ export default function GrantsCheckout() {
                                 .replace(/^0(?=\d)/, "")}
                               type="number"
                               placeholder="Amount"
-                              onChange={(amount) =>
-                                updateGrantAmount(grant.id, amount)
+                              onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>
+                              ) =>
+                                updateGrantAmount(grant.id, event.target.value)
                               }
                               className="px-4 py-2 max-w-[144px] text-lg"
                             />
