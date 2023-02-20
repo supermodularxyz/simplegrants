@@ -1,12 +1,22 @@
 import React, { ReactNode } from "react";
 import clsx from "clsx";
+import { UseFormRegister } from "react-hook-form";
 
 interface IInputProps extends React.HTMLProps<HTMLInputElement> {
   icon?: ReactNode;
   className?: string;
+  register?: UseFormRegister<any>;
 }
 
-export default function Input({ icon, className, ...props }: IInputProps) {
+export default function Input({
+  icon,
+  className,
+  required,
+  register,
+  ...props
+}: IInputProps) {
+  const { id, type } = props;
+
   return (
     <div
       className={clsx("flex flex-row items-center relative w-full", className)}
@@ -22,6 +32,8 @@ export default function Input({ icon, className, ...props }: IInputProps) {
           "block w-full px-7 py-3 border border-sg-500 focus:border-sg-primary focus:ring-0 focus:ring-offset-0 outline-none rounded-lg"
         )}
         {...props}
+        {...(register &&
+          register(id || "", { required, valueAsNumber: type === "number" }))}
       />
     </div>
   );
