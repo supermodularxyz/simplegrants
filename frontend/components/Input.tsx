@@ -1,57 +1,27 @@
 import React, { ReactNode } from "react";
 import clsx from "clsx";
-import { debounce as debouncer } from "lodash";
 
-interface IInputProps {
+interface IInputProps extends React.HTMLProps<HTMLInputElement> {
   icon?: ReactNode;
-  type?: React.HTMLInputTypeAttribute;
-  value?: any;
-  debounce?: boolean;
-  placeholder?: string;
   className?: string;
-  onChange: (value: string) => void;
 }
 
-export default function Input({
-  icon,
-  type,
-  placeholder,
-  debounce,
-  className,
-  value,
-  onChange,
-}: IInputProps) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedOnChange = React.useCallback(
-    debouncer((value) => {
-      onChange(value);
-    }, 300),
-    [onChange]
-  );
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    debouncedOnChange(event.target.value);
-  };
-
+export default function Input({ icon, className, ...props }: IInputProps) {
   return (
     <div
-      className={clsx(
-        "flex flex-row items-center relative w-full input input-bordered px-5 py-4 overflow-hidden",
-        className
-      )}
+      className={clsx("flex flex-row items-center relative w-full", className)}
     >
       {icon && (
-        <label className="" htmlFor={placeholder}>
+        <label className="absolute inset-y-0 left-0 flex items-center pl-4">
           {icon}
         </label>
       )}
       <input
-        id={placeholder}
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        className={clsx(icon ? "pl-4" : "", "outline-none w-full")}
-        onChange={debounce ? handleChange : (e) => onChange(e.target.value)}
+        className={clsx(
+          icon ? "pl-10" : "",
+          "block w-full px-7 py-3 border border-sg-500 focus:border-sg-primary focus:ring-0 focus:ring-offset-0 outline-none rounded-lg"
+        )}
+        {...props}
       />
     </div>
   );
