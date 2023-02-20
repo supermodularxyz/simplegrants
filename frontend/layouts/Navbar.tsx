@@ -10,7 +10,7 @@ import { useHasHydrated } from "../utils/useHydrated";
 import Button from "../components/Button";
 
 interface INavbarProps {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
 }
 
