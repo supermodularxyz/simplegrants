@@ -106,7 +106,7 @@ async function main() {
         name: randCatchPhrase(),
         description: randParagraph({ length: 3 }).join(' '),
         image:
-          'https://images.unsplash.com/photo-1676806850877-0e0acd08985b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+          'https://picsum.photos/seed/cld1dnt1y000008m97yakhtrf/1000/600.jpg',
         twitter: randUserName(),
         website: randUrl(),
         location: randCountry(),
@@ -146,7 +146,7 @@ async function main() {
         name: randCatchPhrase(),
         description: randParagraph({ length: 3 }).join(' '),
         image:
-          'https://images.unsplash.com/photo-1670272504528-790c24957dda?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+          'https://picsum.photos/seed/cld2ilh7t000008l3g1qe3nla/1000/600.jpg',
         twitter: randUserName(),
         website: randUrl(),
         location: randCountry(),
