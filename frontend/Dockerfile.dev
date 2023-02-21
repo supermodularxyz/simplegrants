@@ -1,0 +1,16 @@
+FROM node:18-slim
+
+# For compatibility with M1 Macs
+RUN apt-get update && \
+    apt-get install -y procps && \
+    apt-get install -y openssl && \
+    apt-get install -y libc6 
+
+RUN npm i -g pnpm
+
+# Create app directory
+WORKDIR /app
+
+ARG FRONTEND_PORT
+
+CMD pnpm dev -p $FRONTEND_PORT
