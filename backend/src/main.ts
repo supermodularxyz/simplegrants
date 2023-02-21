@@ -18,6 +18,7 @@ async function bootstrap() {
       'Accept',
       'Accept-Encoding',
       'Cookie',
+      'Access-Control-Request-Headers',
     ],
   });
 
