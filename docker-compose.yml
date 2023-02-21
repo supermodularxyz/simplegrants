@@ -17,6 +17,9 @@ services:
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    depends_on:
+      - simplegrants-backend
+      - simplegrants-database
     networks:
       - simplegrants
   simplegrants-backend:
@@ -27,7 +30,7 @@ services:
       - ./backend/.env.production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.simplegrants-backend.rule=Host(`api.docker.localhost`)"
+      - "traefik.http.routers.simplegrants-backend.rule=Host(`api.simplegrants.xyz`)"
       - "traefik.http.routers.simplegrants-backend.tls.certresolver=myresolver"
       - "traefik.http.services.simplegrants-backend.loadbalancer.server.port=3000"
   simplegrants-database:
@@ -47,7 +50,7 @@ services:
       - ./frontend/.env.production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.simplegrants-frontend.rule=Host(`docker.localhost`)"
+      - "traefik.http.routers.simplegrants-frontend.rule=Host(`simplegrants.xyz`)"
       - "traefik.http.routers.simplegrants-frontend.tls.certresolver=myresolver"
       - "traefik.http.services.simplegrants-frontend.loadbalancer.server.port=3001"
     environment:
