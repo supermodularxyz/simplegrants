@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Param,
   Patch,
   Post,
@@ -185,6 +186,7 @@ export class GrantsController {
     type: CheckoutGrantsResponse,
   })
   @Post('checkout')
+  @Header('Access-Control-Allow-Credentials', 'true')
   @UseGuards(NextAuthGuard)
   async checkoutGrants(
     @Body(
