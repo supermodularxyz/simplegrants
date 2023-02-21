@@ -13,6 +13,7 @@ const nextConfig = {
         hostname: "**unsplash.com",
       },
     ],
+    domains: ["picsum.photos", "fastify.picsum.photos"],
   },
 };
 
