@@ -11,15 +11,6 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-    allowedHeaders: [
-      'X-PINGOTHER',
-      'Content-Type',
-      'Authorization',
-      'Accept',
-      'Accept-Encoding',
-      'Cookie',
-      'Access-Control-Request-Headers',
-    ],
   });
 
   /** Swagger (OpenAPI) for documentation */

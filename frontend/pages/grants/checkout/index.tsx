@@ -45,12 +45,18 @@ export default function GrantsCheckout() {
   const checkoutGrants = () => {
     setLoading(true);
     axios
-      .post("/grants/checkout", {
-        grants: grants.map((grant) => ({
-          id: grant.id,
-          amount: grant.amount,
-        })),
-      })
+      .post(
+        "/grants/checkout",
+        {
+          grants: grants.map((grant) => ({
+            id: grant.id,
+            amount: grant.amount,
+          })),
+        },
+        {
+          withCredentials: true,
+        }
+      )
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });

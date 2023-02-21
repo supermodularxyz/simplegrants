@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import axios from "../../../utils/axios";
 import MainLayout from "../../../layouts/MainLayout";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import Success from "../../../components/icons/Success";
