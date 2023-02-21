@@ -197,6 +197,66 @@ async function main() {
       },
     });
 
+    const fundedGrant = await prisma.grant.upsert({
+      where: { id: 'cledmivau000008lb7jjwd7q0' },
+      update: {},
+      create: {
+        id: 'cledmivau000008lb7jjwd7q0',
+        name: randCatchPhrase(),
+        description: randParagraph({ length: 2 }).join(' '),
+        image:
+          'https://picsum.photos/seed/cledmivau000008lb7jjwd7q0/1000/600.jpg',
+        twitter: randUserName(),
+        website: randUrl(),
+        location: randCountry(),
+        paymentAccount: {
+          connectOrCreate: {
+            create: {
+              recipientAddress: 'acct_1MdDqePwtixIFqie',
+              provider: {
+                connect: {
+                  id: stripeProvider.id,
+                },
+              },
+            },
+            where: {
+              recipientAddress_providerId: {
+                recipientAddress: 'acct_1MdDqePwtixIFqie',
+                providerId: stripeProvider.id,
+              },
+            },
+          },
+        },
+        team: {
+          connect: [
+            {
+              id: user.id,
+            },
+            {
+              id: admin.id,
+            },
+          ],
+        },
+        contributions: {
+          createMany: {
+            data: Array.from(Array(10).keys()).map((_) => {
+              const amount = randNumber({ min: 5000, max: 10000 });
+              return {
+                userId: user.id,
+                amount: amount,
+                denomination: 'USD',
+                amountUsd: amount,
+                paymentMethodId: userPaymentMethod.id,
+                flagged: false,
+              };
+            }),
+          },
+        },
+        fundingGoal: randNumber({ min: 1000, max: 50000 }),
+        verified: true,
+      },
+    });
+
     const unverifiedGrant = await prisma.grant.upsert({
       where: { id: 'clda3184o000008mg5bqobymn' },
       update: {},
@@ -236,7 +296,7 @@ async function main() {
         verified: false,
       },
     });
-    console.log({ emptyGrant, contributedGrant, unverifiedGrant });
+    console.log({ emptyGrant, contributedGrant, fundedGrant, unverifiedGrant });
   }
 }
 
