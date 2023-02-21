@@ -73,16 +73,16 @@ export default function Home() {
 
       <main className="flex flex-col min-w-screen min-h-screen w-full h-full overflow-x-hidden">
         <LandingNavbar className="z-[2] absolute top-0 left-0" />
-        <Fade bottom distance="15px">
-          <div className="flex flex-col w-full items-center justify-center min-h-[60vh] text-center bg-sg-primary px-2">
+        <div className="flex flex-col w-full items-center justify-center min-h-[60vh] text-center bg-sg-primary px-2">
+          <Fade bottom distance="15px">
             <h1 className="font-bold text-3xl md:text-5xl max-w-2xl md:leading-snug">
               Empowering the next generation of changemakers
             </h1>
             <p className="mt-3 text-lg md:text-xl">
               Join us in making an impact through quadratic funding.
             </p>
-          </div>
-        </Fade>
+          </Fade>
+        </div>
         <div className="relative flex w-full -translate-y-[57%]">
           <Image
             src="/assets/abstract.svg"
@@ -271,28 +271,36 @@ export default function Home() {
             className="scale-200 md:scale-150 lg:scale-125 w-screen"
           />
         </div>
-        <footer className="w-full flex flex-col md:flex-row px-28 py-10 gap-x-14 justify-between">
-          <Image src="/logo.svg" alt="SimpleGrants" width={162} height={50} />
-          <div className="flex flex-col gap-y-3">
-            <p className="font-bold text-xl">Product</p>
-            <p className="font-sm">Grants</p>
-            <p className="font-sm">Ecosystems</p>
-          </div>
-          <div className="flex flex-col gap-y-3">
-            <p className="font-bold text-xl">Organization</p>
-            <p className="font-sm">About</p>
-            <p className="font-sm">Mission</p>
-            <p className="font-sm">Blog</p>
-          </div>
-          <div className="flex flex-col gap-y-3">
-            <p className="font-bold text-xl">Community</p>
-            <p className="font-sm">Code of Conduct</p>
-            <p className="font-sm">Support</p>
-          </div>
-          <div className="flex flex-col gap-y-3">
-            <p className="font-bold text-xl">Legal</p>
-            <p className="font-sm">Terms</p>
-            <p className="font-sm">Privacy</p>
+        <footer className="w-full flex flex-col md:flex-row px-6 py-8 md:px-28 md:py-10 gap-x-14 justify-between">
+          <Image
+            src="/logo.svg"
+            alt="SimpleGrants"
+            width={162}
+            height={50}
+            className="mb-8"
+          />
+          <div className="flex flex-row flex-wrap w-full">
+            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+              <p className="font-bold text-xl">Product</p>
+              <p className="font-sm">Grants</p>
+              <p className="font-sm">Ecosystems</p>
+            </div>
+            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+              <p className="font-bold text-xl">Organization</p>
+              <p className="font-sm">About</p>
+              <p className="font-sm">Mission</p>
+              <p className="font-sm">Blog</p>
+            </div>
+            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+              <p className="font-bold text-xl">Community</p>
+              <p className="font-sm">Code of Conduct</p>
+              <p className="font-sm">Support</p>
+            </div>
+            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+              <p className="font-bold text-xl">Legal</p>
+              <p className="font-sm">Terms</p>
+              <p className="font-sm">Privacy</p>
+            </div>
           </div>
         </footer>
       </main>
