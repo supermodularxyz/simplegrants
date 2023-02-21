@@ -51,6 +51,9 @@ module.exports = {
       scale: {
         200: "2",
       },
+      fontSize: {
+        "subtitle-1": "22px",
+      },
     },
   },
   plugins: [require("daisyui"), require("@tailwindcss/line-clamp")],
