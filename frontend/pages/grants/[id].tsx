@@ -47,7 +47,7 @@ export default function GrantDetails() {
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/sign-in");
+      router.replace("/sign-in");
     }
   }, [status]);
 
