@@ -41,6 +41,7 @@ export const authOptions = {
         sameSite: "None",
         path: "/",
         secure: true,
+        domain: ".simplegrants.xyz",
       },
     },
     callbackUrl: {
@@ -49,6 +50,7 @@ export const authOptions = {
         sameSite: "None",
         path: "/",
         secure: true,
+        domain: ".simplegrants.xyz",
       },
     },
     csrfToken: {
@@ -58,6 +60,7 @@ export const authOptions = {
         sameSite: "None",
         path: "/",
         secure: true,
+        domain: ".simplegrants.xyz",
       },
     },
   },
