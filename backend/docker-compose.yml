@@ -7,7 +7,7 @@ services:
     working_dir: /app
     restart: on-failure
     env_file:
-      - .env
+      - .env.production
     environment:
       - DEBUG=${DEBUG}
     ports:
@@ -21,7 +21,7 @@ services:
     image: postgres:14
     restart: on-failure
     env_file:
-      - .env
+      - .env.production
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
