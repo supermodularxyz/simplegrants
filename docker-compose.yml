@@ -1,16 +1,41 @@
 services:
+  traefik:
+    image: traefik:v2.9
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=easonchaijw@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - simplegrants
   simplegrants-backend:
     extends:
       file: ./backend/docker-compose.yml
       service: simplegrants-backend
     env_file:
-      - ./backend/.env
+      - ./backend/.env.production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simplegrants-backend.rule=Host(`api.docker.localhost`)"
+      - "traefik.http.routers.simplegrants-backend.tls.certresolver=myresolver"
+      - "traefik.http.services.simplegrants-backend.loadbalancer.server.port=3000"
   simplegrants-database:
     extends:
       file: ./backend/docker-compose.yml
       service: simplegrants-database
     env_file:
-      - ./backend/.env
+      - ./backend/.env.production
   simplegrants-frontend:
     container_name: simplegrants-frontend
     build:
@@ -20,6 +45,11 @@ services:
     restart: on-failure
     env_file:
       - ./frontend/.env.production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simplegrants-frontend.rule=Host(`docker.localhost`)"
+      - "traefik.http.routers.simplegrants-frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.simplegrants-frontend.loadbalancer.server.port=3001"
     environment:
       - DEBUG=${DEBUG}
     ports:
