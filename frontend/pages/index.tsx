@@ -244,7 +244,12 @@ export default function Home() {
               data
                 .slice(0, 3)
                 .map((grant) => (
-                  <GrantCard grant={grant} key={grant.id} hideButton />
+                  <GrantCard
+                    grant={grant}
+                    key={grant.id}
+                    hideButton
+                    onClick={() => router.push(`/grants/${grant.id}`)}
+                  />
                 ))}
           </div>
         </section>
