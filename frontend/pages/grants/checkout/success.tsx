@@ -21,7 +21,7 @@ export default function CheckoutSuccess() {
     // If we have a session ID, we can make a call to the backend
     if (router.query.session_id) {
       axios
-        .get(`http://localhost:3000/checkout/${router.query.session_id}`)
+        .get(`/checkout/${router.query.session_id}`)
         .then((res) => {
           setData(res.data);
           // TODO: Ensure that this only runs if your checkout succeeds, not when you hit this page
