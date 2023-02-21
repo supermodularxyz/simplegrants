@@ -148,6 +148,7 @@ export default function Grants() {
               {data &&
                 data.map((grant) => (
                   <GrantCard
+                    hideButton={!session}
                     grant={grant}
                     onClick={() => router.push(`/grants/${grant.id}`)}
                     key={grant.id}
