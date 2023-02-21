@@ -271,32 +271,34 @@ export default function Home() {
             className="scale-200 md:scale-150 lg:scale-125 w-screen"
           />
         </div>
-        <footer className="w-full flex flex-col md:flex-row px-6 py-8 md:px-28 md:py-10 gap-x-14 justify-between">
-          <Image
-            src="/logo.svg"
-            alt="SimpleGrants"
-            width={162}
-            height={50}
-            className="mb-8"
-          />
-          <div className="flex flex-row flex-wrap w-full">
-            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+        <footer className="w-full flex flex-col md:flex-row px-6 py-8 md:px-28 md:py-16 gap-x-14 justify-between items-start">
+          <div className="w-full">
+            <Image
+              src="/logo.svg"
+              alt="SimpleGrants"
+              width={162}
+              height={50}
+              className="mb-8"
+            />
+          </div>
+          <div className="flex flex-row flex-wrap lg:flex-nowrap gap-x-8 w-full justify-between">
+            <div className="flex flex-col gap-y-3 mb-6">
               <p className="font-bold text-xl">Product</p>
               <p className="font-sm">Grants</p>
               <p className="font-sm">Ecosystems</p>
             </div>
-            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+            <div className="flex flex-col gap-y-3 mb-6">
               <p className="font-bold text-xl">Organization</p>
               <p className="font-sm">About</p>
               <p className="font-sm">Mission</p>
               <p className="font-sm">Blog</p>
             </div>
-            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+            <div className="flex flex-col gap-y-3 mb-6">
               <p className="font-bold text-xl">Community</p>
               <p className="font-sm">Code of Conduct</p>
               <p className="font-sm">Support</p>
             </div>
-            <div className="flex flex-col gap-y-3 basis-1/2 w-full mb-6">
+            <div className="flex flex-col gap-y-3 mb-6">
               <p className="font-bold text-xl">Legal</p>
               <p className="font-sm">Terms</p>
               <p className="font-sm">Privacy</p>
