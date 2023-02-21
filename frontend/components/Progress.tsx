@@ -34,7 +34,9 @@ const FundingBar = ({ value, max, className }: IFundingBarProps) => {
       <Progress.Indicator
         className="bg-sg-success w-full h-full transition-transform duration-[660ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] rounded-full border-r border-sg-900"
         style={{
-          transform: `translateX(-${100 - (progress / max) * 100}%)`,
+          transform: `translateX(-${
+            100 - (Math.min(progress, max) / max) * 100
+          }%)`,
         }}
       />
     </Progress.Root>
