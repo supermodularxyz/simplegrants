@@ -217,7 +217,10 @@ export class StripeProvider implements PaymentProviderAdapter {
               currency: provider.denominations[0],
               product_data: {
                 name: grant.name,
-                description: grant.description,
+                description:
+                  grant.description.length > 80
+                    ? grant.description.slice(0, 80) + '...'
+                    : grant.description,
               },
               unit_amount: this.roundNumber(grant.amount) * 100,
             },
