@@ -4,6 +4,8 @@ import { SessionProvider } from "next-auth/react";
 import { FpjsProvider } from "@fingerprintjs/fingerprintjs-pro-react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SEO from "../next-seo.config";
+import { DefaultSeo } from "next-seo";
 
 export default function App({
   Component,
@@ -16,6 +18,7 @@ export default function App({
       }}
     >
       <SessionProvider session={session}>
+        <DefaultSeo {...SEO} />
         <Component {...pageProps} />
         <ToastContainer
           position="top-center"
