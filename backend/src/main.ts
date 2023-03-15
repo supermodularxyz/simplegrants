@@ -33,7 +33,7 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
 
-  await app.listen(process.env.BACKEND_PORT);
-  console.log(`✅ Server listening on port ${process.env.BACKEND_PORT}`);
+  await app.listen(3000);
+  console.log(`✅ Server listening on port 3000`);
 }
 bootstrap();
