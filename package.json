@@ -7,9 +7,10 @@
   "private": true,
   "license": "GPL-3.0",
   "scripts": {
-    "backend:dev": "cd backend && npm run docker:dev:up && stripe listen --forward-to localhost:3000/checkout/webhook",
-    "frontend:dev": "cd frontend && pnpm dev -p 3001",
-    "backend:setup": "cd backend && npm run setup"
+    "start:dev": "docker compose -f docker-compose.dev.yml up -d && stripe listen --forward-to localhost:3000/checkout/webhook",
+    "start": "docker compose up -d",
+    "poststart:dev": "echo \"Some scripts to migrate and seed the database\"",
+    "poststart": "echo \"Some scripts to migrate and seed the database\""
   },
   "repository": {
     "type": "git",
