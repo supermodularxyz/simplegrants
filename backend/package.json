@@ -15,7 +15,7 @@
     "start:prod": "node dist/src/main",
     "generate": "npx prisma generate && rsync prisma/schema.prisma ../frontend/prisma && npx --prefix ../frontend prisma generate",
     "migrate": "npx prisma migrate deploy",
-    "setup": "npx prisma migrate deploy && npx prisma db seed",
+    "setup": "./prisma-helper.sh 'npx prisma migrate deploy && npx prisma db seed'",
     "docker:up": "docker compose up -d",
     "docker:dev:up": "docker compose -f docker-compose.dev.yml up -d",
     "docker:dev:build": "docker compose -f docker-compose.dev.yml build",
