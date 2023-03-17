@@ -15,6 +15,7 @@ import { useHasHydrated } from "../../../utils/useHydrated";
 import Input from "../../../components/Input";
 import axios from "../../../utils/axios";
 import { toast } from "react-toastify";
+import BackButton from "../../../components/BackButton";
 
 export default function GrantsCheckout() {
   const router = useRouter();
@@ -94,7 +95,8 @@ export default function GrantsCheckout() {
           </Link>
         </Navbar>
         <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
-          <h1 className="font-bold text-2xl my-14 px-4">Checkout Grants</h1>
+          <BackButton href="/grants">Back to grants</BackButton>
+          <h1 className="font-bold text-2xl my-10 px-4">Checkout Grants</h1>
           <div className="w-full flex flex-col md:flex-row gap-y-8">
             <div className="basis-full md:basis-3/5 px-4">
               <div className="flex flex-col bg-white shadow-card py-8 px-6 rounded-xl gap-y-6">
@@ -130,7 +132,7 @@ export default function GrantsCheckout() {
                               ) =>
                                 updateGrantAmount(grant.id, event.target.value)
                               }
-                              className="px-4 py-2 max-w-[144px] text-lg"
+                              className="px-4 py-2 max-w-[144px] lg:max-w-[192px] text-lg"
                             />
                             <p className="text-lg ml-3">USD</p>
                           </div>

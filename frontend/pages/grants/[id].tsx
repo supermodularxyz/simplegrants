@@ -16,6 +16,7 @@ import { useCartStore } from "../../utils/store";
 import Location from "../../components/icons/Location";
 import Twitter from "../../components/icons/Twitter";
 import Website from "../../components/icons/Website";
+import BackButton from "../../components/BackButton";
 
 export default function GrantDetails() {
   const router = useRouter();
@@ -70,7 +71,7 @@ export default function GrantDetails() {
             </Link>
           </Navbar>
           <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
-            <Link href="/grants">&lt; Back to grants</Link>
+            <BackButton href="/grants">Back to grants</BackButton>
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
               <div className="basis-full md:basis-3/5 px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">

@@ -12,6 +12,7 @@ import Input from "../../components/Input";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import BackButton from "../../components/BackButton";
 
 const validationSchema = z.object({
   name: z.string().min(1, { message: "Grant name is required" }),
@@ -73,7 +74,7 @@ export default function CreateGrant() {
           className="flex flex-col items-start justify-center px-8 my-2 w-full"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Link href="/grants">&lt; Back to grants</Link>
+          <BackButton href="/grants">Back to grants</BackButton>
           <div className="w-full flex flex-col my-10 gap-y-8">
             <div className=" bg-white shadow-card py-8 px-6 rounded-xl w-full">
               <h1 className="font-bold text-subtitle-1 mb-8">Create Grant</h1>
