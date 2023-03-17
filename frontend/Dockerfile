@@ -38,6 +38,4 @@ COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
-ARG FRONTEND_PORT
-
-CMD npm run start -- -p $FRONTEND_PORT
+CMD npm run start -- -p 3001

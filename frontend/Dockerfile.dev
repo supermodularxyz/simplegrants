@@ -11,6 +11,4 @@ RUN npm i -g pnpm
 # Create app directory
 WORKDIR /app
 
-ARG FRONTEND_PORT
-
-CMD pnpm dev -p $FRONTEND_PORT
+CMD pnpm dev -p 3001
