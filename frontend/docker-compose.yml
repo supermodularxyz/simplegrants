@@ -5,6 +5,11 @@ services:
       context: .
       dockerfile: Dockerfile
     working_dir: /app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simplegrants-frontend.rule=Host(`simplegrants.xyz`)"
+      - "traefik.http.routers.simplegrants-frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.simplegrants-frontend.loadbalancer.server.port=3001"
     restart: always
     env_file:
       - .env.production
