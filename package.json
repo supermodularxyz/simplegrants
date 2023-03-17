@@ -9,6 +9,10 @@
   "scripts": {
     "start:dev": "docker compose -f docker-compose.dev.yml up -d && npm run setup && stripe listen --forward-to localhost:3000/checkout/webhook",
     "start": "docker compose up -d",
+    "stop:dev": "docker compose -f docker-compose.dev.yml down",
+    "stop": "docker compose down",
+    "logs:dev": "docker compose -f docker-compose.dev.yml logs --follow",
+    "logs": "docker compose logs --follow",
     "setup": "cd backend && npm run setup"
   },
   "repository": {

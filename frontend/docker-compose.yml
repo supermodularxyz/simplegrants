@@ -1,0 +1,17 @@
+services:
+  simplegrants-frontend:
+    container_name: simplegrants-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    restart: always
+    env_file:
+      - .env.production
+    ports:
+      - 3001:3001
+    networks:
+      - simplegrants
+
+networks:
+  simplegrants:

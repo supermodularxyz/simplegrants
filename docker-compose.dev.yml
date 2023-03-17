@@ -3,6 +3,8 @@ services:
     extends:
       file: ./backend/docker-compose.dev.yml
       service: simplegrants-backend
+    depends_on:
+      - simplegrants-database
   simplegrants-database:
     extends:
       file: ./backend/docker-compose.dev.yml
