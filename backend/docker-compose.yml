@@ -12,7 +12,7 @@ services:
       - 'traefik.http.services.simplegrants-backend.loadbalancer.server.port=3000'
     restart: on-failure
     env_file:
-      - .env.production
+      - .env
     ports:
       - 3000:3000
     depends_on:
