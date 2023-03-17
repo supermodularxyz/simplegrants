@@ -33,37 +33,40 @@ export const authOptions = {
   pages: {
     signIn: "/sign-in",
   },
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "None",
-        path: "/",
-        secure: true,
-        domain: ".simplegrants.xyz",
-      },
-    },
-    callbackUrl: {
-      name: `__Secure-next-auth.callback-url`,
-      options: {
-        sameSite: "None",
-        path: "/",
-        secure: true,
-        domain: ".simplegrants.xyz",
-      },
-    },
-    csrfToken: {
-      name: `__Host-next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "None",
-        path: "/",
-        secure: true,
-        domain: ".simplegrants.xyz",
-      },
-    },
-  },
+  cookies:
+    process.env.NODE_ENV === "production"
+      ? {
+          sessionToken: {
+            name: `__Secure-next-auth.session-token`,
+            options: {
+              httpOnly: true,
+              sameSite: "None",
+              path: "/",
+              secure: true,
+              domain: ".simplegrants.xyz",
+            },
+          },
+          callbackUrl: {
+            name: `__Secure-next-auth.callback-url`,
+            options: {
+              sameSite: "None",
+              path: "/",
+              secure: true,
+              domain: ".simplegrants.xyz",
+            },
+          },
+          csrfToken: {
+            name: `__Host-next-auth.csrf-token`,
+            options: {
+              httpOnly: true,
+              sameSite: "None",
+              path: "/",
+              secure: true,
+              domain: ".simplegrants.xyz",
+            },
+          },
+        }
+      : undefined,
 };
 
 export default NextAuth(authOptions);
