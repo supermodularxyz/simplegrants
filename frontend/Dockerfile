@@ -1,13 +1,14 @@
 FROM node:18-slim AS base
 
-# Install dependencies only when needed
-FROM base AS deps
+FROM base AS binaries
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apt-get update && \
     apt-get install -y procps && \
     apt-get install -y openssl && \
     apt-get install -y libc6
 
+# Install dependencies only when needed
+FROM binaries AS deps
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -22,7 +23,7 @@ RUN \
 RUN npx prisma generate
 
 # Rebuild the source code only when needed
-FROM base AS builder
+FROM binaries AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -31,6 +32,7 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
+RUN npx prisma generate
 RUN yarn build
 
 # If using npm comment out above and use below instead
