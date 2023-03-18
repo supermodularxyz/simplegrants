@@ -5,16 +5,22 @@ services:
       service: simplegrants-backend
     depends_on:
       - simplegrants-database
+    env_file:
+      - ./backend/.env
   simplegrants-database:
     extends:
       file: ./backend/docker-compose.dev.yml
       service: simplegrants-database
+    env_file:
+      - ./backend/.env
   simplegrants-frontend:
     extends:
       file: ./frontend/docker-compose.dev.yml
       service: simplegrants-frontend
     depends_on:
       - simplegrants-backend
+    env_file:
+      - ./frontend/.env.local
 volumes:
   simplegrants-database:
 
