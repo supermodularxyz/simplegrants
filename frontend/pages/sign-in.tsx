@@ -28,11 +28,7 @@ export default function SignIn({
             {Object.values(providers).map((provider) => (
               <Button
                 key={provider.name}
-                onClick={() =>
-                  signIn(provider.id, {
-                    callbackUrl: "https://simplegrants.xyz/grants",
-                  })
-                }
+                onClick={() => signIn(provider.id)}
                 className="px-16 py-3 text-xl"
                 width="full"
               >
