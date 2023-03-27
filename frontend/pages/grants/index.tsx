@@ -10,11 +10,11 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { FilterOptions, GrantResponse, SortOptions } from "../../types/grant";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
-import Select from "../../components/Select";
+import Select from "../../components/input/Select";
 import Divider from "../../components/Divider";
 import GrantCard from "../../components/GrantCard";
 import { useRouter } from "next/router";
-import Input from "../../components/Input";
+import TextInput from "../../components/input/TextInput";
 import Search from "../../components/icons/Search";
 import Grid from "../../components/icons/Grid";
 import List from "../../components/icons/List";
@@ -90,7 +90,7 @@ export default function Grants() {
         </Navbar>
         <div className="flex flex-col items-center justify-center px-8 my-20 w-full">
           <div className="flex flex-row w-full items-center justify-center mb-8">
-            <Input
+            <TextInput
               type="text"
               placeholder="Search"
               onChange={handleChange}

@@ -5,15 +5,15 @@ import React from "react";
 import MainLayout from "../../layouts/MainLayout";
 import Navbar from "../../layouts/Navbar";
 import Button from "../../components/Button";
-import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/router";
-import Input from "../../components/Input";
+import TextInput from "../../components/input/TextInput";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import BackButton from "../../components/BackButton";
-import Dropzone from "../../components/Dropzone";
+import ImageInput from "../../components/input/ImageInput";
+import clsx from "clsx";
+import TextAreaInput from "../../components/input/TextAreaInput";
 
 const validationSchema = z.object({
   name: z.string().min(1, { message: "Grant name is required" }),
@@ -23,10 +23,10 @@ const validationSchema = z.object({
     .string()
     .min(1, { message: "Website link is required" })
     .url("Must be a valid link"),
-  image: z.any().refine((file) => {
-    console.log(file);
-    return file?.size <= 2000000;
-  }, `Max file size is 20MB.`),
+  image: z
+    .any()
+    .refine((file) => !!file, "Image is required")
+    .refine((file) => file?.size <= 2000000, `Max file size is 20MB.`),
   description: z.string().min(1, { message: "Grant description is required" }),
   fundingGoal: z
     .number()
@@ -82,10 +82,14 @@ export default function CreateGrant() {
               <h1 className="font-bold text-subtitle-1 mb-8">Create Grant</h1>
               <div className="flex flex-col md:flex-row w-full gap-11">
                 <div className="relative h-full basis-[2/5] w-full">
-                  <Dropzone
-                    className="aspect-[3/2] object-cover w-full h-full"
+                  <ImageInput
+                    className={clsx(
+                      "aspect-[3/2] object-cover w-full h-full border"
+                    )}
+                    id="image"
+                    errors={errors}
                     onChange={(value: any) => {
-                      setValue("image", value);
+                      setValue("image", value, { shouldValidate: true });
                     }}
                   />
                 </div>
@@ -96,8 +100,9 @@ export default function CreateGrant() {
                         Grant Name
                       </span>
                     </label>
-                    <Input
-                      className="w-full"
+                    <TextInput
+                      className={clsx("w-full")}
+                      errors={errors}
                       id="name"
                       type="text"
                       register={register}
@@ -109,9 +114,10 @@ export default function CreateGrant() {
                         Location
                       </span>
                     </label>
-                    <Input
+                    <TextInput
                       type="text"
-                      className="w-full"
+                      className={clsx("w-full")}
+                      errors={errors}
                       id="location"
                       register={register}
                     />
@@ -120,12 +126,16 @@ export default function CreateGrant() {
                     <div className="form-control w-full flex-1">
                       <label className="label">
                         <span className="label-text font-bold text-lg">
-                          Twitter Handle
+                          Twitter Handle{" "}
+                          <small className="font-normal text-sm">
+                            (Optional)
+                          </small>
                         </span>
                       </label>
-                      <Input
+                      <TextInput
                         type="text"
-                        className="w-full"
+                        className={clsx("w-full")}
+                        errors={errors}
                         id="twitter"
                         register={register}
                       />
@@ -136,9 +146,10 @@ export default function CreateGrant() {
                           Website
                         </span>
                       </label>
-                      <Input
+                      <TextInput
                         type="text"
-                        className="w-full"
+                        className={clsx("w-full")}
+                        errors={errors}
                         id="website"
                         register={register}
                       />
@@ -152,12 +163,11 @@ export default function CreateGrant() {
                     Grant Description
                   </span>
                 </label>
-                <textarea
-                  rows={8}
-                  className="border border-sg-200 w-full h-full focus:border-sg-primary rounded-lg px-5 py-4 outline-none"
+                <TextAreaInput
                   id="description"
-                  {...register("description")}
-                ></textarea>
+                  register={register}
+                  errors={errors}
+                />
               </div>
               {/* <p className="mt-12">{data.description}</p> */}
             </div>
@@ -169,9 +179,10 @@ export default function CreateGrant() {
                       Funding Goal
                     </span>
                   </label>
-                  <Input
+                  <TextInput
                     type="number"
-                    className="w-full"
+                    className={clsx("w-full")}
+                    errors={errors}
                     id="fundingGoal"
                     register={register}
                   />
@@ -182,9 +193,10 @@ export default function CreateGrant() {
                       Payment Account
                     </span>
                   </label>
-                  <Input
+                  <TextInput
                     type="text"
-                    className="w-full"
+                    className={clsx("w-full")}
+                    errors={errors}
                     id="paymentAccount"
                     register={register}
                   />
