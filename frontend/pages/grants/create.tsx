@@ -13,6 +13,7 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import BackButton from "../../components/BackButton";
+import Dropzone from "../../components/Dropzone";
 
 const validationSchema = z.object({
   name: z.string().min(1, { message: "Grant name is required" }),
@@ -22,10 +23,10 @@ const validationSchema = z.object({
     .string()
     .min(1, { message: "Website link is required" })
     .url("Must be a valid link"),
-  image: z
-    .string()
-    .min(1, { message: "Image is required" })
-    .url("Invalid image upload"),
+  image: z.any().refine((file) => {
+    console.log(file);
+    return file?.size <= 2000000;
+  }, `Max file size is 20MB.`),
   description: z.string().min(1, { message: "Grant description is required" }),
   fundingGoal: z
     .number()
@@ -42,6 +43,7 @@ export default function CreateGrant() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ValidationSchema>({
     resolver: zodResolver(validationSchema),
@@ -79,13 +81,12 @@ export default function CreateGrant() {
             <div className=" bg-white shadow-card py-8 px-6 rounded-xl w-full">
               <h1 className="font-bold text-subtitle-1 mb-8">Create Grant</h1>
               <div className="flex flex-col md:flex-row w-full gap-11">
-                <div className="relative h-full rounded-lg overflow-hidden basis-[2/5] w-full">
-                  <Image
-                    alt="image"
-                    src={"https://picsum.photos/seed/1000/600"}
-                    width={500}
-                    height={300}
-                    className="aspect-[3/2] object-cover w-full"
+                <div className="relative h-full basis-[2/5] w-full">
+                  <Dropzone
+                    className="aspect-[3/2] object-cover w-full h-full"
+                    onChange={(value: any) => {
+                      setValue("image", value);
+                    }}
                   />
                 </div>
                 <div className="flex flex-col basis-[3/5] w-full gap-y-6">
@@ -95,12 +96,6 @@ export default function CreateGrant() {
                         Grant Name
                       </span>
                     </label>
-                    {/* <Input
-                      type="text"
-                      className="w-full"
-                      id="name"
-                      register={register}
-                    /> */}
                     <Input
                       className="w-full"
                       id="name"

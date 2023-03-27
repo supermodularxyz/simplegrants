@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { GrantDetailResponse } from "../../types/grant";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import FundingBar from "../../components/Progress";
+import FundingBar from "../../components/FundingBar";
 import { useCartStore } from "../../utils/store";
 import Location from "../../components/icons/Location";
 import Twitter from "../../components/icons/Twitter";
