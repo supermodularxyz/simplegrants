@@ -28,7 +28,7 @@ const FundingBar = ({ value, max, className }: IFundingBarProps) => {
         // https://gist.github.com/domske/b66047671c780a238b51c51ffde8d3a0
         transform: "translateZ(0)",
       }}
-      value={value}
+      value={value > max ? max : value}
       max={max}
     >
       <Progress.Indicator

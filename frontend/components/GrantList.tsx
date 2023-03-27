@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { GrantResponse } from "../types/grant";
-import FundingBar from "./Progress";
+import FundingBar from "./FundingBar";
 import { useCartStore } from "../utils/store";
 import Button from "./Button";
 
