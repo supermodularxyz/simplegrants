@@ -86,9 +86,10 @@ export default function ImageInput({
               </button>
             ) : (
               <>
-                <Upload className="w-8 h-8 mb-2 fill-sg-secondary" />
-                <p>Drag & drop your thumbnail, or click to select image</p>
-                <p className="text-sm">
+                <button className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80">
+                  Upload image
+                </button>
+                <p className="text-sm mt-2">
                   Only .jpg, .jpeg, or .png files are supported
                 </p>
               </>

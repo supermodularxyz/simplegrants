@@ -45,11 +45,15 @@ export default function TextInput({
             register(id || "", { required, valueAsNumber: type === "number" }))}
         />
       </div>
-      <ErrorMessage
-        name={id || ""}
-        errors={errors}
-        render={({ message }) => <ErrorMessageText>{message}</ErrorMessageText>}
-      />
+      {errors && (
+        <ErrorMessage
+          name={id || ""}
+          errors={errors}
+          render={({ message }) => (
+            <ErrorMessageText>{message}</ErrorMessageText>
+          )}
+        />
+      )}
     </>
   );
 }
