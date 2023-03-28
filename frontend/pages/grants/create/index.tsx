@@ -2,18 +2,18 @@
 import Head from "next/head";
 import { useSession, signIn } from "next-auth/react";
 import React from "react";
-import MainLayout from "../../layouts/MainLayout";
-import Navbar from "../../layouts/Navbar";
-import Button from "../../components/Button";
+import MainLayout from "../../../layouts/MainLayout";
+import Navbar from "../../../layouts/Navbar";
+import Button from "../../../components/Button";
 import { useRouter } from "next/router";
-import TextInput from "../../components/input/TextInput";
+import TextInput from "../../../components/input/TextInput";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import BackButton from "../../components/BackButton";
-import ImageInput from "../../components/input/ImageInput";
+import BackButton from "../../../components/BackButton";
+import ImageInput from "../../../components/input/ImageInput";
 import clsx from "clsx";
-import TextAreaInput from "../../components/input/TextAreaInput";
+import TextAreaInput from "../../../components/input/TextAreaInput";
 
 const validationSchema = z.object({
   name: z.string().min(1, { message: "Grant name is required" }),
@@ -56,8 +56,6 @@ export default function CreateGrant() {
   }, [status]);
 
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => console.log(data);
-
-  console.log(errors);
 
   return (
     <div>
