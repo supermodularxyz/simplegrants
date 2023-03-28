@@ -225,6 +225,9 @@ export class GrantsService {
           },
         },
       },
+      include: {
+        team: true,
+      },
     });
   }
 
