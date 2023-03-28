@@ -54,6 +54,9 @@ module.exports = {
       fontSize: {
         "subtitle-1": "22px",
       },
+      backgroundImage: {
+        "sg-gradient": "linear-gradient(90deg, #FFE0DB 26.25%, #FFE1A7 100%)",
+      },
     },
   },
   plugins: [require("daisyui"), require("@tailwindcss/line-clamp")],

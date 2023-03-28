@@ -14,6 +14,9 @@ import BackButton from "../../../components/BackButton";
 import ImageInput from "../../../components/input/ImageInput";
 import clsx from "clsx";
 import TextAreaInput from "../../../components/input/TextAreaInput";
+import axios from "../../../utils/axios";
+import { useGrantStore } from "../../../utils/store";
+import { toast } from "react-toastify";
 
 const validationSchema = z.object({
   name: z.string().min(1, { message: "Grant name is required" }),
@@ -38,6 +41,7 @@ type ValidationSchema = z.infer<typeof validationSchema>;
 
 export default function CreateGrant() {
   const router = useRouter();
+  const { saveGrant } = useGrantStore();
   const { data: session, status } = useSession();
   const [loading, setLoading] = React.useState(false);
   const {
@@ -55,7 +59,36 @@ export default function CreateGrant() {
     }
   }, [status]);
 
-  const onSubmit: SubmitHandler<ValidationSchema> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
+    // The first thing we need to do is to actually send it over to our backend to process
+    // It will then upload to AWS S3 and save the data and return it here
+    // We will then store the returned data in our store to display the success page
+    setLoading(true);
+
+    axios
+      .post("/grants", {
+        name: "New Grant",
+        location: "New Orleans",
+        twitter: "twitter",
+        website: "https://google.com",
+        image: "https://picsum.photos/200/300",
+        description: "Crazy description",
+        fundingGoal: 1000,
+        paymentAccount: "testing",
+      })
+      .then((res) => {
+        saveGrant(res.data);
+        toast.success("Grant created successfully!");
+        router.push("/grants/create/success");
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <div>
@@ -210,7 +243,11 @@ export default function CreateGrant() {
               </div>
             </div>
             <div className="flex flex-col w-full items-center justify-center">
-              <Button className="mt-6" onClick={handleSubmit(onSubmit)}>
+              <Button
+                className="mt-6"
+                onClick={handleSubmit(onSubmit)}
+                disabled={loading}
+              >
                 Create Grant
               </Button>
             </div>

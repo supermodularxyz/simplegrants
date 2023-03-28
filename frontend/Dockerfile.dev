@@ -6,9 +6,7 @@ RUN apt-get update && \
     apt-get install -y openssl && \
     apt-get install -y libc6 
 
-RUN npm i -g pnpm
-
 # Create app directory
 WORKDIR /app
 
-CMD pnpm dev -p 3001
+CMD yarn dev -p 3001

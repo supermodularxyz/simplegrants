@@ -44,7 +44,7 @@ const GrantCard = ({
           alt={grant.name}
           src={grant.image}
           fill
-          className="aspect-[5/3]"
+          className="aspect-[5/3] object-contain"
         />
       </div>
       <div className="flex flex-col px-8 py-6 h-full items-start justify-between">

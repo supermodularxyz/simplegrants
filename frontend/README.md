@@ -12,7 +12,7 @@
 ## Requirements 📝
 
 - NodeJS (v17.5+)
-- pnpm
+- yarn
 - Prisma CLI
 
 ## Installation & Setup 🧪
@@ -21,7 +21,7 @@ The frontend utilizes NextAuth for authentication. You should update the [authen
 
 ```bash
 # To setup
-$ pnpm install
+$ yarn install
 
 # Copy .env over
 $ cp .env.example .env.local
@@ -39,10 +39,10 @@ $ cp .env.example .env.production
 
 ```bash
 # development mode
-$ pnpm dev -p 3001
+$ yarn dev -p 3001
 
 # production mode
-$ pnpm build && pnpm start
+$ yarn build && yarn start
 ```
 
 ## Additional Notes 🧠
