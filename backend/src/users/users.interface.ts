@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { IsString } from 'class-validator';
@@ -10,17 +10,17 @@ export interface RequestWithUser {
 }
 
 export class User {
-  @ApiProperty({
+  @ApiResponseProperty({
     type: String,
   })
   id: string;
 
-  @ApiProperty({
+  @ApiResponseProperty({
     type: String,
   })
   name: string;
 
-  @ApiProperty({
+  @ApiResponseProperty({
     type: String,
   })
   email: string;
@@ -31,7 +31,7 @@ export class User {
   })
   emailVerified: Date | null;
 
-  @ApiProperty({
+  @ApiResponseProperty({
     type: String,
   })
   image: string;
@@ -51,7 +51,7 @@ export class User {
   @Exclude()
   visitorId: string | null;
 
-  @ApiProperty({
+  @ApiResponseProperty({
     enum: Role,
   })
   role: Role;
@@ -59,12 +59,12 @@ export class User {
   @Exclude()
   flagged: boolean;
 
-  @ApiProperty({
+  @ApiResponseProperty({
     type: Date,
   })
   createdAt: Date;
 
-  @ApiProperty({
+  @ApiResponseProperty({
     type: Date,
   })
   updatedAt: Date;
@@ -75,12 +75,12 @@ export class User {
 }
 
 export class UserProfile extends User {
-  @ApiProperty({
+  @ApiResponseProperty({
     type: [Contribution],
   })
   contributions: Contribution[];
 
-  @ApiProperty({
+  @ApiResponseProperty({
     type: [GrantResponse],
   })
   grants: GrantResponse[];

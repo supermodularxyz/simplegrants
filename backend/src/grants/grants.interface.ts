@@ -173,6 +173,16 @@ export class GrantResponse {
   verified: boolean;
 
   @ApiResponseProperty({
+    type: [Contribution],
+  })
+  contributions?: Contribution[];
+
+  @ApiResponseProperty({
+    type: [User],
+  })
+  team?: User[];
+
+  @ApiResponseProperty({
     type: Date,
   })
   createdAt: Date;
