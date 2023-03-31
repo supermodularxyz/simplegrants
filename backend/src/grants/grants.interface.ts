@@ -16,6 +16,7 @@ import {
   IsUrl,
   ValidateNested,
 } from 'class-validator';
+import { HasMimeType, IsFile } from 'nestjs-form-data';
 import { Contribution } from 'src/contributions/contributions.interface';
 import { User, UserProfile } from 'src/users/users.interface';
 
@@ -63,6 +64,49 @@ export class GetGrantDto extends GetGrantQueryDto {
   isVerified?: boolean;
 }
 
+class FileTypeResult {
+  @ApiProperty({
+    type: String,
+  })
+  ext: string;
+  @ApiProperty({
+    type: String,
+  })
+  mime: string;
+}
+
+class MemoryStoredFile {
+  @ApiProperty({
+    type: String,
+  })
+  originalName: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  encoding: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  busBoyMimeType: string;
+
+  @ApiProperty({
+    type: Buffer,
+  })
+  buffer: Buffer;
+
+  @ApiProperty({
+    type: Number,
+  })
+  size: number;
+
+  @ApiProperty({
+    type: FileTypeResult,
+  })
+  fileType: FileTypeResult;
+}
+
 export class UpdateGrantDto {
   @ApiProperty({
     type: String,
@@ -90,10 +134,11 @@ export class UpdateGrantDto {
   website: string;
 
   @ApiProperty({
-    type: String,
+    type: MemoryStoredFile,
   })
-  @IsUrl()
-  image: string;
+  @IsFile()
+  @HasMimeType(['image/jpeg', 'image/jpg', 'image/png'])
+  image: any;
 
   @ApiProperty({
     type: String,
@@ -106,6 +151,7 @@ export class CreateGrantDto extends UpdateGrantDto {
   @ApiProperty({
     type: Number,
   })
+  @Type(() => Number)
   @IsPositive()
   fundingGoal: number;
 
