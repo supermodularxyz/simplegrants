@@ -12,8 +12,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "**unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "**amazonaws.com",
+      },
     ],
-    domains: ["picsum.photos", "fastify.picsum.photos"],
+    domains: ["picsum.photos", "fastify.picsum.photos", "amazonaws.com"],
   },
 };
 

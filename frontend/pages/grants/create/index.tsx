@@ -60,22 +60,15 @@ export default function CreateGrant() {
   }, [status]);
 
   const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
-    // The first thing we need to do is to actually send it over to our backend to process
-    // It will then upload to AWS S3 and save the data and return it here
-    // We will then store the returned data in our store to display the success page
     setLoading(true);
 
+    const formData = new FormData();
+    for (const key in data) {
+      formData.set(key, data[key as keyof ValidationSchema]);
+    }
+
     axios
-      .post("/grants", {
-        name: "New Grant",
-        location: "New Orleans",
-        twitter: "twitter",
-        website: "https://google.com",
-        image: "https://picsum.photos/200/300",
-        description: "Crazy description",
-        fundingGoal: 1000,
-        paymentAccount: "testing",
-      })
+      .post("/grants", formData)
       .then((res) => {
         saveGrant(res.data);
         toast.success("Grant created successfully!");
@@ -88,6 +81,7 @@ export default function CreateGrant() {
       .finally(() => {
         setLoading(false);
       });
+    setLoading(false);
   };
 
   return (

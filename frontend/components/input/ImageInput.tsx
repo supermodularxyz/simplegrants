@@ -81,12 +81,18 @@ export default function ImageInput({
             {isDragActive ? (
               <p>Drop the image here</p>
             ) : file ? (
-              <button className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80">
+              <button
+                className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80"
+                onClick={(e) => e.preventDefault()}
+              >
                 Change image
               </button>
             ) : (
               <>
-                <button className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80">
+                <button
+                  className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80"
+                  onClick={(e) => e.preventDefault()}
+                >
                   Upload image
                 </button>
                 <p className="text-sm mt-2">
