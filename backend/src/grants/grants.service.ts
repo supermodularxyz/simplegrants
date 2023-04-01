@@ -13,12 +13,15 @@ import {
   UpdateGrantDto,
 } from './grants.interface';
 import { ProviderService } from 'src/provider/provider.service';
+import { AwsService } from 'src/aws/aws.service';
+import * as cuid from 'cuid';
 
 @Injectable()
 export class GrantsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly providerService: ProviderService,
+    private readonly awsService: AwsService,
   ) {}
 
   private paymentProvider = this.providerService.getProvider();
@@ -171,11 +174,11 @@ export class GrantsService {
      * 1. Only admins can view unverified grants
      * 2. Only the grant owner can view their own unverified grant
      */
-    if (!grant.verified) {
-      if (!user)
-        throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
-      if (user.role !== Role.Admin) this.checkGrantOwnership(grant, user);
-    }
+    // if (!grant.verified) {
+    //   if (!user)
+    //     throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
+    //   if (user.role !== Role.Admin) this.checkGrantOwnership(grant, user);
+    // }
 
     // Otherwise, we can return it
     return {
@@ -196,9 +199,17 @@ export class GrantsService {
   async createGrant(data: CreateGrantDto, user: User) {
     const paymentProvider = await this.paymentProvider;
 
+    const id = cuid();
+
+    // First, we need to upload this to AWS
+    const uploadedFile = await this.awsService.uploadFile(data.image, id);
+
+    // After getting back the url, we create an entry in our database
     return await this.prisma.grant.create({
       data: {
         ...data,
+        id,
+        image: uploadedFile,
         twitter: data.twitter || '',
         verified: false,
         team: {

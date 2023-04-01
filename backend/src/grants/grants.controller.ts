@@ -36,6 +36,8 @@ import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { Public } from 'src/auth/decorator/public.decorator';
+import { FormDataRequest } from 'nestjs-form-data';
+import { FormDataPipe } from 'src/pipes/form-data.pipe';
 
 @ApiTags('Grants')
 @Controller('grants')
@@ -75,7 +77,8 @@ export class GrantsController {
   })
   @Post()
   @UseGuards(NextAuthGuard)
-  async createGrant(@Body() body: CreateGrantDto, @Request() req) {
+  @FormDataRequest()
+  async createGrant(@Body(FormDataPipe) body: CreateGrantDto, @Request() req) {
     return await this.grantsService.createGrant(body, req.user);
   }
 
@@ -103,9 +106,9 @@ export class GrantsController {
     description: 'Full details about the grant including team & contributions',
     type: GrantDetailResponse,
   })
-  @ApiUnauthorizedResponse({
-    description: 'User has to be logged in to view an unverified grant',
-  })
+  // @ApiUnauthorizedResponse({
+  //   description: 'User has to be logged in to view an unverified grant',
+  // })
   @ApiForbiddenResponse({
     description: 'User is not an admin or team member',
   })
