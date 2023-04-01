@@ -13,7 +13,9 @@ export class AwsService {
       },
     });
 
-    const filename = `${name}.${file.extension}`;
+    const filename = `${name}.${
+      file.extension || (file as any).fileType.ext || ''
+    }`;
 
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
