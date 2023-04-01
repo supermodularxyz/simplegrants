@@ -17,6 +17,7 @@ import Location from "../../components/icons/Location";
 import Twitter from "../../components/icons/Twitter";
 import Website from "../../components/icons/Website";
 import BackButton from "../../components/BackButton";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 export default function GrantDetails() {
   const router = useRouter();
@@ -135,6 +136,7 @@ export default function GrantDetails() {
                     })}
                   </p>
                   <p className="mb-4">contributors</p>
+                  <div className="badge badge-error mb-4">Unverified Grant</div>
                   {grants.find((grant) => grant.id === id) ? (
                     <Button
                       width="full"
@@ -144,13 +146,22 @@ export default function GrantDetails() {
                       Remove from cart
                     </Button>
                   ) : (
-                    <Button
-                      width="full"
-                      className=""
-                      onClick={() => addToCart(data)}
+                    <div
+                      className={
+                        data.verified ? "" : "tooltip tooltip-secondary"
+                      }
+                      data-tip="This grant is unverified, therefore you cannot
+                    donate to it."
                     >
-                      Add to cart
-                    </Button>
+                      <Button
+                        width="full"
+                        className=""
+                        disabled={!data.verified}
+                        onClick={() => addToCart(data)}
+                      >
+                        Add to cart
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
