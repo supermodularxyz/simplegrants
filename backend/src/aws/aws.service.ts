@@ -13,9 +13,11 @@ export class AwsService {
       },
     });
 
+    const filename = `${name}.${file.extension}`;
+
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: name,
+      Key: filename,
       Body: file.buffer,
     };
 
@@ -27,6 +29,6 @@ export class AwsService {
       throw err;
     }
 
-    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${name}`;
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
   }
 }
