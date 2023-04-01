@@ -202,14 +202,14 @@ export class GrantsService {
     const id = cuid();
 
     // First, we need to upload this to AWS
-    const uploadedFile = await this.awsService.uploadFile(data.image, id);
+    const image = await this.awsService.uploadFile(data.image, id);
 
     // After getting back the url, we create an entry in our database
     return await this.prisma.grant.create({
       data: {
         ...data,
         id,
-        image: uploadedFile,
+        image,
         twitter: data.twitter || '',
         verified: false,
         team: {
@@ -259,9 +259,16 @@ export class GrantsService {
     // Check if grant owner is calling this function
     this.checkGrantOwnership(grant, user);
 
+    let image;
+
+    if (data.image) {
+      image = await this.awsService.uploadFile(data.image, id);
+    }
+
     return await this.prisma.grant.update({
       data: {
         ...data,
+        image,
       },
       where: {
         id,
@@ -295,9 +302,12 @@ export class GrantsService {
 
     const paymentProvider = await this.paymentProvider;
 
+    const image = await this.awsService.uploadFile(data.image, id);
+
     return await this.prisma.grant.update({
       data: {
         ...data,
+        image,
         verified: false, // Explicitly ensure the grant is in an unverified state
         paymentAccount: {
           connectOrCreate: {

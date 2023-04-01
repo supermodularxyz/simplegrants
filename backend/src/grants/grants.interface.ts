@@ -110,6 +110,57 @@ class MemoryStoredFile {
 export class UpdateGrantDto {
   @ApiProperty({
     type: String,
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  location: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  twitter?: string;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+  })
+  @IsUrl()
+  @IsOptional()
+  website: string;
+
+  @ApiProperty({
+    type: MemoryStoredFile,
+    nullable: true,
+  })
+  @IsFile()
+  @HasMimeType(['image/jpeg', 'image/jpg', 'image/png'])
+  @IsOptional()
+  image: any;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  description: string;
+}
+
+export class CreateGrantDto {
+  @ApiProperty({
+    type: String,
   })
   @IsString()
   name: string;
@@ -145,9 +196,7 @@ export class UpdateGrantDto {
   })
   @IsString()
   description: string;
-}
 
-export class CreateGrantDto extends UpdateGrantDto {
   @ApiProperty({
     type: Number,
   })

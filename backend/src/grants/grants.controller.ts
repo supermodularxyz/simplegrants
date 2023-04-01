@@ -142,10 +142,11 @@ export class GrantsController {
     description: 'Grant with given ID cannot be found',
   })
   @Patch(':id')
+  @FormDataRequest()
   @UseGuards(NextAuthGuard)
   async updateGrant(
     @Param('id') id: string,
-    @Body() body: UpdateGrantDto,
+    @Body(FormDataPipe) body: UpdateGrantDto,
     @Request() req,
   ) {
     return await this.grantsService.updateGrant(id, body, req.user);
@@ -172,10 +173,11 @@ export class GrantsController {
       'Grant with given ID cannot be found or grant is already verified',
   })
   @Put(':id')
+  @FormDataRequest()
   @UseGuards(NextAuthGuard)
   async resubmitGrant(
     @Param('id') id: string,
-    @Body() body: CreateGrantDto,
+    @Body(FormDataPipe) body: CreateGrantDto,
     @Request() req,
   ) {
     return await this.grantsService.resubmitGrant(id, body, req.user);
