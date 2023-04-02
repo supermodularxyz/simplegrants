@@ -12,6 +12,7 @@ interface IImageInputProps {
   className?: string;
   onChange?: any;
   errors: FieldErrors;
+  preview?: string;
   id: string;
 }
 
@@ -20,6 +21,7 @@ export default function ImageInput({
   onChange,
   id,
   errors,
+  preview,
 }: IImageInputProps) {
   const [file, setFile] = React.useState<any>();
 
@@ -54,6 +56,14 @@ export default function ImageInput({
       });
     }
   }, [fileRejections]);
+
+  React.useEffect(() => {
+    if (preview) {
+      setFile({
+        preview,
+      });
+    }
+  }, [preview]);
 
   return (
     <>

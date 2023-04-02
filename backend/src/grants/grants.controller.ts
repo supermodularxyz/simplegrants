@@ -30,6 +30,7 @@ import {
   GetGrantQueryDto,
   GrantDetailResponse,
   GrantResponse,
+  ResubmitGrantDto,
   UpdateGrantDto,
 } from './grants.interface';
 import { Roles } from 'src/auth/decorator/roles.decorator';
@@ -177,7 +178,7 @@ export class GrantsController {
   @UseGuards(NextAuthGuard)
   async resubmitGrant(
     @Param('id') id: string,
-    @Body(FormDataPipe) body: CreateGrantDto,
+    @Body(FormDataPipe) body: ResubmitGrantDto,
     @Request() req,
   ) {
     return await this.grantsService.resubmitGrant(id, body, req.user);

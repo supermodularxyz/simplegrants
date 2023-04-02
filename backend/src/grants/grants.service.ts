@@ -10,6 +10,7 @@ import {
   GrantCheckout,
   GrantFilterOptions,
   GrantSortOptions,
+  ResubmitGrantDto,
   UpdateGrantDto,
 } from './grants.interface';
 import { ProviderService } from 'src/provider/provider.service';
@@ -286,7 +287,7 @@ export class GrantsService {
    * @param user
    * @returns
    */
-  async resubmitGrant(id: string, data: CreateGrantDto, user: User) {
+  async resubmitGrant(id: string, data: ResubmitGrantDto, user: User) {
     const grant = await this.getGrantById(id);
 
     /**
@@ -304,7 +305,11 @@ export class GrantsService {
 
     const paymentProvider = await this.paymentProvider;
 
-    const image = await this.awsService.uploadFile(data.image, id);
+    let image;
+
+    if (data.image) {
+      image = await this.awsService.uploadFile(data.image, id);
+    }
 
     return await this.prisma.grant.update({
       data: {

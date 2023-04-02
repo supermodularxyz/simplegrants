@@ -211,6 +211,21 @@ export class CreateGrantDto {
   paymentAccount: string;
 }
 
+export class ResubmitGrantDto extends UpdateGrantDto {
+  @ApiProperty({
+    type: Number,
+  })
+  @Type(() => Number)
+  @IsPositive()
+  fundingGoal: number;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  paymentAccount: string;
+}
+
 export class GrantResponse {
   @ApiResponseProperty({
     type: String,
