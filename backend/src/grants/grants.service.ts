@@ -152,6 +152,7 @@ export class GrantsService {
       include: {
         contributions: true,
         team: true,
+        paymentAccount: true,
       },
     });
   }
@@ -187,6 +188,7 @@ export class GrantsService {
         (acc, contribution) => acc + contribution.amountUsd,
         0,
       ),
+      paymentAccount: grant.paymentAccount.recipientAddress,
     };
   }
 

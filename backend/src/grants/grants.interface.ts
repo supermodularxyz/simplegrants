@@ -298,11 +298,17 @@ export class GrantDetailResponse extends GrantResponse {
     type: [Contribution],
   })
   contributions: Contribution[];
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  paymentAccount: string;
 }
 
 export type ExtendedGrant = Grant & {
   contributions: Contribution[];
   team: User[];
+  paymentAccount: PaymentAccount;
 };
 
 export class GrantCheckout {
