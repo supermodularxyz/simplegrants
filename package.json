@@ -11,6 +11,7 @@
     "start": "docker compose up -d",
     "stop:dev": "docker compose -f docker-compose.dev.yml down",
     "stop": "docker compose down",
+    "logs:dev": "docker compose -f docker-compose.dev.yml logs --follow",
     "logs": "docker compose logs --follow",
     "setup": "cd backend && npm run setup"
   },
