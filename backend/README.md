@@ -69,8 +69,8 @@ There are multiple ways of running this application, each with a slightly differ
 
 If you are running locally for development, there are a few things to take note of:
 
-1. Because of the way Docker networking works, if you need to run commands like `prisma migrate` or `prisma db seed`, you need to change the `DATABASE_CONTAINER` environment variable to `localhost` temporarily. Make sure you remember to switch it back!
-2. Depending on how you choose to run this application, you may need to update `FRONTEND_URL` and `NEXTAUTH_URL` accordingly.
+1. Because of the way Docker networking works, if you need to run commands like `prisma migrate` or `prisma db seed`, you need to change the `DATABASE_CONTAINER` environment variable to `localhost`. Luckily, there is a simple script that helps you with that in `prisma-helper.sh`. Running `npm run migrate:dev` or `npm run setup` should automatically swap the .env variables for you.
+2. Depending on how you choose to run this application, you may need to update `FRONTEND_URL` and `NEXTAUTH_URL` accordingly. It is important to note that the `NEXTAUTH_URL` has to be `http://host.docker.internal:3001` and **NOT** `http://localhost:3001` if you are running everything locally with Docker.
 3. If you are using Stripe, **remember to configure your webhook**!
 
 ```bash
