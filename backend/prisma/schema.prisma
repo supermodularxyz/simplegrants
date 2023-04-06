@@ -176,15 +176,20 @@ model EcosystemBuilder {
   userId         String
   user           User            @relation(fields: [userId], references: [id])
   matchingRounds MatchingRound[]
+  inviteCodesId  String          @unique
+  inviteCode     InviteCodes     @relation(fields: [inviteCodesId], references: [id])
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
 
 model InviteCodes {
-  id        String   @id @default(cuid())
-  code      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String            @id @default(cuid())
+  code        String
+  claimed     Boolean           @default(false)
+  claimedById String?
+  claimedBy   EcosystemBuilder?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model MatchedFund {
