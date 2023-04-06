@@ -4,6 +4,7 @@ import { Seed } from './types';
 import { seedUsers } from './users';
 import { seedGrants } from './grants';
 import { seedEcosystemBuilder } from './ecosystemBuilder';
+import { seedInviteCodes } from './inviteCodes';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,7 @@ async function main() {
     await seedUsers(seed);
     await seedGrants(seed);
     await seedEcosystemBuilder(seed);
+    await seedInviteCodes(seed);
   }
 }
 

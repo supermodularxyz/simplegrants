@@ -8,6 +8,7 @@ import {
   randUrl,
   randUserName,
 } from '@ngneat/falso';
+import * as cuidgenerator from 'cuid';
 
 export const seedEcosystemBuilder = async (seed: Seed) => {
   const { prisma, cuid, users, grants, paymentMethod } = seed;
@@ -24,6 +25,11 @@ export const seedEcosystemBuilder = async (seed: Seed) => {
       user: {
         connect: {
           id: users[Math.floor(Math.random() * users.length)].id,
+        },
+      },
+      inviteCode: {
+        create: {
+          code: cuidgenerator(),
         },
       },
     },
