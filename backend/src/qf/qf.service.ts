@@ -6,6 +6,58 @@ import { PoolQfInformation } from './qf.interface';
 export class QfService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  /**
+   * Get the latest active matching round the grant is part of
+   * @param grantId
+   * @returns
+   */
+  async getActiveMatchingRoundByGrant(grantId: string) {
+    const matchingRound = await this.prismaService.matchingRound.findFirst({
+      where: {
+        grants: {
+          some: {
+            id: grantId,
+          },
+        },
+        endDate: {
+          gte: new Date(),
+        },
+      },
+    });
+
+    return matchingRound;
+  }
+
+  async estimateMatchedAmount(donationAmount: number, grantId: string) {
+    const matchingRound = await this.getActiveMatchingRoundByGrant(grantId);
+
+    if (!matchingRound) return 0;
+
+    const qfInfo = await this.calculateQuadraticFundingAmount(matchingRound.id);
+
+    /**
+     * We can estimate the QF amount by doing these steps:
+     * 1. Square root the qfValue
+     * 2. Square root the new donation amount
+     * 3. Sum both these values together
+     * 4. Square the value in step 3
+     * 5. Calculate the difference
+     * 6. Add the difference to the total qf value
+     * 7. Multiply step 4 with total pool, divided by step 6
+     * 8. Subtract with the original amount
+     */
+    const qfValue = qfInfo.grants[grantId].qfValue;
+    const squared = Math.sqrt(qfValue) + Math.sqrt(donationAmount);
+    const newQfValue = Math.pow(squared, 2);
+    const difference = newQfValue - qfValue;
+    const newDivisor = qfInfo.sumOfQfValues + difference;
+    const newMatchedAmount =
+      (qfInfo.totalFundsInPool * newQfValue) / newDivisor;
+    const matchedAmountDifference =
+      newMatchedAmount - qfInfo.grants[grantId].qfAmount;
+    return matchedAmountDifference;
+  }
+
   async calculateQuadraticFundingAmount(matchingRoundId: string) {
     /**
      * We first need to get all the info of the matching round
@@ -88,13 +140,33 @@ export class QfService {
      * Now that we have all of the QF values,
      * we can now calculate the amount of funds going to each grant
      */
-    Object.keys(qfInfo.qfValues).map((grantId) => {
-      const qfValue = qfInfo.qfValues[grantId];
-      const qfPercentage = qfValue / qfInfo.sumOfQfValues;
-      const qfAmount = qfPercentage * totalFundsInPool;
-      console.log(
-        `Grant: ${grantId} will be getting $${qfAmount} in matched funds!`,
-      );
-    });
+    return Object.keys(qfInfo.qfValues).reduce(
+      (prev, grantId) => {
+        const grants = prev.grants;
+        const qfValue = qfInfo.qfValues[grantId];
+        const qfPercentage = qfValue / qfInfo.sumOfQfValues;
+        const qfAmount = qfPercentage * totalFundsInPool;
+        console.log(
+          `Grant: ${grantId} will be getting $${qfAmount} in matched funds!`,
+        );
+
+        grants[grantId] = {
+          qfValue,
+          qfAmount,
+        };
+
+        return {
+          ...prev,
+          grants,
+          sumOfQfValues: qfInfo.sumOfQfValues,
+          totalFundsInPool,
+        };
+      },
+      {
+        grants: {},
+        sumOfQfValues: 0,
+        totalFundsInPool: 0,
+      },
+    );
   }
 }
