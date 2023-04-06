@@ -173,7 +173,7 @@ model MatchingRound {
 
 model EcosystemBuilder {
   id             String          @id @default(cuid())
-  userId         String
+  userId         String          @unique
   user           User            @relation(fields: [userId], references: [id])
   matchingRounds MatchingRound[]
   inviteCodesId  String          @unique
