@@ -7,6 +7,9 @@ import { ProviderModule } from './provider/provider.module';
 import { AuthModule } from './auth/auth.module';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { AwsModule } from './aws/aws.module';
+import { QfModule } from './qf/qf.module';
+import { InvitesModule } from './invites/invites.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -21,6 +24,12 @@ import { AwsModule } from './aws/aws.module';
     ProviderModule,
     AuthModule,
     AwsModule,
+    QfModule,
+    InvitesModule,
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
