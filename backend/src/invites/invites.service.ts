@@ -24,7 +24,7 @@ export class InvitesService {
 
     if (ecosystemBuilder)
       throw new HttpException(
-        'User already has an ecosystem builder account',
+        'User already has an ecosystem builder account. Please login to the ecosystem builder platform.',
         HttpStatus.BAD_REQUEST,
       );
 

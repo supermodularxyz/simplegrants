@@ -169,4 +169,8 @@ export class QfService {
       },
     );
   }
+
+  async distributeMatchedFunds() {
+    // Find every ended pool & distribute the funds
+  }
 }

@@ -30,6 +30,7 @@ export const seedEcosystemBuilder = async (seed: Seed) => {
       inviteCode: {
         create: {
           code: cuidgenerator(),
+          claimed: true,
         },
       },
     },
@@ -71,7 +72,7 @@ export const seedEcosystemBuilder = async (seed: Seed) => {
       },
       verified: true,
       startDate: new Date(),
-      endDate: new Date(new Date().getTime() + 240000),
+      endDate: new Date(new Date().getTime() + 2592000000),
     },
   });
 
@@ -374,7 +375,7 @@ export const seedEcosystemBuilder = async (seed: Seed) => {
       },
       verified: true,
       startDate: new Date(),
-      endDate: new Date(new Date().getTime() + 240000),
+      endDate: new Date(new Date().getTime() + 2592000000),
     },
   });
   console.log({ meticulousMatchingRound });

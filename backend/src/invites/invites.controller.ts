@@ -16,13 +16,9 @@ export class InvitesController {
   //     return await this.invitesService.createInvites()
   //   }
 
-  /**
-   * Claim an invite code
-   * Rate limited to:
-   * 3 tries for 24 hours
-   */
   @ApiOperation({
-    description: 'Claim an invite code to be an Ecosystem Builder',
+    description:
+      'Claim an invite code to be an Ecosystem Builder. Rate limited to 3 tries for 24 hours.',
   })
   @ApiOkResponse({
     description: 'Ecosystem Builder account created',
