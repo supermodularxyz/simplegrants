@@ -11,17 +11,13 @@ import { toast } from "react-toastify";
 import { GrantDetailResponse } from "../../../types/grant";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import FundingBar from "../../../components/FundingBar";
-import { useCartStore } from "../../../utils/store";
 import Location from "../../../components/icons/Location";
 import Twitter from "../../../components/icons/Twitter";
 import Website from "../../../components/icons/Website";
 import BackButton from "../../../components/BackButton";
-import * as Tooltip from "@radix-ui/react-tooltip";
 
-export default function GrantDetails() {
+export default function ReviewGrant() {
   const router = useRouter();
-  const { grants, addToCart, removeFromCart } = useCartStore();
   const { id } = router.query;
   const { data: session, status } = useSession();
   const [data, setData] = React.useState<GrantDetailResponse>();
@@ -50,8 +46,26 @@ export default function GrantDetails() {
   React.useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/sign-in");
+      /**
+       * There is no need to ensure you are an admin because this is already handled in the backend
+       * Furthermore, it would be a slight security risk to store user roles in cookies
+       */
     }
   }, [status]);
+
+  const verifyGrant = () => {
+    setLoading(true);
+    axios
+      .post(`/grants/verify/${id}`)
+      .then((res) => setData(res.data))
+      .catch((err) => {
+        console.error({ err });
+        toast.error(err.response.data.message || "Something went wrong", {
+          toastId: "review-grant",
+        });
+      })
+      .finally(() => setLoading(false));
+  };
 
   return (
     data && (
@@ -107,79 +121,33 @@ export default function GrantDetails() {
                 </div>
               </div>
               <div className="basis-full md:basis-2/5 px-4 flex flex-col items-center gap-4">
-                <div className="flex flex-col w-full bg-white shadow-card py-8 px-6 rounded-xl max-w-sm">
-                  <FundingBar
-                    className="mb-4"
-                    value={data.amountRaised}
-                    max={data.fundingGoal}
-                  />
-                  <p className="font-bold text-2xl">
-                    ${" "}
-                    {data.amountRaised.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                <div className="flex flex-col w-full bg-white shadow-card py-8 px-6 rounded-xl">
+                  <h2 className="font-bold text-xl mb-6">Payment Method</h2>
+                  <p className="font-bold">
+                    {data.paymentAccount.provider.name}
                   </p>
-                  <p className="mb-2">
-                    raised of ${" "}
-                    {data.fundingGoal.toLocaleString("en-US", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,
-                    })}{" "}
-                    goal
+                  <p>ID: {data.paymentAccount.recipientAddress}</p>
+                  <p>
+                    Denomination:{" "}
+                    {data.paymentAccount.provider.denominations.join(", ")}
                   </p>
-
-                  <p className="font-bold text-2xl">
-                    {data.contributions.length.toLocaleString("en-US", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,
-                    })}
-                  </p>
-                  <p className="mb-4">contributors</p>
-                  {!data.verified && (
-                    <div className="badge badge-error mb-4">
-                      Unverified Grant
-                    </div>
-                  )}
-                  {grants.find((grant) => grant.id === id) ? (
-                    <Button
-                      width="full"
-                      className="btn-error"
-                      onClick={() => removeFromCart(id as string)}
-                    >
-                      Remove from cart
-                    </Button>
-                  ) : (
-                    <div
-                      className={
-                        data.verified ? "" : "tooltip tooltip-secondary"
-                      }
-                      data-tip="This grant is unverified, therefore you cannot
-                    donate to it."
-                    >
-                      <Button
-                        width="full"
-                        className=""
-                        disabled={!data.verified}
-                        onClick={() => addToCart(data)}
-                      >
-                        Add to cart
-                      </Button>
-                    </div>
-                  )}
+                  <Button
+                    width="full"
+                    className="mt-6"
+                    disabled={data.verified || loading}
+                    onClick={() => verifyGrant()}
+                  >
+                    Approve Grant
+                  </Button>
                 </div>
-                {data.team.some(
-                  (team) => team.id === (session?.user as any).id
-                ) && (
-                  <div className="flex flex-col w-full bg-white shadow-card py-8 px-6 rounded-xl max-w-sm">
-                    <p className="font-bold mb-4">Looking to make changes?</p>
-                    <Link href={`/grants/${id}/edit`}>
-                      <Button width="full" className="">
-                        Edit Grant
-                      </Button>
-                    </Link>
-                  </div>
-                )}
+                <div className="flex flex-col items-start w-full">
+                  <h2 className="font-bold text-xl my-4">Team</h2>
+                  {data.team.map((team, index) => (
+                    <p key={index}>
+                      {team.name} - {team.email}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

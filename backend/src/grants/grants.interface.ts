@@ -3,7 +3,7 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { Grant, PaymentAccount } from '@prisma/client';
+import { Grant, PaymentProvider } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -18,6 +18,7 @@ import {
 } from 'class-validator';
 import { HasMimeType, IsFile } from 'nestjs-form-data';
 import { Contribution } from 'src/contributions/contributions.interface';
+import { ProviderResponse } from 'src/provider/provider.interface';
 import { User, UserProfile } from 'src/users/users.interface';
 
 export enum GrantSortOptions {
@@ -303,6 +304,38 @@ export class GrantResponse {
   updatedAt: Date;
 }
 
+export class PaymentAccount {
+  @ApiResponseProperty({
+    type: String,
+  })
+  id: string;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  recipientAddress: string;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  providerId: string;
+
+  @ApiResponseProperty({
+    type: ProviderResponse,
+  })
+  provider?: ProviderResponse;
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  createdAt: Date;
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  updatedAt: Date;
+}
+
 export class GrantDetailResponse extends GrantResponse {
   @ApiResponseProperty({
     type: [UserProfile],
@@ -315,11 +348,14 @@ export class GrantDetailResponse extends GrantResponse {
   contributions: Contribution[];
 
   @ApiResponseProperty({
-    type: String,
+    type: PaymentAccount,
   })
-  paymentAccount: string;
+  paymentAccount: PaymentAccount;
 }
 
+/**
+ * Has no `amountRaised` computed value
+ */
 export type ExtendedGrant = Grant & {
   contributions: Contribution[];
   team: User[];

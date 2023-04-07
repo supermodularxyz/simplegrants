@@ -1,3 +1,4 @@
+import { PaymentAccount, PaymentProvider } from "@prisma/client";
 import { Contribution } from "./contributions";
 import { UserProfile } from "./user";
 
@@ -20,6 +21,9 @@ export interface GrantResponse {
 export interface GrantDetailResponse extends GrantResponse {
   team: UserProfile[];
   contributions: Contribution[];
+  paymentAccount: PaymentAccount & {
+    provider: PaymentProvider;
+  };
 }
 
 export const SortOptions = [
