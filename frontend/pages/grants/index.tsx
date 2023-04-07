@@ -8,7 +8,11 @@ import Button from "../../components/Button";
 import axios from "../../utils/axios";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { FilterOptions, GrantResponse, SortOptions } from "../../types/grant";
+import {
+  FilterOptions,
+  GrantDetailResponse,
+  SortOptions,
+} from "../../types/grant";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import Select from "../../components/input/Select";
 import Divider from "../../components/Divider";
@@ -24,7 +28,7 @@ import { debounce as debouncer } from "lodash";
 export default function Grants() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [data, setData] = React.useState<GrantResponse[]>([]);
+  const [data, setData] = React.useState<GrantDetailResponse[]>([]);
   const [sort, setSort] = React.useState<string | undefined>(undefined);
   const [filter, setFilter] = React.useState<string | undefined>(undefined);
   const [search, setSearch] = React.useState<string | undefined>(undefined);

@@ -6,10 +6,13 @@ import Head from "next/head";
 import React from "react";
 import MainLayout from "../layouts/MainLayout";
 import Button from "../components/Button";
+import { useInviteStore } from "../utils/store";
 
 export default function SignIn({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { inviteCode } = useInviteStore();
+
   return (
     <div>
       <Head>
@@ -28,7 +31,11 @@ export default function SignIn({
             {Object.values(providers).map((provider) => (
               <Button
                 key={provider.name}
-                onClick={() => signIn(provider.id)}
+                onClick={() =>
+                  signIn(provider.id, {
+                    callbackUrl: inviteCode ? `/invite` : undefined,
+                  })
+                }
                 className="px-16 py-3 text-xl"
                 width="full"
               >
@@ -49,6 +56,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   // Note: Make sure not to redirect to the same page
   // To avoid an infinite loop!
   if (session) {
+    if (context.query.redirect) {
+      return { redirect: { destination: context.query.redirect } };
+    }
     return { redirect: { destination: "/grants" } };
   }
 

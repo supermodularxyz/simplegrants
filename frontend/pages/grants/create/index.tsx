@@ -81,7 +81,6 @@ export default function CreateGrant() {
       .finally(() => {
         setLoading(false);
       });
-    setLoading(false);
   };
 
   return (
