@@ -6,6 +6,10 @@ export class FormDataPipe implements PipeTransform {
     if (metadata.type === 'body') {
       const parsed = {};
       for (const key in body) {
+        if (!body[key]) {
+          parsed[key] = body[key];
+          continue;
+        }
         const temp = Number(body[key]);
         if (isNaN(temp)) {
           parsed[key] = body[key];

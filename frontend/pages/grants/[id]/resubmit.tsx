@@ -65,7 +65,10 @@ export default function ResubmitGrant() {
       .then((res) => {
         setData(res.data);
         const { image, ...dataWithoutImage } = res.data;
-        reset(dataWithoutImage);
+        reset({
+          ...dataWithoutImage,
+          paymentAccount: res.data.paymentAccount.recipientAddress,
+        });
       })
       .catch((err) => {
         console.error({ err });
