@@ -64,6 +64,7 @@ export default function GetStarted() {
     if (inviteCode && session) {
       claimInviteCode();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteCode, session]);
 
   return (

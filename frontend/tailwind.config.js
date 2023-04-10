@@ -32,7 +32,7 @@ module.exports = {
         sg: {
           primary: "#BBE3FC",
           secondary: "#413A34",
-          accent: "#FEC89A",
+          accent: "#9C6353",
           neutral: "#BBE3FC",
           info: "#8BCFFA",
           success: "#87CC66",
@@ -93,7 +93,7 @@ module.exports = {
         simplegrants: {
           primary: "#BBE3FC",
           secondary: "#413A34",
-          accent: "#FEC89A",
+          accent: "#9C6353",
           neutral: "#BBE3FC",
           "base-100": "#ffffff",
           info: "#8BCFFA",
