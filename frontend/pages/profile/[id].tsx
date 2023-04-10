@@ -1,17 +1,19 @@
 import Head from "next/head";
 import { useSession } from "next-auth/react";
-import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react";
 import React from "react";
 import Image from "next/image";
 import LandingNavbar from "../../layouts/landing/LandingNavbar";
-import Button from "../../components/Button";
 import { useRouter } from "next/router";
-import { ArrowTopRightIcon } from "@radix-ui/react-icons";
-import GrantCard from "../../components/GrantCard";
 import axios from "../../utils/axios";
 import { toast } from "react-toastify";
 import Fade from "react-reveal/Fade";
 import { UserProfile } from "../../types/user";
+import * as Tabs from "@radix-ui/react-tabs";
+import GrantCard from "../../components/GrantCard";
+import Link from "next/link";
+import Button from "../../components/Button";
+import Navbar from "../../layouts/Navbar";
+import DonationList from "../../components/DonationList";
 
 export default function Home() {
   const router = useRouter();
@@ -24,11 +26,13 @@ export default function Home() {
     if (id) {
       setLoading(true);
       axios
-        .get(`/profile/${id}`)
-        .then((res: any) => setData(res))
+        .get(`/users/profile/${id}`)
+        .then((res: any) => {
+          setData(res.data);
+        })
         .catch((err) => {
           console.error(err);
-          toast.error(err.response.data.message, {
+          toast.error(err.response?.data?.message || err.message, {
             toastId: "user-profile",
           });
         })
@@ -49,47 +53,108 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col min-w-screen min-h-screen w-full h-full overflow-x-hidden">
-        <LandingNavbar className="z-[2] absolute top-0 left-0" />
+      <main className="flex flex-col min-w-screen min-h-screen w-full h-full overflow-x-hidden text-sg-secondary">
+        <Navbar className="p-4 absolute">
+          {" "}
+          <Link href="/grants/create">
+            <Button>Create Grant</Button>
+          </Link>
+        </Navbar>
         {loading ? (
           <></>
         ) : (
-          <>{data ? <></> : <h1>User profile not found</h1>}</>
+          <>
+            {data ? (
+              <div className="w-full flex flex-col md:flex-row min-h-screen">
+                <div className="basis-full shrink-0 md:basis-1/4 bg-sg-gradient px-8 sm:px-12 md:px-14 pt-24 pb-6 rounded-b-xl overflow-hidden">
+                  <p className="font-bold text-2xl text-sg-accent">Profile</p>
+                  <div className="max-w-[8rem] aspect-square rounded-full relative overflow-hidden my-6">
+                    <Image fill src={data.image} alt={data.name} />
+                  </div>
+                  <p className="font-bold text-xl text-sg-accent">
+                    {data.name}
+                  </p>
+                  <p className="text-xl">{data.email}</p>
+                  <p className="mt-4 my-12 line-clamp-4">{data.bio}</p>
+                  <p className="font-bold text-xl text-sg-accent">
+                    Total Donated Amount
+                  </p>
+                  <p className="text-xl mb-5">
+                    ${" "}
+                    {data.totalDonated.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    USD
+                  </p>
+                  <p className="font-bold text-xl text-sg-accent">
+                    Total Raised Amount
+                  </p>
+                  <p className="text-xl">
+                    ${" "}
+                    {data.totalRaised.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    USD
+                  </p>
+                </div>
+                <div className="basis-full shrink-0 md:basis-3/4 px-8 sm:px-12 md:px-14 py-20 md:pt-24 pb-6">
+                  <Tabs.Root
+                    className="flex flex-col w-full items-center md:items-start"
+                    defaultValue="donations"
+                  >
+                    <Tabs.List
+                      className="flex flex-row gap-x-11 font-bold text-xl mb-11"
+                      aria-label="View your donations or grants"
+                    >
+                      <Tabs.Trigger
+                        className="data-[state=active]:text-sg-accent data-[state=active]:underline"
+                        value="donations"
+                      >
+                        Donations
+                      </Tabs.Trigger>
+                      <Tabs.Trigger
+                        className="data-[state=active]:text-sg-accent data-[state=active]:underline"
+                        value="grants"
+                      >
+                        Grants
+                      </Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content
+                      className="flex flex-col gap-10"
+                      value="donations"
+                    >
+                      {data.contributions.map((contribution) => (
+                        <DonationList
+                          grant={contribution.grant}
+                          contributedAmount={contribution.amountUsd}
+                          key={contribution.id}
+                          onClick={() =>
+                            router.push(`/grants/${contribution.grantId}`)
+                          }
+                        />
+                      ))}
+                    </Tabs.Content>
+                    <Tabs.Content
+                      className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10"
+                      value="grants"
+                    >
+                      {data.grants.map((grant) => (
+                        <GrantCard
+                          grant={grant}
+                          key={grant.id}
+                          onClick={() => router.push(`/grants/${grant.id}`)}
+                          hideButton
+                        />
+                      ))}
+                    </Tabs.Content>
+                  </Tabs.Root>
+                </div>
+              </div>
+            ) : (
+              <h1>User profile not found</h1>
+            )}
+          </>
         )}
-        <footer className="w-full flex flex-col md:flex-row px-6 py-8 md:px-28 md:py-16 gap-x-14 justify-between items-start">
-          <div className="w-full">
-            <Image
-              src="/logo.svg"
-              alt="SimpleGrants"
-              width={162}
-              height={50}
-              className="mb-8"
-            />
-          </div>
-          <div className="flex flex-row flex-wrap lg:flex-nowrap gap-x-8 w-full justify-between">
-            <div className="flex flex-col gap-y-3 mb-6">
-              <p className="font-bold text-xl">Product</p>
-              <p className="font-sm">Grants</p>
-              <p className="font-sm">Ecosystems</p>
-            </div>
-            <div className="flex flex-col gap-y-3 mb-6">
-              <p className="font-bold text-xl">Organization</p>
-              <p className="font-sm">About</p>
-              <p className="font-sm">Mission</p>
-              <p className="font-sm">Blog</p>
-            </div>
-            <div className="flex flex-col gap-y-3 mb-6">
-              <p className="font-bold text-xl">Community</p>
-              <p className="font-sm">Code of Conduct</p>
-              <p className="font-sm">Support</p>
-            </div>
-            <div className="flex flex-col gap-y-3 mb-6">
-              <p className="font-bold text-xl">Legal</p>
-              <p className="font-sm">Terms</p>
-              <p className="font-sm">Privacy</p>
-            </div>
-          </div>
-        </footer>
       </main>
     </div>
   );

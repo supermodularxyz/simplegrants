@@ -85,7 +85,12 @@ export default function Navbar({ children, className }: INavbarProps) {
                   className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
                 >
                   <li>
-                    <a className="justify-between">Profile</a>
+                    <Link
+                      className="justify-between"
+                      href={`/profile/${(session.user as any).id}`}
+                    >
+                      Profile
+                    </Link>
                   </li>
                   <li>
                     <a>Settings</a>
@@ -123,7 +128,12 @@ export default function Navbar({ children, className }: INavbarProps) {
                   </Link>
                 </li>
                 <li>
-                  <a className="justify-between">Profile</a>
+                  <Link
+                    className="justify-between"
+                    href={`/profile/${(session.user as any).id}`}
+                  >
+                    Profile
+                  </Link>
                 </li>
                 <li>
                   <a>Settings</a>
