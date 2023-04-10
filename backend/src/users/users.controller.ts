@@ -8,11 +8,17 @@ import {
   ClassSerializerInterceptor,
   Body,
   CacheInterceptor,
+  Param,
 } from '@nestjs/common';
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { UsersService } from './users.service';
 import { RequestWithUser, UpdateUserDto, UserProfile } from './users.interface';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('User')
 @Controller('users')
@@ -52,5 +58,20 @@ export class UsersController {
     return new UserProfile(
       await this.usersService.updateUserProfile(req.user.id, body),
     );
+  }
+
+  @ApiOperation({
+    description: 'Retrieves the user profile by ID',
+  })
+  @ApiOkResponse({
+    description: 'The user profile',
+    type: UserProfile,
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @Get('profile/:id')
+  async getProfileById(@Param('id') id: string) {
+    return new UserProfile(await this.usersService.retrieveUserProfile(id));
   }
 }

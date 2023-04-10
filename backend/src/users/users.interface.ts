@@ -1,14 +1,25 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-import { Exclude } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
 import { IsString } from 'class-validator';
-import { Contribution } from 'src/contributions/contributions.interface';
-import { GrantResponse } from 'src/grants/grants.interface';
+import { UserProfileContributionInfo } from 'src/contributions/contributions.interface';
+import { GrantResponseWithContributions } from 'src/grants/grants.interface';
 
+/**
+ * Typed interface for `@Request()` calls protected by NextAuthGuard
+ * which includes `user`
+ */
 export interface RequestWithUser {
   user: User;
 }
 
+/**
+ * Basic information about a User
+ *
+ * There are a few information that we hide from the users
+ * 1. The visitorId
+ * 2. Whether their account is flagged or not
+ */
 export class User {
   @ApiResponseProperty({
     type: String,
@@ -59,14 +70,10 @@ export class User {
   @Exclude()
   flagged: boolean;
 
-  @ApiResponseProperty({
-    type: Date,
-  })
+  @Exclude()
   createdAt: Date;
 
-  @ApiResponseProperty({
-    type: Date,
-  })
+  @Exclude()
   updatedAt: Date;
 
   constructor(partial: Partial<User>) {
@@ -74,16 +81,34 @@ export class User {
   }
 }
 
+/**
+ * Additional information that is returned when querying a UserProfile
+ *
+ * This includes information about their contributions, the grants they own,
+ * the total amount donated & total amount raised
+ */
 export class UserProfile extends User {
   @ApiResponseProperty({
-    type: [Contribution],
+    type: [UserProfileContributionInfo],
   })
-  contributions: Contribution[];
+  @Type(() => UserProfileContributionInfo)
+  contributions: UserProfileContributionInfo[];
 
   @ApiResponseProperty({
-    type: [GrantResponse],
+    type: [GrantResponseWithContributions],
   })
-  grants: GrantResponse[];
+  @Type(() => GrantResponseWithContributions)
+  grants: GrantResponseWithContributions[];
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  totalDonated: number;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  totalRaised: number;
 
   constructor(partial: Partial<UserProfile>) {
     super(partial);
@@ -91,6 +116,9 @@ export class UserProfile extends User {
   }
 }
 
+/**
+ * When updating a user, we only allow you to update your name, bio, and twitter handle for now
+ */
 export class UpdateUserDto {
   @ApiProperty({
     type: String,
