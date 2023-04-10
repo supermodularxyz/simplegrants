@@ -131,6 +131,12 @@ export default function ReviewGrant() {
                     Denomination:{" "}
                     {data.paymentAccount.provider.denominations.join(", ")}
                   </p>
+                  <h2 className="font-bold text-xl my-4">Team</h2>
+                  {data.team.map((team, index) => (
+                    <p key={index}>
+                      {team.name} - {team.email}
+                    </p>
+                  ))}
                   <Button
                     width="full"
                     className="mt-6"
@@ -139,14 +145,6 @@ export default function ReviewGrant() {
                   >
                     Approve Grant
                   </Button>
-                </div>
-                <div className="flex flex-col items-start w-full">
-                  <h2 className="font-bold text-xl my-4">Team</h2>
-                  {data.team.map((team, index) => (
-                    <p key={index}>
-                      {team.name} - {team.email}
-                    </p>
-                  ))}
                 </div>
               </div>
             </div>

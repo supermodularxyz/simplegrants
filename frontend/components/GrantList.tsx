@@ -35,7 +35,7 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
       <div className="flex flex-col flex-grow w-full justify-between mb-4 md:mb-0">
         <div className="flex flex-col mb-4">
           <p className="font-bold text-xl">{grant.name}</p>
-          <p className="text-sg-700 mb-2">by User</p>
+          {grant.team && <p className="text-sg-700">by {grant.team[0].name}</p>}
           <p className="leading-relaxed line-clamp-3">{grant.description}</p>
         </div>
         <div className="flex flex-col">

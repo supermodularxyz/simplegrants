@@ -8,7 +8,7 @@ import Button from "../components/Button";
 import { useRouter } from "next/router";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 import GrantCard from "../components/GrantCard";
-import { GrantDetailResponse } from "../types/grant";
+import { GrantResponse } from "../types/grant";
 import axios from "../utils/axios";
 import { toast } from "react-toastify";
 import Fade from "react-reveal/Fade";
@@ -16,7 +16,7 @@ import Fade from "react-reveal/Fade";
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [data, setData] = React.useState<GrantDetailResponse[]>([]);
+  const [data, setData] = React.useState<GrantResponse[]>([]);
   const [loading, setLoading] = React.useState(false);
   const { getData } = useVisitorData({ tag: "signin" }, { immediate: false });
 

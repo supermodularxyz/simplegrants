@@ -8,11 +8,7 @@ import Button from "../../components/Button";
 import axios from "../../utils/axios";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import {
-  FilterOptions,
-  GrantDetailResponse,
-  SortOptions,
-} from "../../types/grant";
+import { FilterOptions, GrantResponse, SortOptions } from "../../types/grant";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import Select from "../../components/input/Select";
 import Divider from "../../components/Divider";
@@ -28,7 +24,7 @@ import { debounce as debouncer } from "lodash";
 export default function Grants() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [data, setData] = React.useState<GrantDetailResponse[]>([]);
+  const [data, setData] = React.useState<GrantResponse[]>([]);
   const [sort, setSort] = React.useState<string | undefined>(undefined);
   const [filter, setFilter] = React.useState<string | undefined>(undefined);
   const [search, setSearch] = React.useState<string | undefined>(undefined);
@@ -148,7 +144,7 @@ export default function Grants() {
             </div>
           </div>
           {view === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-10 w-full my-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-8 gap-x-10 w-full my-6 justify-items-center">
               {data &&
                 data.map((grant) => (
                   <GrantCard

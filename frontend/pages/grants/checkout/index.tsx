@@ -137,7 +137,7 @@ export default function GrantsCheckout() {
                           </div>
                         </div>
                         <p
-                          className="cursor-pointer h-full items-center justify-center"
+                          className="cursor-pointer h-full items-center justify-center text-sg-error"
                           onClick={() => removeFromCart(grant.id)}
                         >
                           Remove

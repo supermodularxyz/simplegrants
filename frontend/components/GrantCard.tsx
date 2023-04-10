@@ -1,15 +1,13 @@
 import React from "react";
 import Image from "next/image";
-import { GrantResponse } from "../types/grant";
+import { GrantResponse, GrantResponseWithContributions } from "../types/grant";
 import FundingBar from "./FundingBar";
 import { useCartStore } from "../utils/store";
 import Button from "./Button";
 import clsx from "clsx";
 
 interface IGrantCardProps {
-  grant: GrantResponse & {
-    team: { name: string }[];
-  };
+  grant: GrantResponse | GrantResponseWithContributions;
   onClick?: (e?: any) => any;
   hideButton?: boolean;
   hideProgress?: boolean;
@@ -29,6 +27,8 @@ const GrantCard = ({
     () => grants.find((data) => data.id === grant.id),
     [grants, grant]
   );
+
+  // const isGrantResponse = (x: any): x is GrantResponse => x.
 
   return (
     <div
@@ -50,7 +50,9 @@ const GrantCard = ({
       <div className="flex flex-col px-8 py-6 h-full items-start justify-between">
         <div className="flex flex-col">
           <p className="font-bold text-[22px]">{grant.name}</p>
-          <p className="text-sg-700">by {grant.team[0].name}</p>
+          {"team" in grant && (
+            <p className="text-sg-700">by {grant.team[0].name}</p>
+          )}
           <p className="text-sm mt-4 overflow-hidden text-ellipsis line-clamp-3">
             {grant.description}
           </p>
