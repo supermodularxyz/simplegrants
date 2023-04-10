@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PaymentProvider, User } from '@prisma/client';
-import * as cuid from 'cuid';
 import {
   FeeAllocationMethod,
   GrantWithFunding,

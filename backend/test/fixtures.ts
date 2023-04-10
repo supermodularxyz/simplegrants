@@ -8,9 +8,8 @@ import {
   randUrl,
   randUserName,
 } from '@ngneat/falso';
-import { Role } from '@prisma/client';
+import { Contribution, Grant, Role, User } from '@prisma/client';
 import * as cuid from 'cuid';
-import { ExtendedGrant } from 'src/grants/grants.interface';
 import { UserProfile } from 'src/users/users.interface';
 
 // Creating a mock result
@@ -33,6 +32,22 @@ const users: UserProfile[] = [...Array(3)].map((_, index) => {
         id: cuid(),
         userId: cuid(),
         grantId: cuid(),
+        grant: {
+          id: cuid(),
+          name: 'test one',
+          description: randText(),
+          image: randImg(),
+          twitter: randUserName(),
+          website: randUrl(),
+          location: randCountry(),
+          paymentAccountId: randUuid(),
+          fundingGoal: 100,
+          contributions: [],
+          team: [],
+          verified: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
         matchingRoundId: null,
         amount: 1000,
         denomination: 'USD',
@@ -44,12 +59,17 @@ const users: UserProfile[] = [...Array(3)].map((_, index) => {
       },
     ],
     grants: [],
+    totalDonated: 0,
+    totalRaised: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 });
 
-const grants: ExtendedGrant[] = [
+const grants: (Grant & {
+  team: User[];
+  contributions: Contribution[];
+})[] = [
   {
     id: cuid(),
     name: 'test one',

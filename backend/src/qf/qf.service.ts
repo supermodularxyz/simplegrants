@@ -31,7 +31,7 @@ export class QfService {
   async estimateMatchedAmount(donationAmount: number, grantId: string) {
     const matchingRound = await this.getActiveMatchingRoundByGrant(grantId);
 
-    if (!matchingRound) return 0;
+    if (!matchingRound || donationAmount <= 0) return 0;
 
     const qfInfo = await this.calculateQuadraticFundingAmount(matchingRound.id);
 

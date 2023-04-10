@@ -1,8 +1,8 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
-  Header,
   Param,
   Patch,
   Post,
@@ -10,6 +10,7 @@ import {
   Query,
   Request,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { GrantsService } from './grants.service';
@@ -24,12 +25,14 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import {
+  BasicGrantResponse,
   CheckoutGrantsDto,
   CheckoutGrantsResponse,
   CreateGrantDto,
   GetGrantQueryDto,
   GrantDetailResponse,
   GrantResponse,
+  GrantResponseWithTeam,
   ResubmitGrantDto,
   UpdateGrantDto,
 } from './grants.interface';
@@ -39,9 +42,11 @@ import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { FormDataRequest } from 'nestjs-form-data';
 import { FormDataPipe } from 'src/pipes/form-data.pipe';
+import { RequestWithUser } from 'src/users/users.interface';
 
 @ApiTags('Grants')
 @Controller('grants')
+@UseInterceptors(ClassSerializerInterceptor)
 export class GrantsController {
   constructor(private readonly grantsService: GrantsService) {}
 
@@ -63,10 +68,12 @@ export class GrantsController {
     )
     queries?: GetGrantQueryDto,
   ) {
-    return await this.grantsService.getAllGrants({
-      isVerified: true,
-      ...queries,
-    });
+    return (
+      await this.grantsService.getAllGrants({
+        isVerified: true,
+        ...queries,
+      })
+    ).map((grant) => new GrantResponse(grant));
   }
 
   @ApiOperation({
@@ -74,13 +81,18 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Created a grant with the submitted data',
-    type: GrantResponse,
+    type: GrantResponseWithTeam,
   })
   @Post()
   @UseGuards(NextAuthGuard)
   @FormDataRequest()
-  async createGrant(@Body(FormDataPipe) body: CreateGrantDto, @Request() req) {
-    return await this.grantsService.createGrant(body, req.user);
+  async createGrant(
+    @Body(FormDataPipe) body: CreateGrantDto,
+    @Request() req: RequestWithUser,
+  ) {
+    return new GrantResponseWithTeam(
+      await this.grantsService.createGrant(body, req.user),
+    );
   }
 
   @ApiOperation({
@@ -88,7 +100,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Grant verified state is set to `true`',
-    type: GrantResponse,
+    type: BasicGrantResponse,
   })
   @ApiUnauthorizedResponse({
     description: 'User is not an admin',
@@ -96,8 +108,10 @@ export class GrantsController {
   @Post('verify/:id')
   @Roles(Role.Admin)
   @UseGuards(NextAuthGuard)
-  async reviewGrant(@Param('id') id: string, @Request() req) {
-    return await this.grantsService.reviewGrant(id, req.user);
+  async reviewGrant(@Param('id') id: string, @Request() req: RequestWithUser) {
+    return new BasicGrantResponse(
+      await this.grantsService.reviewGrant(id, req.user),
+    );
   }
 
   @ApiOperation({
@@ -119,8 +133,10 @@ export class GrantsController {
   @Get(':id')
   @Public()
   @UseGuards(NextAuthGuard)
-  async getGrant(@Param('id') id: string, @Request() req) {
-    return await this.grantsService.getGrant(id, req.user);
+  async getGrant(@Param('id') id: string, @Request() req: RequestWithUser) {
+    return new GrantDetailResponse(
+      await this.grantsService.getGrant(id, req.user),
+    );
   }
 
   /**
@@ -134,7 +150,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Updated grant information',
-    type: GrantResponse,
+    type: BasicGrantResponse,
   })
   @ApiForbiddenResponse({
     description: 'User is a team member of this grant',
@@ -148,9 +164,11 @@ export class GrantsController {
   async updateGrant(
     @Param('id') id: string,
     @Body(FormDataPipe) body: UpdateGrantDto,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
-    return await this.grantsService.updateGrant(id, body, req.user);
+    return new BasicGrantResponse(
+      await this.grantsService.updateGrant(id, body, req.user),
+    );
   }
 
   /**
@@ -164,7 +182,7 @@ export class GrantsController {
   })
   @ApiCreatedResponse({
     description: 'Updated grant information',
-    type: GrantResponse,
+    type: BasicGrantResponse,
   })
   @ApiForbiddenResponse({
     description: 'User is a team member of this grant',
@@ -179,9 +197,11 @@ export class GrantsController {
   async resubmitGrant(
     @Param('id') id: string,
     @Body(FormDataPipe) body: ResubmitGrantDto,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
-    return await this.grantsService.resubmitGrant(id, body, req.user);
+    return new BasicGrantResponse(
+      await this.grantsService.resubmitGrant(id, body, req.user),
+    );
   }
 
   @ApiOperation({
@@ -202,7 +222,7 @@ export class GrantsController {
       }),
     )
     body: CheckoutGrantsDto,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
     return await this.grantsService.checkoutGrants(body, req.user);
   }

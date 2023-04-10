@@ -3,12 +3,12 @@ import { Grant, Prisma, Role, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CheckoutGrantsDto,
+  CheckoutGrantsResponse,
   CreateGrantDto,
-  ExtendedGrant,
   FeeAllocationMethod,
   GetGrantDto,
-  GrantCheckout,
   GrantFilterOptions,
+  GrantResponseWithTeam,
   GrantSortOptions,
   ResubmitGrantDto,
   UpdateGrantDto,
@@ -33,7 +33,12 @@ export class GrantsService {
    * @param user
    * @returns `true` if is a team member
    */
-  checkGrantOwnership(grant: ExtendedGrant, user: User) {
+  checkGrantOwnership(
+    grant: Grant & {
+      team: User[];
+    },
+    user: User,
+  ) {
     if (!grant.team.some((member) => member.id === user.id))
       throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
     return true;
@@ -72,7 +77,7 @@ export class GrantsService {
    * @param data
    * @returns
    */
-  async getAllGrants(data: GetGrantDto): Promise<Grant[]> {
+  async getAllGrants(data: GetGrantDto) {
     const { isVerified, sort, filter, search } = data;
 
     let grants = await this.prisma.grant.findMany({
@@ -145,7 +150,7 @@ export class GrantsService {
    * @param id ID of the grant to retrieve
    * @returns
    */
-  async getGrantById(id: string): Promise<ExtendedGrant> {
+  async getGrantById(id: string) {
     return await this.prisma.grant.findUnique({
       where: {
         id,
@@ -180,6 +185,7 @@ export class GrantsService {
      * 1. Only admins can view unverified grants
      * 2. Only the grant owner can view their own unverified grant
      */
+    user; // Do nothing with user for now
     // if (!grant.verified) {
     //   if (!user)
     //     throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
@@ -202,7 +208,10 @@ export class GrantsService {
    * @param user The owner to tie this grant to
    * @returns
    */
-  async createGrant(data: CreateGrantDto, user: User) {
+  async createGrant(
+    data: CreateGrantDto,
+    user: User,
+  ): Promise<GrantResponseWithTeam> {
     const paymentProvider = await this.paymentProvider;
 
     const id = cuid();
@@ -372,7 +381,10 @@ export class GrantsService {
    * @param grants The grants to checkout
    * @param user User making the purchase
    */
-  async checkoutGrants(body: CheckoutGrantsDto, user: User) {
+  async checkoutGrants(
+    body: CheckoutGrantsDto,
+    user: User,
+  ): Promise<CheckoutGrantsResponse> {
     const { grants, feeAllocation } = body;
     /**
      * What we should do is to actually create a payment intent for each grant.

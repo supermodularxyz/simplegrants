@@ -1,5 +1,13 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
+/**
+ * Information about a specific checkout session
+ *
+ * @param donated The amount donated
+ * @param matched The **estimated** amount matched. This may not be 100% accurate
+ * @param numberOfGrants The number of grants this user donated to
+ */
 export class SuccessfulCheckoutInfo {
   @ApiResponseProperty({
     type: Number,
@@ -17,10 +25,13 @@ export class SuccessfulCheckoutInfo {
   numberOfGrants: number;
 }
 
+/**
+ * Information about a specific payment provider
+ *
+ * Majority of properties are excluded
+ */
 export class ProviderResponse {
-  @ApiResponseProperty({
-    type: String,
-  })
+  @Exclude()
   id: string;
 
   @ApiResponseProperty({
@@ -43,26 +54,22 @@ export class ProviderResponse {
   })
   denominations: string[];
 
-  @ApiResponseProperty({
-    type: String,
-  })
+  @Exclude()
   website: string;
 
-  @ApiResponseProperty({})
+  @Exclude()
   schema: any;
 
-  @ApiResponseProperty({
-    type: Number,
-  })
+  @Exclude()
   version: number;
 
-  @ApiResponseProperty({
-    type: Date,
-  })
+  @Exclude()
   createdAt: Date;
 
-  @ApiResponseProperty({
-    type: Date,
-  })
+  @Exclude()
   updatedAt: Date;
+
+  constructor(partial: Partial<ProviderResponse>) {
+    Object.assign(this, partial);
+  }
 }

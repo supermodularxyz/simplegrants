@@ -2,9 +2,11 @@ import { Controller, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { InvitesService } from './invites.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InviteCodeResponse } from './invites.interface';
+import { RequestWithUser } from 'src/users/users.interface';
 
+@ApiTags('Ecosystem Builder Invites')
 @UseGuards(ThrottlerGuard)
 @Controller('invites')
 export class InvitesController {
@@ -27,7 +29,10 @@ export class InvitesController {
   @Throttle(3, 86400)
   @Post(':code')
   @UseGuards(NextAuthGuard)
-  async claimInviteCode(@Param('code') inviteCode: string, @Request() req) {
+  async claimInviteCode(
+    @Param('code') inviteCode: string,
+    @Request() req: RequestWithUser,
+  ) {
     return new InviteCodeResponse(
       await this.invitesService.claimInviteCode(inviteCode, req.user),
     );

@@ -3,8 +3,8 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { Grant, PaymentProvider } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { Grant } from '@prisma/client';
+import { Exclude, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
@@ -18,8 +18,8 @@ import {
 } from 'class-validator';
 import { HasMimeType, IsFile } from 'nestjs-form-data';
 import { Contribution } from 'src/contributions/contributions.interface';
-import { ProviderResponse } from 'src/provider/provider.interface';
-import { User, UserProfile } from 'src/users/users.interface';
+import { PaymentAccount } from 'src/payment-accounts/payment-accounts.interface';
+import { User } from 'src/users/users.interface';
 
 export enum GrantSortOptions {
   NEWEST = 'newest',
@@ -38,6 +38,9 @@ export enum FeeAllocationMethod {
   PASS_TO_GRANT = 'grant',
 }
 
+/**
+ * Used when searching/retrieving all grants
+ */
 export class GetGrantQueryDto {
   @ApiPropertyOptional({
     enum: GrantSortOptions,
@@ -61,21 +64,33 @@ export class GetGrantQueryDto {
   search?: string;
 }
 
+/**
+ * For the `getAllGrants` function in `grants.service.ts`
+ *
+ * Controls whether we get all grants or verified grants only
+ */
 export class GetGrantDto extends GetGrantQueryDto {
   isVerified?: boolean;
 }
 
+/**
+ * Information about `fileType`
+ */
 class FileTypeResult {
   @ApiProperty({
     type: String,
   })
   ext: string;
+
   @ApiProperty({
     type: String,
   })
   mime: string;
 }
 
+/**
+ * This is the strucutre of a file sent over multipart/form-data
+ */
 class MemoryStoredFile {
   @ApiProperty({
     type: String,
@@ -108,6 +123,12 @@ class MemoryStoredFile {
   fileType: FileTypeResult;
 }
 
+/**
+ * Data transfer object when updating a grant
+ *
+ * Every field is optional
+ * @note - fundingGoal & paymentAccount is not allowed to be changed
+ */
 export class UpdateGrantDto {
   @ApiProperty({
     type: String,
@@ -123,7 +144,7 @@ export class UpdateGrantDto {
   })
   @IsString()
   @IsOptional()
-  location: string;
+  location?: string;
 
   @ApiPropertyOptional({
     type: String,
@@ -139,7 +160,7 @@ export class UpdateGrantDto {
   })
   @IsUrl()
   @IsOptional()
-  website: string;
+  website?: string;
 
   @ApiProperty({
     type: MemoryStoredFile,
@@ -148,7 +169,7 @@ export class UpdateGrantDto {
   @IsFile()
   @HasMimeType(['image/jpeg', 'image/jpg', 'image/png'])
   @IsOptional()
-  image: any;
+  image?: any;
 
   @ApiProperty({
     type: String,
@@ -156,9 +177,12 @@ export class UpdateGrantDto {
   })
   @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
 }
 
+/**
+ * Data transfer object when creating a grant
+ */
 export class CreateGrantDto {
   @ApiProperty({
     type: String,
@@ -212,6 +236,9 @@ export class CreateGrantDto {
   paymentAccount: string;
 }
 
+/**
+ * We extend UpdateGrantDto because there are fields that you may not need to update (such as images)
+ */
 export class ResubmitGrantDto extends UpdateGrantDto {
   @ApiProperty({
     type: Number,
@@ -227,7 +254,12 @@ export class ResubmitGrantDto extends UpdateGrantDto {
   paymentAccount: string;
 }
 
-export class GrantResponse {
+/**
+ * Basic grant info which doesn't include nested objects
+ *
+ * Used in UserProfileContributionInfo and inherited classes
+ */
+export class BasicGrantResponse {
   @ApiResponseProperty({
     type: String,
   })
@@ -263,9 +295,7 @@ export class GrantResponse {
   })
   location: string;
 
-  @ApiResponseProperty({
-    type: String,
-  })
+  @Exclude()
   paymentAccountId: string;
 
   @ApiResponseProperty({
@@ -274,94 +304,220 @@ export class GrantResponse {
   fundingGoal: number;
 
   @ApiResponseProperty({
+    type: Boolean,
+  })
+  verified: boolean;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+
+  constructor(partial: Partial<BasicGrantResponse>) {
+    Object.assign(this, partial);
+  }
+}
+
+/**
+ * Response body of a Grant, with additional information such as:
+ *
+ * @param amountRaised Computed value of all contributions under this grant
+ * @param contributions Donations made to the grant
+ */
+export class GrantResponseWithContributions extends BasicGrantResponse {
+  @ApiResponseProperty({
     type: Number,
   })
   amountRaised: number;
 
   @ApiResponseProperty({
-    type: Boolean,
+    type: [Contribution],
+    example: [
+      {
+        id: 'clg4zguz00089s5nndx5507js',
+        amount: 1,
+        denomination: 'USD',
+        amountUsd: 1,
+        grantId: 'clg3bs7400014x6s53234dnw2',
+      },
+      {
+        id: 'clg4zguz0008as5nn9b536n6r',
+        amount: 2,
+        denomination: 'USD',
+        amountUsd: 2,
+        grantId: 'clg3bs7400014x6s53234dnw2',
+      },
+    ],
   })
-  verified: boolean;
+  @Type(() => Contribution)
+  contributions: Contribution[];
+
+  constructor(partial: Partial<GrantResponseWithContributions>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
+}
+
+/**
+ * Response body of a Grant, with team info:
+ *
+ * @param team Users part of this grant's team
+ */
+export class GrantResponseWithTeam extends BasicGrantResponse {
+  @ApiResponseProperty({
+    type: [User],
+    example: [
+      {
+        id: 'clg5yxz390006rs0u6po4496g',
+        name: 'John Doe',
+        email: 'johndoe@gmail.com',
+        emailVerified: null,
+        image:
+          'https://lh3.googleusercontent.com/a/HYholaWYk79ztL_n1_AfWAXyPSr8isJUg=s96-c',
+        bio: 'Hello there',
+        twitter: 'johndoe',
+        role: 'User',
+      },
+    ],
+  })
+  @Type(() => User)
+  team: User[];
+
+  constructor(partial: Partial<GrantResponseWithTeam>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
+}
+
+/**
+ * Grant details about a specific grant
+ * This includes:
+ * @param team All users under this grant
+ * @param contributions All donations to this grant
+ */
+export class GrantResponse extends BasicGrantResponse {
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amountRaised: number;
 
   @ApiResponseProperty({
     type: [Contribution],
+    example: [
+      {
+        id: 'clg4zguz00089s5nndx5507js',
+        amount: 1,
+        denomination: 'USD',
+        amountUsd: 1,
+        grantId: 'clg3bs7400014x6s53234dnw2',
+      },
+      {
+        id: 'clg4zguz0008as5nn9b536n6r',
+        amount: 2,
+        denomination: 'USD',
+        amountUsd: 2,
+        grantId: 'clg3bs7400014x6s53234dnw2',
+      },
+    ],
   })
-  contributions?: Contribution[];
+  @Type(() => Contribution)
+  contributions: Contribution[];
 
   @ApiResponseProperty({
     type: [User],
+    example: [
+      {
+        id: 'clg5yxz390006rs0u6po4496g',
+        name: 'John Doe',
+        email: 'johndoe@gmail.com',
+        emailVerified: null,
+        image:
+          'https://lh3.googleusercontent.com/a/HYholaWYk79ztL_n1_AfWAXyPSr8isJUg=s96-c',
+        bio: 'Hello there',
+        twitter: 'johndoe',
+        role: 'User',
+      },
+    ],
   })
-  team?: User[];
+  @Type(() => User)
+  team: User[];
 
-  @ApiResponseProperty({
-    type: Date,
-  })
-  createdAt: Date;
-
-  @ApiResponseProperty({
-    type: Date,
-  })
-  updatedAt: Date;
+  constructor(partial: Partial<GrantResponse>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
 }
 
-export class PaymentAccount {
+/**
+ * Full grant details about a specific grant
+ * This includes:
+ * @param team All users under this grant
+ * @param contributions All donations to this grant
+ * @param paymentAccount The payment account info for this grant
+ */
+export class GrantDetailResponse extends BasicGrantResponse {
   @ApiResponseProperty({
-    type: String,
+    type: Number,
   })
-  id: string;
-
-  @ApiResponseProperty({
-    type: String,
-  })
-  recipientAddress: string;
-
-  @ApiResponseProperty({
-    type: String,
-  })
-  providerId: string;
-
-  @ApiResponseProperty({
-    type: ProviderResponse,
-  })
-  provider?: ProviderResponse;
-
-  @ApiResponseProperty({
-    type: Date,
-  })
-  createdAt: Date;
-
-  @ApiResponseProperty({
-    type: Date,
-  })
-  updatedAt: Date;
-}
-
-export class GrantDetailResponse extends GrantResponse {
-  @ApiResponseProperty({
-    type: [UserProfile],
-  })
-  team: UserProfile[];
+  amountRaised: number;
 
   @ApiResponseProperty({
     type: [Contribution],
+    example: [
+      {
+        id: 'clg4zguz00089s5nndx5507js',
+        amount: 1,
+        denomination: 'USD',
+        amountUsd: 1,
+        grantId: 'clg3bs7400014x6s53234dnw2',
+      },
+      {
+        id: 'clg4zguz0008as5nn9b536n6r',
+        amount: 2,
+        denomination: 'USD',
+        amountUsd: 2,
+        grantId: 'clg3bs7400014x6s53234dnw2',
+      },
+    ],
   })
+  @Type(() => Contribution)
   contributions: Contribution[];
+
+  @ApiResponseProperty({
+    type: [User],
+    example: [
+      {
+        id: 'clg5yxz390006rs0u6po4496g',
+        name: 'John Doe',
+        email: 'johndoe@gmail.com',
+        emailVerified: null,
+        image:
+          'https://lh3.googleusercontent.com/a/HYholaWYk79ztL_n1_AfWAXyPSr8isJUg=s96-c',
+        bio: 'Hello there',
+        twitter: 'johndoe',
+        role: 'User',
+      },
+    ],
+  })
+  @Type(() => User)
+  team: User[];
 
   @ApiResponseProperty({
     type: PaymentAccount,
   })
+  @Type(() => PaymentAccount)
   paymentAccount: PaymentAccount;
+
+  constructor(partial: Partial<GrantDetailResponse>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
 }
 
 /**
- * Has no `amountRaised` computed value
+ * Helper class for grant checkout process
  */
-export type ExtendedGrant = Grant & {
-  contributions: Contribution[];
-  team: User[];
-  paymentAccount: PaymentAccount;
-};
-
 export class GrantCheckout {
   @ApiProperty({
     type: String,
@@ -376,6 +532,9 @@ export class GrantCheckout {
   amount: number;
 }
 
+/**
+ * DTO for checking out one or more grants
+ */
 export class CheckoutGrantsDto {
   @ApiProperty({
     type: [GrantCheckout],
@@ -402,19 +561,9 @@ export class CheckoutGrantsResponse {
   url: string;
 }
 
-export class GrantWithFunding {
+/**
+ * Additional computed amount field which is used when checking out
+ */
+export type GrantWithFunding = Grant & {
   amount: number;
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  twitter: string;
-  website: string;
-  location: string;
-  paymentAccountId: string;
-  fundingGoal: number;
-  verified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  paymentAccount: PaymentAccount;
-}
+};

@@ -10,7 +10,7 @@ import {
   ApiForbiddenResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserProfile } from 'src/users/users.interface';
+import { RequestWithUser, UserProfile } from 'src/users/users.interface';
 
 @ApiTags('Admin')
 @Controller('auth')
@@ -30,7 +30,10 @@ export class AuthController {
   @Post('admin/grant')
   @Roles(Role.Admin)
   @UseGuards(NextAuthGuard)
-  async grantAdminPrivilege(@Body() body: AdminPrivilegeDto, @Request() req) {
+  async grantAdminPrivilege(
+    @Body() body: AdminPrivilegeDto,
+    @Request() req: RequestWithUser,
+  ) {
     return this.authService.grantAdminPrivilege(body.email, req.user);
   }
 
@@ -48,7 +51,10 @@ export class AuthController {
   @Post('admin/revoke')
   @Roles(Role.Admin)
   @UseGuards(NextAuthGuard)
-  async revokeAdminPrivilege(@Body() body: AdminPrivilegeDto, @Request() req) {
+  async revokeAdminPrivilege(
+    @Body() body: AdminPrivilegeDto,
+    @Request() req: RequestWithUser,
+  ) {
     return this.authService.revokeAdminPrivilege(body.email, req.user);
   }
 }

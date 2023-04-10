@@ -1,7 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
 import { prisma } from '../prisma';
 import { Role, User } from '@prisma/client';
 import { randUser, randQuote } from '@ngneat/falso';

@@ -7,7 +7,7 @@ import {
   PaymentProviderConstructorProps,
 } from './types';
 import Stripe from 'stripe';
-import { PaymentProvider, Prisma, User } from '@prisma/client';
+import { PaymentProvider, User } from '@prisma/client';
 import * as cuid from 'cuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
