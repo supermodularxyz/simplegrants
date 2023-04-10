@@ -1,8 +1,8 @@
 import { PaymentAccount, PaymentProvider } from "@prisma/client";
 import { Contribution } from "./contributions";
-import { UserProfile } from "./user";
+import { User } from "./user";
 
-export interface GrantResponse {
+export interface BasicGrantResponse {
   id: string;
   name: string;
   description: string;
@@ -10,16 +10,22 @@ export interface GrantResponse {
   twitter: string;
   website: string;
   location: string;
-  paymentAccountId: string;
   fundingGoal: number;
-  amountRaised: number;
   verified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+}
+export interface GrantResponse extends BasicGrantResponse {
+  amountRaised: number;
+  contributions: Contribution[];
+  team: User[];
+}
+
+export interface GrantResponseWithContributions extends BasicGrantResponse {
+  amountRaised: number;
+  contributions: Contribution[];
 }
 
 export interface GrantDetailResponse extends GrantResponse {
-  team: UserProfile[];
+  team: User[];
   contributions: Contribution[];
   paymentAccount: PaymentAccount & {
     provider: PaymentProvider;

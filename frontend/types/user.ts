@@ -1,5 +1,6 @@
-import { GrantResponse } from "./grant";
-import { Contribution } from "./contributions";
+import { GrantResponseWithContributions } from "./grant";
+import { UserProfileContributionInfo } from "./contributions";
+import { Role } from "@prisma/client";
 
 export interface User {
   id: string;
@@ -9,14 +10,12 @@ export interface User {
   image: string;
   bio: string | null;
   twitter: string | null;
-  visitorId: string | null;
-  // role: Role;
-  flagged: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  role: Role;
 }
 
 export interface UserProfile extends User {
-  contributions: Contribution[];
-  grants: GrantResponse[];
+  contributions: UserProfileContributionInfo[];
+  grants: GrantResponseWithContributions[];
+  totalDonated: number;
+  totalRaised: number;
 }

@@ -1,6 +1,6 @@
-import { Grant } from "@prisma/client";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { BasicGrantResponse } from "../../types/grant";
 
 // The info about a grant that will be checked out
 interface GrantCheckoutItem {
@@ -12,7 +12,7 @@ interface GrantCheckoutItem {
 
 interface CartState {
   grants: GrantCheckoutItem[];
-  addToCart: (grant: Grant) => void;
+  addToCart: (grant: BasicGrantResponse) => void;
   updateCart: (id: string, amount: number) => void;
   removeFromCart: (grantId: string) => void;
   clearCart: () => void;
