@@ -8,6 +8,9 @@ import Success from "../../../components/icons/Success";
 import Button from "../../../components/Button";
 import Link from "next/link";
 import { useCartStore } from "../../../utils/store";
+import Image from "next/image";
+import Copy from "../../../components/icons/Copy";
+import { FacebookShareButton, TwitterShareButton } from "react-share";
 
 export default function CheckoutSuccess() {
   const [loading, setLoading] = React.useState(false);
@@ -15,6 +18,17 @@ export default function CheckoutSuccess() {
   const hasHydrated = useHasHydrated();
   const router = useRouter();
   const { clearCart } = useCartStore();
+  const shareInformation = React.useMemo(() => {
+    if (typeof window !== undefined && data) {
+      return {
+        url: window.location.href,
+        message: `I've just donated $${data.donated.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} to ${data.numberOfGrants} grants! Check it out here!🥳\n`,
+      };
+    }
+  }, [data]);
 
   React.useEffect(() => {
     setLoading(true);
@@ -47,33 +61,65 @@ export default function CheckoutSuccess() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <MainLayout>
+      <MainLayout className="h-full min-h-screen items-center justify-center bg-sg-gradient">
+        <Image
+          src={"/assets/texture.svg"}
+          alt=""
+          fill
+          className="object-cover pointer-events-none"
+        />
         {hasHydrated && data && !loading && (
           <div className="flex flex-col w-full min-h-screen h-full items-center justify-center text-center">
             <Success className="fill-sg-success mb-6" />
-            <h1 className="font-bold text-3xl mb-3">Congratulations</h1>
-            <p className="text-2xl">Your donations have been processed!</p>
-            <p className="font-bold text-3xl max-w-2xl my-16">
-              Your donation of $
-              {data.donated.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              USD is matched with an additional{" "}
-              <b className="text-sg-success">
+            <h1 className="font-bold text-3xl mb-3">Congratulations!</h1>
+            <p className="text-2xl max-w-2xl mt-2 mb-10">
+              Your{" "}
+              <b>
+                $
+                {data.donated.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </b>{" "}
+              donation has been processed! The estimated matching amount is{" "}
+              <b>
                 $
                 {data.matched.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
-              </b>{" "}
-              going to {data.numberOfGrants} separate grants!
+              </b>
+              .
             </p>
-            <div className="flex flex-row gap-x-8">
-              <Button>Share on Twitter</Button>
-              <Button>Share on Facebook</Button>
-              <Button>Copy Link</Button>
-            </div>
+            {shareInformation && (
+              <>
+                <Button
+                  style="ghost"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                  }}
+                  className="mb-5"
+                >
+                  <Copy className="stroke-sg-secondary mr-2" />
+                  Copy link
+                </Button>
+                <div className="flex flex-row items-center justify-center w-full gap-6">
+                  <TwitterShareButton
+                    url={shareInformation.url}
+                    title={shareInformation.message}
+                  >
+                    <Button style="outline">Share on Twitter</Button>
+                  </TwitterShareButton>
+                  <FacebookShareButton
+                    url={shareInformation.url}
+                    quote={shareInformation.message}
+                  >
+                    <Button style="outline">Share on Facebook</Button>
+                  </FacebookShareButton>
+                </div>
+              </>
+            )}
+
             <Link href="/grants">
               <Button className="mt-6" style="secondary">
                 Back To Grants

@@ -12,12 +12,25 @@ import { GrantDetailResponse } from "../../../types/grant";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { TwitterShareButton, FacebookShareButton } from "react-share";
 
 export default function CreateGrantSuccess() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { grant } = useGrantStore();
   const [createdGrant, setCreatedGrant] = React.useState<GrantDetailResponse>();
+  const shareInformation = React.useMemo(() => {
+    if (typeof window !== undefined && createdGrant) {
+      return {
+        url: `${
+          process.env.NODE_ENV === "production"
+            ? "https://simplegrants.xyz"
+            : "http://localhost:3001"
+        }/grants/${createdGrant.id}`,
+        message: `Check out my grant - ${createdGrant.name}!\n`,
+      };
+    }
+  }, [createdGrant]);
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
@@ -64,7 +77,7 @@ export default function CreateGrantSuccess() {
             <p className="font-bold">Back to Home</p>
           </Link>
         </div>
-        {createdGrant && (
+        {createdGrant && shareInformation && (
           <div className="flex flex-col items-center justify-center px-8 my-2 w-full z-10">
             <h1 className="font-bold text-2xl lg:text-3xl text-center">
               Congratulations!
@@ -74,7 +87,7 @@ export default function CreateGrantSuccess() {
             </p>
             <GrantCard
               grant={createdGrant}
-              onClick={() => router.push(`/grants/${createdGrant.id}`)}
+              onClick={() => router.push(shareInformation.url)}
               className="my-8"
               hideButton
               hideProgress
@@ -82,13 +95,7 @@ export default function CreateGrantSuccess() {
             <Button
               style="ghost"
               onClick={() => {
-                navigator.clipboard.writeText(
-                  `${
-                    process.env.NODE_ENV === "production"
-                      ? "https://simplegrants.xyz"
-                      : "http://localhost:3001"
-                  }/grants/${createdGrant.id}`
-                );
+                navigator.clipboard.writeText(shareInformation.url);
               }}
               className="mb-5"
             >
@@ -96,8 +103,18 @@ export default function CreateGrantSuccess() {
               Copy link
             </Button>
             <div className="flex flex-row items-center justify-center w-full gap-6">
-              <Button style="outline">Share on Twitter</Button>
-              <Button style="outline">Share on Facebook</Button>
+              <TwitterShareButton
+                url={shareInformation.url}
+                title={shareInformation.message}
+              >
+                <Button style="outline">Share on Twitter</Button>
+              </TwitterShareButton>
+              <FacebookShareButton
+                url={shareInformation.url}
+                quote={shareInformation.message}
+              >
+                <Button style="outline">Share on Facebook</Button>
+              </FacebookShareButton>
             </div>
           </div>
         )}
