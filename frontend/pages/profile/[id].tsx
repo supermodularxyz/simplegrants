@@ -17,7 +17,6 @@ import DonationList from "../../components/DonationList";
 
 export default function Home() {
   const router = useRouter();
-  const { data: session } = useSession();
   const { id } = router.query;
   const [data, setData] = React.useState<UserProfile>();
   const [loading, setLoading] = React.useState(false);
@@ -66,7 +65,7 @@ export default function Home() {
           <>
             {data ? (
               <div className="w-full flex flex-col md:flex-row min-h-screen">
-                <div className="basis-full shrink-0 md:basis-1/4 bg-sg-gradient px-8 sm:px-12 md:px-14 pt-24 pb-6 rounded-b-xl overflow-hidden">
+                <div className="basis-full shrink-0 md:basis-1/3 lg:basis-1/4 bg-sg-gradient px-8 sm:px-12 md:px-14 pt-24 pb-6 rounded-b-xl overflow-hidden">
                   <p className="font-bold text-2xl text-sg-accent">Profile</p>
                   <div className="max-w-[8rem] aspect-square rounded-full relative overflow-hidden my-6">
                     <Image fill src={data.image} alt={data.name} />
@@ -97,7 +96,7 @@ export default function Home() {
                     USD
                   </p>
                 </div>
-                <div className="basis-full shrink-0 md:basis-3/4 px-8 sm:px-12 md:px-14 py-20 md:pt-24 pb-6">
+                <div className="basis-full shrink-0 md:basis-2/3 lg:basis-3/4 px-8 sm:px-12 md:px-14 py-20 md:pt-24 pb-6">
                   <Tabs.Root
                     className="flex flex-col w-full items-center md:items-start"
                     defaultValue="donations"
@@ -126,7 +125,7 @@ export default function Home() {
                       {data.contributions.map((contribution) => (
                         <DonationList
                           grant={contribution.grant}
-                          contributedAmount={contribution.amountUsd}
+                          contribution={contribution}
                           key={contribution.id}
                           onClick={() =>
                             router.push(`/grants/${contribution.grantId}`)

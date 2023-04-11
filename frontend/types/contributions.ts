@@ -8,6 +8,8 @@ export interface UserProfileContributionInfo {
   amountUsd: number;
   grantId: string | null;
   grant: BasicGrantResponse;
+  totalMatched: number; // Computed info
+  totalDonated: number; // Computed info
 }
 
 export interface Contribution {

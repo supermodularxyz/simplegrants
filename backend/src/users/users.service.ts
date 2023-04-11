@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto, UserProfile } from './users.interface';
-import { Contribution, Grant, User } from '@prisma/client';
+import { Contribution, Grant, MatchedFund, User } from '@prisma/client';
 import { UserProfileContributionInfo } from 'src/contributions/contributions.interface';
 
 @Injectable()
@@ -17,9 +17,14 @@ export class UsersService {
 
   calculateUserDonationMetrics(
     user: User & {
-      contributions: UserProfileContributionInfo[];
       grants: (Grant & {
         contributions: Contribution[];
+      })[];
+      contributions: (Contribution & {
+        grant: Grant & {
+          contributions: Contribution[];
+          matchedFund: MatchedFund[];
+        };
       })[];
     },
   ): UserProfile {
@@ -30,15 +35,36 @@ export class UsersService {
      *
      * Since we need to display the donations and grants in the frontend,
      * we might as well calculate them manually here
+     *
+     * There is also another thing we need to calculate, which is the matched amount.
+     * This has to be computed by:
+     * 1. Sum the total matched by grant
+     * 2. Sum the total contribution of user by grant
+     * 3. Divide the values to get an approximation of how much the user's
+     *    contribution was matched to
      */
     const contributions = user.contributions.reduce((prev, contribution) => {
       const grantIndex = prev.findIndex(
         (cont) => cont.grantId === contribution.grantId,
       );
       if (grantIndex === -1) {
-        return [...prev, contribution];
+        return [
+          ...prev,
+          {
+            ...contribution,
+            totalMatched: contribution.grant.matchedFund.reduce(
+              (prev, fund) => prev + fund.amountUsd,
+              0,
+            ),
+            totalDonated: contribution.grant.contributions.reduce(
+              (prev, cont) => prev + cont.amountUsd,
+              0,
+            ),
+          },
+        ];
       } else {
         const temp = prev[grantIndex];
+
         prev[grantIndex] = {
           ...temp,
           amountUsd: temp.amountUsd + contribution.amountUsd,
@@ -89,7 +115,12 @@ export class UsersService {
       include: {
         contributions: {
           include: {
-            grant: true,
+            grant: {
+              include: {
+                matchedFund: true,
+                contributions: true,
+              },
+            },
           },
         },
         grants: {
@@ -119,7 +150,12 @@ export class UsersService {
       include: {
         contributions: {
           include: {
-            grant: true,
+            grant: {
+              include: {
+                matchedFund: true,
+                contributions: true,
+              },
+            },
           },
         },
         grants: {

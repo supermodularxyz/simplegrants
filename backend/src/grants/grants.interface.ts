@@ -3,7 +3,7 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { Grant } from '@prisma/client';
+import { Grant, MatchedFund } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -315,6 +315,24 @@ export class BasicGrantResponse {
   updatedAt: Date;
 
   constructor(partial: Partial<BasicGrantResponse>) {
+    Object.assign(this, partial);
+  }
+}
+
+/**
+ * Grant with matching info such as `matchedFund` & `contributions`
+ *
+ * Used for calculating QF amount
+ */
+export class GrantWithMatchingInfo extends BasicGrantResponse {
+  @Exclude()
+  matchedFund: MatchedFund[];
+
+  @Exclude()
+  contributions: Contribution[];
+
+  constructor(partial: Partial<GrantWithMatchingInfo>) {
+    super(partial);
     Object.assign(this, partial);
   }
 }

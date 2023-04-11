@@ -94,6 +94,16 @@ export class UserProfileContributionInfo {
   @Type(() => BasicGrantResponse)
   grant: BasicGrantResponse;
 
+  @ApiResponseProperty({
+    type: Number,
+  })
+  totalMatched: number;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  totalDonated: number;
+
   @Exclude()
   userId: string;
 
