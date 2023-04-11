@@ -157,14 +157,18 @@ export default function GrantDetails() {
                       data-tip="This grant is unverified, therefore you cannot
                     donate to it."
                     >
-                      <Button
-                        width="full"
-                        className=""
-                        disabled={!data.verified}
-                        onClick={() => addToCart(data)}
-                      >
-                        Add to cart
-                      </Button>
+                      {!data.team.some(
+                        (team) => team.email === session?.user?.email
+                      ) && (
+                        <Button
+                          width="full"
+                          className=""
+                          disabled={!data.verified}
+                          onClick={() => addToCart(data)}
+                        >
+                          Add to cart
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>

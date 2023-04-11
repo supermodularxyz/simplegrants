@@ -5,6 +5,7 @@ import FundingBar from "./FundingBar";
 import { useCartStore } from "../utils/store";
 import Button from "./Button";
 import clsx from "clsx";
+import { useSession } from "next-auth/react";
 
 interface IGrantCardProps {
   grant: GrantResponse | GrantResponseWithContributions;
@@ -22,13 +23,12 @@ const GrantCard = ({
   className,
 }: IGrantCardProps) => {
   const { grants, addToCart, removeFromCart } = useCartStore();
+  const { data: session } = useSession();
 
   const addedToCart = React.useMemo(
     () => grants.find((data) => data.id === grant.id),
     [grants, grant]
   );
-
-  // const isGrantResponse = (x: any): x is GrantResponse => x.
 
   return (
     <div
@@ -102,6 +102,13 @@ const GrantCard = ({
                     e.stopPropagation();
                     addToCart(grant);
                   }}
+                  disabled={
+                    "team" in grant
+                      ? grant.team.some(
+                          (team) => team.email === session?.user?.email
+                        )
+                      : false
+                  }
                 >
                   Add to cart
                 </Button>

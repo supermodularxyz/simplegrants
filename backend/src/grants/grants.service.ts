@@ -399,8 +399,22 @@ export class GrantsService {
       },
       include: {
         paymentAccount: true,
+        team: true,
       },
     });
+
+    if (data.length < 0)
+      throw new HttpException('Grants not found', HttpStatus.NOT_FOUND);
+
+    // We should check if any of these grants are owned by us. If yes, we do not allow the user to donate to its own grant
+    const ownedGrants = data.some((grant) =>
+      grant.team.some((team) => team.email === user.email),
+    );
+    if (ownedGrants)
+      throw new HttpException(
+        'You cannot checkout your own grants!',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
 
     // Creating a lookup table to reduce time complexity of the grants merging to O(n)
     const amountLookup = grants.reduce((acc, grant) => {

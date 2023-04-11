@@ -211,6 +211,13 @@ export class GrantsController {
     description: 'Checkout link/information from the payment provider',
     type: CheckoutGrantsResponse,
   })
+  @ApiNotFoundResponse({
+    description: 'All grants to checkout cannot be found',
+  })
+  @ApiUnprocessableEntityResponse({
+    description:
+      'This error is thrown if you attempt to checkout a grant that you own',
+  })
   @Post('checkout')
   @UseGuards(NextAuthGuard)
   async checkoutGrants(

@@ -4,6 +4,7 @@ import { GrantResponse } from "../types/grant";
 import FundingBar from "./FundingBar";
 import { useCartStore } from "../utils/store";
 import Button from "./Button";
+import { useSession } from "next-auth/react";
 
 interface IGrantListProps {
   grant: GrantResponse;
@@ -12,6 +13,7 @@ interface IGrantListProps {
 
 const GrantList = ({ grant, onClick }: IGrantListProps) => {
   const { grants, addToCart, removeFromCart } = useCartStore();
+  const { data: session } = useSession();
 
   const addedToCart = React.useMemo(
     () => grants.find((data) => data.id === grant.id),
@@ -71,6 +73,9 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
             e.stopPropagation();
             addToCart(grant);
           }}
+          disabled={grant.team.some(
+            (team) => team.email === session?.user?.email
+          )}
         >
           Add to cart
         </Button>

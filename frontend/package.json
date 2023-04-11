@@ -43,6 +43,7 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.43.1",
     "react-reveal": "^1.2.2",
+    "react-share": "^4.4.1",
     "react-toastify": "^9.1.1",
     "typescript": "4.9.3",
     "zod": "^3.20.6",
