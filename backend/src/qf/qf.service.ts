@@ -34,7 +34,6 @@ export class QfService {
     if (!matchingRound || donationAmount <= 0) return 0;
 
     const qfInfo = await this.calculateQuadraticFundingAmount(matchingRound.id);
-
     /**
      * We can estimate the QF amount by doing these steps:
      * 1. Square root the qfValue

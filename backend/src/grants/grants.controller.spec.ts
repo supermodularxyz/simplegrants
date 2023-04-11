@@ -10,6 +10,7 @@ import {
 } from './grants.interface';
 import { UserProfile } from 'src/users/users.interface';
 import {
+  awsService,
   checkoutItems,
   grants,
   grantsService,
@@ -19,6 +20,8 @@ import {
 } from 'test/fixtures';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderService } from 'src/provider/provider.service';
+import { AwsService } from 'src/aws/aws.service';
+import { NestjsFormDataModule } from 'nestjs-form-data';
 
 describe('GrantsController', () => {
   let controller: GrantsController;
@@ -31,6 +34,9 @@ describe('GrantsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         CacheModule.register({
+          isGlobal: true,
+        }),
+        NestjsFormDataModule.config({
           isGlobal: true,
         }),
       ],
@@ -46,6 +52,10 @@ describe('GrantsController', () => {
         {
           provide: ProviderService,
           useValue: providerService,
+        },
+        {
+          provide: AwsService,
+          useValue: awsService,
         },
       ],
       controllers: [GrantsController],

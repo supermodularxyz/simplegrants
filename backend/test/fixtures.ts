@@ -10,6 +10,7 @@ import {
 } from '@ngneat/falso';
 import { Contribution, Grant, Role, User } from '@prisma/client';
 import * as cuid from 'cuid';
+import { PaymentAccount } from 'src/payment-accounts/payment-accounts.interface';
 import { UserProfile } from 'src/users/users.interface';
 
 // Creating a mock result
@@ -59,7 +60,7 @@ const users: UserProfile[] = [...Array(3)].map((_, index) => {
       },
     ],
     grants: [],
-    totalDonated: 0,
+    totalDonated: 1000,
     totalRaised: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -69,6 +70,7 @@ const users: UserProfile[] = [...Array(3)].map((_, index) => {
 const grants: (Grant & {
   team: User[];
   contributions: Contribution[];
+  paymentAccount: PaymentAccount;
 })[] = [
   {
     id: cuid(),
@@ -96,6 +98,25 @@ const grants: (Grant & {
       },
     ],
     team: [users[0]],
+    paymentAccount: {
+      id: 'clg4zguri0002s5nnydvf9ido',
+      recipientAddress: 'acct_1MdDqePwtixIFqie',
+      providerId: 'clg4zguri0002s5nnydvf9ido',
+      provider: {
+        id: 'clg4zguri0002s5nnydvf9ido',
+        name: 'Stripe',
+        type: 'CARD',
+        acceptedCountries: ['US', 'MY'],
+        denominations: ['USD'],
+        website: '',
+        schema: {},
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     verified: true,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -126,6 +147,25 @@ const grants: (Grant & {
       },
     ],
     team: [users[1]],
+    paymentAccount: {
+      id: 'clg4zguri0002s5nnydvf9ido',
+      recipientAddress: 'acct_1MdDqePwtixIFqie',
+      providerId: 'clg4zguri0002s5nnydvf9ido',
+      provider: {
+        id: 'clg4zguri0002s5nnydvf9ido',
+        name: 'Stripe',
+        type: 'CARD',
+        acceptedCountries: ['US', 'MY'],
+        denominations: ['USD'],
+        website: '',
+        schema: {},
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     verified: true,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -142,11 +182,39 @@ const grants: (Grant & {
     fundingGoal: 100,
     contributions: [],
     team: [users[2]],
+    paymentAccount: {
+      id: 'clg4zguri0002s5nnydvf9ido',
+      recipientAddress: 'acct_1MdDqePwtixIFqie',
+      providerId: 'clg4zguri0002s5nnydvf9ido',
+      provider: {
+        id: 'clg4zguri0002s5nnydvf9ido',
+        name: 'Stripe',
+        type: 'CARD',
+        acceptedCountries: ['US', 'MY'],
+        denominations: ['USD'],
+        website: '',
+        schema: {},
+        version: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     verified: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
 ];
+
+const ecosystemBuilder = {
+  id: 'id',
+  userId: 'userId',
+  matchingRounds: [],
+  inviteCodesId: 'inviteCodeId',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 const checkoutItems = {
   grants: [
@@ -169,6 +237,43 @@ const checkoutInfo = {
 
 const checkoutPaymentSession = { url: 'checkoutlink' };
 
+const claimedCode = {
+  code: 'clfsbx7bb0000pd0kjloobn8a',
+  claimed: true,
+};
+
+const inviteCode = {
+  id: 'clfsbx7bb0000pd0kjloobn8a',
+  code: 'clfsbx7bb0000pd0kjloobn8a',
+  claimed: false,
+  claimedById: undefined,
+  claimedBy: undefined,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const claimedInviteCode = {
+  id: 'clfsbx7bb0000pd0kjloobn8a',
+  code: 'clfsbx7bb0000pd0kjloobn8a',
+  claimed: true,
+  claimedById: undefined,
+  claimedBy: undefined,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const matchingRound = {
+  id: 'clg3bs7400017x6s5e7t96pzk',
+  name: 'Matching Round',
+  verified: true,
+  startDate: new Date(),
+  endDate: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const uploadedFileUrl = 'https://bucket.s3.us-1.amazonaws.com/file';
+
 const prismaService = {
   user: {
     findUnique: jest.fn().mockResolvedValue(users[0]),
@@ -179,6 +284,16 @@ const prismaService = {
     findUnique: jest.fn().mockResolvedValue(grants[0]),
     create: jest.fn().mockResolvedValue(grants[0]),
     update: jest.fn().mockResolvedValue(grants[0]),
+  },
+  ecosystemBuilder: {
+    findUnique: jest.fn().mockResolvedValue(ecosystemBuilder),
+  },
+  inviteCodes: {
+    findUnique: jest.fn().mockResolvedValue(inviteCode),
+    update: jest.fn().mockResolvedValue(claimedInviteCode),
+  },
+  matchingRound: {
+    findFirst: jest.fn().mockResolvedValue(matchingRound),
   },
 };
 
@@ -211,15 +326,39 @@ const grantsService = {
   checkoutGrants: jest.fn().mockResolvedValue(checkoutPaymentSession),
 };
 
+const invitesService = {
+  claimInviteCode: jest.fn().mockResolvedValue(claimedCode),
+};
+
+const qfService = {
+  getActiveMatchingRoundByGrant: jest.fn().mockResolvedValue(matchingRound),
+  // estimateMatchedAmount: jest.fn().mockResolvedValue(), // TODO
+  // calculateQuadraticFundingAmount: jest.fn().mockResolvedValue(), // TODO
+  // distributeMatchedFunds: jest.fn().mockResolvedValue(null), // TODO
+};
+
+const awsService = {
+  uploadFile: jest.fn().mockResolvedValue(uploadedFileUrl),
+};
+
 export {
   users,
   grants,
   checkoutItems,
   checkoutInfo,
   checkoutPaymentSession,
+  claimedCode,
+  ecosystemBuilder,
+  inviteCode,
+  claimedInviteCode,
+  matchingRound,
+  uploadedFileUrl,
   prismaService,
   providerService,
   usersService,
   authService,
   grantsService,
+  invitesService,
+  qfService,
+  awsService,
 };

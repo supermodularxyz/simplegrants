@@ -12,6 +12,7 @@ import {
 import { UserProfile } from 'src/users/users.interface';
 import { ProviderService } from 'src/provider/provider.service';
 import {
+  awsService,
   checkoutItems,
   checkoutPaymentSession,
   grants,
@@ -20,6 +21,8 @@ import {
   users,
 } from 'test/fixtures';
 import * as _ from 'lodash';
+import { AwsService } from 'src/aws/aws.service';
+import { NestjsFormDataModule } from 'nestjs-form-data';
 
 const grantQuery = {
   sort: GrantSortOptions.NEWEST,
@@ -42,6 +45,9 @@ describe('GrantsService', () => {
         CacheModule.register({
           isGlobal: true,
         }),
+        NestjsFormDataModule.config({
+          isGlobal: true,
+        }),
       ],
       providers: [
         {
@@ -51,6 +57,10 @@ describe('GrantsService', () => {
         {
           provide: ProviderService,
           useValue: providerService,
+        },
+        {
+          provide: AwsService,
+          useValue: awsService,
         },
         GrantsService,
       ],
@@ -242,41 +252,44 @@ describe('GrantsService', () => {
       expect(service.getGrantById).toBeCalled();
     });
 
-    it('should handle unauthorized access for unverified grant with basic user', async () => {
-      await expect(service.getGrant('random', undefined)).rejects.toEqual(
-        new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED),
-      );
-      expect(service.getGrantById).toBeCalled();
-    });
+    /**
+     * This feature has been temporarily removed
+     */
+    // it('should handle unauthorized access for unverified grant with basic user', async () => {
+    //   await expect(service.getGrant('random', undefined)).rejects.toEqual(
+    //     new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED),
+    //   );
+    //   expect(service.getGrantById).toBeCalled();
+    // });
 
-    it('should handle forbidden access for unverified grant with basic user', async () => {
-      await expect(
-        service.getGrant('random', {
-          ...userA,
-        }),
-      ).rejects.toEqual(
-        new HttpException('No edit rights', HttpStatus.FORBIDDEN),
-      );
-      expect(service.getGrantById).toBeCalled();
-    });
+    // it('should handle forbidden access for unverified grant with basic user', async () => {
+    //   await expect(
+    //     service.getGrant('random', {
+    //       ...userA,
+    //     }),
+    //   ).rejects.toEqual(
+    //     new HttpException('No edit rights', HttpStatus.FORBIDDEN),
+    //   );
+    //   expect(service.getGrantById).toBeCalled();
+    // });
 
-    it('should allow admin to view an unverified grant', async () => {
-      expect(
-        await service.getGrant('random', {
-          ...admin,
-        }),
-      ).toEqual(grants[2]);
-      expect(service.getGrantById).toBeCalled();
-    });
+    // it('should allow admin to view an unverified grant', async () => {
+    //   expect(
+    //     await service.getGrant('random', {
+    //       ...admin,
+    //     }),
+    //   ).toEqual(grants[2]);
+    //   expect(service.getGrantById).toBeCalled();
+    // });
 
-    it('should allow team member to view their own unverified grant', async () => {
-      expect(
-        await service.getGrant('random', {
-          ...userB,
-        }),
-      ).toEqual(grants[2]);
-      expect(service.getGrantById).toBeCalled();
-    });
+    // it('should allow team member to view their own unverified grant', async () => {
+    //   expect(
+    //     await service.getGrant('random', {
+    //       ...userB,
+    //     }),
+    //   ).toEqual(grants[2]);
+    //   expect(service.getGrantById).toBeCalled();
+    // });
   });
 
   describe('createGrant', () => {
@@ -409,7 +422,7 @@ describe('GrantsService', () => {
   describe('checkoutGrants', () => {
     it('should call prisma with the appropriate values', async () => {
       await service.checkoutGrants(checkoutItems, {
-        ...userA,
+        ...userB,
       });
 
       expect(prisma.grant.findMany).toBeCalledWith({
@@ -427,9 +440,22 @@ describe('GrantsService', () => {
     it('should create a payment session', async () => {
       expect(
         await service.checkoutGrants(checkoutItems, {
-          ...userA,
+          ...userB,
         }),
       ).toEqual(checkoutPaymentSession);
+    });
+
+    it('should not allow owner to create a payment session', async () => {
+      await expect(
+        service.checkoutGrants(checkoutItems, {
+          ...userA,
+        }),
+      ).rejects.toThrow(
+        new HttpException(
+          'You cannot checkout your own grants!',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        ),
+      );
     });
   });
 });

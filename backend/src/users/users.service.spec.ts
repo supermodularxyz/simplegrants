@@ -44,15 +44,23 @@ describe('UsersService', () => {
           id: user.id,
         },
         include: {
-          contributions: true,
-          grants: true,
+          contributions: {
+            include: {
+              grant: true,
+            },
+          },
+          grants: {
+            include: {
+              contributions: true,
+            },
+          },
         },
       });
     });
 
     it('should return the correct values', async () => {
       const result = await service.retrieveUserProfile(user.id);
-      expect(result).toBe(user);
+      expect(result).toStrictEqual(user);
     });
   });
 
@@ -74,15 +82,23 @@ describe('UsersService', () => {
           id: user.id,
         },
         include: {
-          contributions: true,
-          grants: true,
+          contributions: {
+            include: {
+              grant: true,
+            },
+          },
+          grants: {
+            include: {
+              contributions: true,
+            },
+          },
         },
       });
     });
 
     it('should return the correct values', async () => {
       const result = await service.updateUserProfile(user.id, data);
-      expect(result).toBe(user);
+      expect(result).toStrictEqual(user);
     });
   });
 });
