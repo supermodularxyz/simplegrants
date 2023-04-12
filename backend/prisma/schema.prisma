@@ -164,7 +164,8 @@ model MatchingRound {
   contributions Contribution[]
   grants        Grant[]
   matchedFunds  MatchedFund[]
-  verified      Boolean
+  paid          Boolean            @default(false)
+  verified      Boolean            @default(false)
   startDate     DateTime
   endDate       DateTime
   createdAt     DateTime           @default(now())
@@ -202,6 +203,8 @@ model MatchedFund {
   denomination    String
   amountUsd       Float
   payoutAt        DateTime
+
+  @@unique([matchingRoundId, grantId])
 }
 
 model Checkout {
