@@ -5,7 +5,7 @@ import React from "react";
 import MainLayout from "../../../layouts/MainLayout";
 import Button from "../../../components/Button";
 import { useRouter } from "next/router";
-import GrantCard from "../../../components/GrantCard";
+import GrantCard from "../../../components/grant/GrantCard";
 import { useGrantStore } from "../../../utils/store";
 import Copy from "../../../components/icons/Copy";
 import { GrantDetailResponse } from "../../../types/grant";

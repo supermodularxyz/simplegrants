@@ -7,7 +7,7 @@ import { useHasHydrated } from "../../../utils/useHydrated";
 import Success from "../../../components/icons/Success";
 import Button from "../../../components/Button";
 import Link from "next/link";
-import { useCartStore } from "../../../utils/store";
+import { useGrantCartStore } from "../../../utils/store";
 import Image from "next/image";
 import Copy from "../../../components/icons/Copy";
 import { FacebookShareButton, TwitterShareButton } from "react-share";
@@ -17,7 +17,7 @@ export default function CheckoutSuccess() {
   const [data, setData] = React.useState<any>();
   const hasHydrated = useHasHydrated();
   const router = useRouter();
-  const { clearCart } = useCartStore();
+  const { clearCart } = useGrantCartStore();
   const shareInformation = React.useMemo(() => {
     if (typeof window !== undefined && data) {
       return {

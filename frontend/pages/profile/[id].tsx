@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import Fade from "react-reveal/Fade";
 import { UserProfile } from "../../types/user";
 import * as Tabs from "@radix-ui/react-tabs";
-import GrantCard from "../../components/GrantCard";
+import GrantCard from "../../components/grant/GrantCard";
 import Link from "next/link";
 import Button from "../../components/Button";
 import Navbar from "../../layouts/Navbar";

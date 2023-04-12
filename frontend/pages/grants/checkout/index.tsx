@@ -8,7 +8,7 @@ import Button from "../../../components/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useCartStore } from "../../../utils/store";
+import { useGrantCartStore } from "../../../utils/store";
 import Divider from "../../../components/Divider";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import TextInput from "../../../components/input/TextInput";
@@ -18,7 +18,7 @@ import BackButton from "../../../components/BackButton";
 
 export default function GrantsCheckout() {
   const router = useRouter();
-  const { grants, addToCart, removeFromCart, updateCart } = useCartStore();
+  const { grants, addToCart, removeFromCart, updateCart } = useGrantCartStore();
   const { id } = router.query;
   const { data: session, status } = useSession();
   const [data, setData] = React.useState<any>();

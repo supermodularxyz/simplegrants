@@ -1,7 +1,7 @@
 import { useSession, signOut, signIn } from "next-auth/react";
 import React, { ReactNode } from "react";
 import Link from "next/link";
-import { useCartStore } from "../utils/store";
+import { useGrantCartStore } from "../utils/store";
 import clsx from "clsx";
 import Cart from "../components/icons/Cart";
 import Avatar from "../components/icons/Avatar";
@@ -16,7 +16,7 @@ interface INavbarProps {
 
 export default function Navbar({ children, className }: INavbarProps) {
   const { data: session } = useSession();
-  const { grants } = useCartStore();
+  const { grants } = useGrantCartStore();
   const hasHydrated = useHasHydrated();
 
   const subtotal = React.useMemo(

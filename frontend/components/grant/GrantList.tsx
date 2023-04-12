@@ -1,9 +1,9 @@
 import React from "react";
 import Image from "next/image";
-import { GrantResponse } from "../types/grant";
-import FundingBar from "./FundingBar";
-import { useCartStore } from "../utils/store";
-import Button from "./Button";
+import { GrantResponse } from "../../types/grant";
+import FundingBar from "../FundingBar";
+import { useGrantCartStore } from "../../utils/store";
+import Button from "../Button";
 import { useSession } from "next-auth/react";
 
 interface IGrantListProps {
@@ -12,7 +12,7 @@ interface IGrantListProps {
 }
 
 const GrantList = ({ grant, onClick }: IGrantListProps) => {
-  const { grants, addToCart, removeFromCart } = useCartStore();
+  const { grants, addToCart, removeFromCart } = useGrantCartStore();
   const { data: session } = useSession();
 
   const addedToCart = React.useMemo(
@@ -68,7 +68,8 @@ const GrantList = ({ grant, onClick }: IGrantListProps) => {
         </Button>
       ) : (
         <Button
-          className="flex-none"
+          className="flex-none md:w-max w-full"
+          width="custom"
           onClick={(e) => {
             e.stopPropagation();
             addToCart(grant);

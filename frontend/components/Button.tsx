@@ -11,6 +11,7 @@ const ButtonStyles = {
 const ButtonWidth = {
   full: "w-full",
   max: "w-max",
+  custom: "",
 };
 
 interface IButtonProps {
@@ -19,7 +20,7 @@ interface IButtonProps {
   className?: string;
   disabled?: boolean;
   style?: keyof typeof ButtonStyles;
-  width?: "full" | "max";
+  width?: "full" | "max" | "custom";
 }
 
 export default function Button({

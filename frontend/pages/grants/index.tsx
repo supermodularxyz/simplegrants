@@ -12,13 +12,13 @@ import { FilterOptions, GrantResponse, SortOptions } from "../../types/grant";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import Select from "../../components/input/Select";
 import Divider from "../../components/Divider";
-import GrantCard from "../../components/GrantCard";
+import GrantCard from "../../components/grant/GrantCard";
 import { useRouter } from "next/router";
 import TextInput from "../../components/input/TextInput";
 import Search from "../../components/icons/Search";
 import Grid from "../../components/icons/Grid";
 import List from "../../components/icons/List";
-import GrantList from "../../components/GrantList";
+import GrantList from "../../components/grant/GrantList";
 import { debounce as debouncer } from "lodash";
 
 export default function Grants() {

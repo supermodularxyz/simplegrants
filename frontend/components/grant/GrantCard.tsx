@@ -1,9 +1,12 @@
 import React from "react";
 import Image from "next/image";
-import { GrantResponse, GrantResponseWithContributions } from "../types/grant";
-import FundingBar from "./FundingBar";
-import { useCartStore } from "../utils/store";
-import Button from "./Button";
+import {
+  GrantResponse,
+  GrantResponseWithContributions,
+} from "../../types/grant";
+import FundingBar from "../FundingBar";
+import { useGrantCartStore } from "../../utils/store";
+import Button from "../Button";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 
@@ -22,7 +25,7 @@ const GrantCard = ({
   hideProgress = false,
   className,
 }: IGrantCardProps) => {
-  const { grants, addToCart, removeFromCart } = useCartStore();
+  const { grants, addToCart, removeFromCart } = useGrantCartStore();
   const { data: session } = useSession();
 
   const addedToCart = React.useMemo(

@@ -10,7 +10,7 @@ interface GrantCheckoutItem {
   amount: number;
 }
 
-interface CartState {
+interface GrantCartState {
   grants: GrantCheckoutItem[];
   addToCart: (grant: BasicGrantResponse) => void;
   updateCart: (id: string, amount: number) => void;
@@ -18,7 +18,7 @@ interface CartState {
   clearCart: () => void;
 }
 
-export const useCartStore = create<CartState>()(
+export const useGrantCartStore = create<GrantCartState>()(
   devtools(
     persist(
       (set) => ({
@@ -54,7 +54,7 @@ export const useCartStore = create<CartState>()(
         clearCart: () => set(() => ({ grants: [] })),
       }),
       {
-        name: "simplegrants-cart-storage",
+        name: "simplegrants-grant-cart-storage",
       }
     )
   )

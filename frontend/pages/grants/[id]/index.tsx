@@ -12,7 +12,7 @@ import { GrantDetailResponse } from "../../../types/grant";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import FundingBar from "../../../components/FundingBar";
-import { useCartStore } from "../../../utils/store";
+import { useGrantCartStore } from "../../../utils/store";
 import Location from "../../../components/icons/Location";
 import Twitter from "../../../components/icons/Twitter";
 import Website from "../../../components/icons/Website";
@@ -21,7 +21,7 @@ import * as Tooltip from "@radix-ui/react-tooltip";
 
 export default function GrantDetails() {
   const router = useRouter();
-  const { grants, addToCart, removeFromCart } = useCartStore();
+  const { grants, addToCart, removeFromCart } = useGrantCartStore();
   const { id } = router.query;
   const { data: session, status } = useSession();
   const [data, setData] = React.useState<GrantDetailResponse>();

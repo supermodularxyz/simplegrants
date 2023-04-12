@@ -7,7 +7,7 @@ import LandingNavbar from "../layouts/landing/LandingNavbar";
 import Button from "../components/Button";
 import { useRouter } from "next/router";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
-import GrantCard from "../components/GrantCard";
+import GrantCard from "../components/grant/GrantCard";
 import { GrantResponse } from "../types/grant";
 import axios from "../utils/axios";
 import { toast } from "react-toastify";
