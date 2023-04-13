@@ -1,0 +1,165 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import Head from "next/head";
+import { useSession, signIn } from "next-auth/react";
+import React from "react";
+import MainLayout from "../../../layouts/MainLayout";
+import Navbar from "../../../layouts/Navbar";
+import Button from "../../../components/Button";
+import axios from "../../../utils/axios";
+import Link from "next/link";
+import { toast } from "react-toastify";
+import { PoolDetailResponse } from "../../../types/pool";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import FundingBar from "../../../components/FundingBar";
+import { usePoolCartStore } from "../../../utils/store";
+import Location from "../../../components/icons/Location";
+import Twitter from "../../../components/icons/Twitter";
+import Website from "../../../components/icons/Website";
+import BackButton from "../../../components/BackButton";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import clsx from "clsx";
+import GrantCard from "../../../components/grant/GrantCard";
+import dayjs from "dayjs";
+
+export default function PoolDetails() {
+  const router = useRouter();
+  const { pools, addToCart, removeFromCart } = usePoolCartStore();
+  const { id } = router.query;
+  const { data: session, status } = useSession();
+  const [data, setData] = React.useState<PoolDetailResponse>();
+  const [loading, setLoading] = React.useState(false);
+
+  const getPool = () => {
+    setLoading(true);
+    axios
+      .get(`/pools/${id}`)
+      .then((res) => setData(res.data))
+      .catch((err) => {
+        console.error({ err });
+        toast.error(err.message || "Something went wrong", {
+          toastId: "retrieve-pool-error",
+        });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  React.useEffect(() => {
+    if (id) {
+      getPool();
+    }
+  }, [id]);
+
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/sign-in");
+    }
+  }, [status]);
+
+  return (
+    data && (
+      <div>
+        <Head>
+          <title>{data.name} | SimpleGrants</title>
+          <meta
+            name="description"
+            content="Join us in making an impact through quadratic funding."
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+
+        <MainLayout>
+          <Navbar className="p-0">
+            <Link href="/pools/create">
+              <Button>Create Pool</Button>
+            </Link>
+          </Navbar>
+          <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
+            <BackButton href="/pools">Back to pools</BackButton>
+            <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
+              <div className="basis-full md:basis-3/5 px-4">
+                <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
+                  <p className="font-bold text-2xl my-6">{data.name}</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-11 gap-y-8 justify-items-center">
+                    {data.grants.map((grant) => (
+                      <GrantCard grant={grant} key={grant.id} hideButton />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="basis-full md:basis-2/5 px-4 flex flex-col items-center gap-4">
+                <div className="grid grid-cols-2 w-full bg-white shadow-card py-8 px-6 rounded-xl max-w-sm gap-y-6 gap-x-10">
+                  <div className="flex flex-col col-span-1">
+                    <p className="">
+                      <b className="text-2xl">
+                        $
+                        {data.amountRaised.toLocaleString("en-US", {
+                          maximumFractionDigits: 0,
+                        })}
+                      </b>
+                      <br />
+                      raised
+                    </p>
+                  </div>
+                  <div className="flex flex-col col-span-1">
+                    <p className="">
+                      <b className="text-2xl">{data.contributors}</b>
+                      <br />
+                      contributors
+                    </p>
+                  </div>
+                  <div className="flex flex-col col-span-1">
+                    <p className="">
+                      <b className="text-2xl">
+                        {dayjs(data.endDate).diff(dayjs(), "days")}
+                      </b>
+                      <br />
+                      days to go
+                    </p>
+                  </div>
+                  <div className="flex flex-col col-span-1">
+                    <p className="">
+                      <b className="text-2xl">{data.grants.length}</b>
+                      <br />
+                      grants in pool
+                    </p>
+                  </div>
+                  {!data.verified && (
+                    <div className="badge badge-error">Unverified Pool</div>
+                  )}
+                  {pools.find((pool) => pool.id === id) ? (
+                    <Button
+                      width="full"
+                      className="btn-error col-span-2"
+                      onClick={() => removeFromCart(id as string)}
+                    >
+                      Remove from cart
+                    </Button>
+                  ) : (
+                    <div
+                      className={clsx(
+                        data.verified ? "" : "tooltip tooltip-secondary",
+                        "col-span-2"
+                      )}
+                      data-tip="This pool is unverified, therefore you cannot
+                    donate to it."
+                    >
+                      <Button
+                        width="full"
+                        className=""
+                        disabled={!data.verified}
+                        onClick={() => addToCart(data)}
+                      >
+                        Add to cart
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </MainLayout>
+      </div>
+    )
+  );
+}

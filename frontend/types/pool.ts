@@ -1,3 +1,6 @@
+import { Contribution } from "./contributions";
+import { GrantResponse } from "./grant";
+
 export interface BasicPoolResponse {
   id: string;
   name: string;
@@ -10,6 +13,12 @@ export interface BasicPoolResponse {
 }
 export interface PoolResponse extends BasicPoolResponse {
   amountRaised: number;
+}
+
+export interface PoolDetailResponse extends BasicPoolResponse {
+  amountRaised: number;
+  contributors: number;
+  grants: GrantResponse[];
 }
 
 export const SortOptions = [
