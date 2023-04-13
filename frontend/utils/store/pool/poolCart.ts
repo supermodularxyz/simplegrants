@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { BasicPoolResponse } from "../../types/pool";
+import { BasicPoolResponse } from "../../../types/pool";
 
 // The info about a pool that will be checked out
 interface PoolCheckoutItem {

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { BasicGrantResponse } from "../../types/grant";
+import { BasicGrantResponse } from "../../../types/grant";
 
 // The info about a grant that will be checked out
 interface GrantCheckoutItem {
