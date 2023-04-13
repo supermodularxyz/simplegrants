@@ -9,18 +9,15 @@ import axios from "../../../utils/axios";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { PoolDetailResponse } from "../../../types/pool";
-import Image from "next/image";
 import { useRouter } from "next/router";
-import FundingBar from "../../../components/FundingBar";
 import { usePoolCartStore } from "../../../utils/store";
-import Location from "../../../components/icons/Location";
-import Twitter from "../../../components/icons/Twitter";
-import Website from "../../../components/icons/Website";
 import BackButton from "../../../components/BackButton";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import GrantCard from "../../../components/grant/GrantCard";
 import dayjs from "dayjs";
+import { Dialog } from "@headlessui/react";
+import { GrantDetailResponse } from "../../../types/grant";
+import GrantModal from "../../../components/grant/GrantModal";
 
 export default function PoolDetails() {
   const router = useRouter();
@@ -28,7 +25,14 @@ export default function PoolDetails() {
   const { id } = router.query;
   const { data: session, status } = useSession();
   const [data, setData] = React.useState<PoolDetailResponse>();
+  const [grant, setGrant] = React.useState<GrantDetailResponse>();
   const [loading, setLoading] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const hasEnded = React.useMemo(
+    () => (data ? dayjs(data.endDate).diff(dayjs()) <= 0 : true),
+    [data]
+  );
 
   const getPool = () => {
     setLoading(true);
@@ -39,6 +43,23 @@ export default function PoolDetails() {
         console.error({ err });
         toast.error(err.message || "Something went wrong", {
           toastId: "retrieve-pool-error",
+        });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const getGrant = (grantId: string) => {
+    setLoading(true);
+    axios
+      .get(`/grants/${grantId}`)
+      .then((res) => {
+        setGrant(res.data);
+        setIsOpen(true);
+      })
+      .catch((err) => {
+        console.error({ err });
+        toast.error(err.message || "Something went wrong", {
+          toastId: "retrieve-grant-error",
         });
       })
       .finally(() => setLoading(false));
@@ -74,15 +95,20 @@ export default function PoolDetails() {
               <Button>Create Pool</Button>
             </Link>
           </Navbar>
-          <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
+          <div className="flex flex-col items-start justify-center px-4 md:px-8 my-2 w-full">
             <BackButton href="/pools">Back to pools</BackButton>
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
-              <div className="basis-full md:basis-3/5 px-4">
+              <div className="basis-full md:basis-3/5 md:px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
                   <p className="font-bold text-2xl my-6">{data.name}</p>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-11 gap-y-8 justify-items-center">
                     {data.grants.map((grant) => (
-                      <GrantCard grant={grant} key={grant.id} hideButton />
+                      <GrantCard
+                        grant={grant}
+                        key={grant.id}
+                        hideButton
+                        onClick={() => getGrant(grant.id)}
+                      />
                     ))}
                   </div>
                 </div>
@@ -138,16 +164,21 @@ export default function PoolDetails() {
                   ) : (
                     <div
                       className={clsx(
-                        data.verified ? "" : "tooltip tooltip-secondary",
+                        data.verified && !hasEnded
+                          ? ""
+                          : "tooltip tooltip-secondary",
                         "col-span-2"
                       )}
-                      data-tip="This pool is unverified, therefore you cannot
-                    donate to it."
+                      data-tip={
+                        hasEnded
+                          ? "Pool has ended"
+                          : "This pool is unverified, therefore you cannot donate to it."
+                      }
                     >
                       <Button
                         width="full"
                         className=""
-                        disabled={!data.verified}
+                        disabled={!data.verified || hasEnded}
                         onClick={() => addToCart(data)}
                       >
                         Add to cart
@@ -159,6 +190,24 @@ export default function PoolDetails() {
             </div>
           </div>
         </MainLayout>
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          className="relative z-50"
+        >
+          {/* The backdrop, rendered as a fixed sibling to the panel container */}
+          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+          {/* Full-screen container to center the panel */}
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            {/* The actual dialog panel  */}
+            <Dialog.Panel className="max-w-7xl rounded bg-white h-max">
+              {grant && (
+                <GrantModal grant={grant} onClose={() => setIsOpen(false)} />
+              )}
+            </Dialog.Panel>
+          </div>
+        </Dialog>
       </div>
     )
   );
