@@ -4,6 +4,7 @@ import clsx from "clsx";
 const ButtonStyles = {
   primary: "btn-primary text-sg-900 disabled:bg-sg-50 disabled:text-sg-500",
   secondary: "btn-secondary text-white",
+  error: "btn-error",
   ghost: "btn-ghost",
   outline: "btn-outline btn-secondary",
 };
