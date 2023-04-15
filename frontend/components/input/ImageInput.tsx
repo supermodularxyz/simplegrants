@@ -92,7 +92,7 @@ export default function ImageInput({
               <p>Drop the image here</p>
             ) : file ? (
               <button
-                className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80"
+                className="bg-sg-error rounded-full px-12 py-4 font-bold group-hover:opacity-100 opacity-80"
                 onClick={(e) => e.preventDefault()}
               >
                 Change image
@@ -100,7 +100,7 @@ export default function ImageInput({
             ) : (
               <>
                 <button
-                  className="bg-sg-error rounded-full px-12 py-4 text-black font-bold group-hover:opacity-100 opacity-80"
+                  className="bg-sg-error rounded-full px-12 py-4 font-bold group-hover:opacity-100 opacity-80"
                   onClick={(e) => e.preventDefault()}
                 >
                   Upload image
