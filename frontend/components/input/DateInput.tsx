@@ -6,6 +6,7 @@ import ErrorMessageText from "./ErrorMessageText";
 import DatePicker from "react-datepicker";
 
 interface IInputProps {
+  disabled?: boolean;
   onChange: any;
   onBlur: any;
   value: Date;
@@ -16,6 +17,7 @@ interface IInputProps {
 }
 
 export default function DateInput({
+  disabled,
   onChange,
   onBlur,
   value,
@@ -30,8 +32,10 @@ export default function DateInput({
         minDate={minDate}
         className={clsx(
           "block w-full px-2 md:px-4 py-3 border focus:border-sg-primary focus:ring-0 focus:ring-offset-0 outline-none rounded-lg border-sg-500",
+          disabled ? "opacity-50" : "opacity-100",
           errors && !!errors[name || ""] ? "border-sg-error" : "border-sg-500"
         )}
+        disabled={disabled}
         dateFormat="MM.dd.yyyy"
         selected={value}
         name={name}
