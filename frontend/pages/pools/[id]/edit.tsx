@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Head from "next/head";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import React from "react";
 import MainLayout from "../../../layouts/MainLayout";
 import Navbar from "../../../layouts/Navbar";
@@ -15,15 +15,17 @@ import clsx from "clsx";
 import axios from "../../../utils/axios";
 import { usePoolStore } from "../../../utils/store";
 import { toast } from "react-toastify";
-import Card from "../../../layouts/Card";
-import Add from "../../../components/icons/Add";
-import GrantCard from "../../../components/grant/GrantCard";
 import { GrantResponse } from "../../../types/grant";
 import { Dialog } from "@headlessui/react";
-import GrantSearchModal from "../../../components/grant/GrantSearchModal";
 import dayjs from "dayjs";
-import { useHasHydrated } from "../../../utils/useHydrated";
+import GrantCard from "../../../components/grant/GrantCard";
+import GrantSearchModal from "../../../components/grant/GrantSearchModal";
+import Add from "../../../components/icons/Add";
 import DateInput from "../../../components/input/DateInput";
+import Card from "../../../layouts/Card";
+import { useHasHydrated } from "../../../utils/useHydrated";
+import minMax from "dayjs/plugin/minMax";
+dayjs.extend(minMax);
 
 const validationSchema = z
   .object({
@@ -42,30 +44,30 @@ const validationSchema = z
 
 type ValidationSchema = z.infer<typeof validationSchema>;
 
-export default function CreatePool() {
+export default function EditPool() {
   const router = useRouter();
-  const { savePool } = usePoolStore();
+  const { id } = router.query;
   const hasHydrated = useHasHydrated();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [loading, setLoading] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const {
     register,
     handleSubmit,
-    setValue,
+    reset,
     control,
     watch,
     formState: { errors },
   } = useForm<ValidationSchema>({
     resolver: zodResolver(validationSchema),
   });
-  const { grants, addGrantsToPool, removeGrantFromPool } = usePoolStore();
-
-  React.useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/sign-in");
-    }
-  }, [status]);
+  const {
+    grants,
+    addGrantsToPool,
+    removeGrantFromPool,
+    clearGrantsFromPool,
+    resetGrantsInPool,
+  } = usePoolStore();
 
   const startDate = watch("startDate", new Date());
 
@@ -74,14 +76,14 @@ export default function CreatePool() {
       setLoading(true);
 
       axios
-        .post("/pools", {
+        .patch(`/pools/${id}`, {
           ...data,
           grants: grants.map((grant) => grant.id),
         })
-        .then((res) => {
-          savePool(res.data);
-          toast.success("Pool created successfully!");
-          router.push("/pools/create/success");
+        .then(() => {
+          toast.success("Pool edited successfully!");
+          router.push(`/pools/${id}`);
+          clearGrantsFromPool();
         })
         .catch((err) => {
           console.error(err);
@@ -92,7 +94,7 @@ export default function CreatePool() {
         });
     } else {
       toast.error("At least one grant must be selected!", {
-        toastId: "pool-create-error",
+        toastId: "pool-edit-error",
       });
     }
   };
@@ -105,10 +107,44 @@ export default function CreatePool() {
     removeGrantFromPool(grant);
   };
 
+  const getPool = () => {
+    setLoading(true);
+    axios
+      .get(`/pools/${id}`)
+      .then((res) => {
+        const { grants, ...data } = res.data;
+        resetGrantsInPool(grants);
+        reset({
+          name: data.name,
+          startDate: new Date(data.startDate),
+          endDate: new Date(data.endDate),
+        });
+      })
+      .catch((err) => {
+        console.error({ err });
+        toast.error(err.message || "Something went wrong", {
+          toastId: "retrieve-pool-error",
+        });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  React.useEffect(() => {
+    if (id) {
+      getPool();
+    }
+  }, [id]);
+
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/sign-in");
+    }
+  }, [status]);
+
   return (
     <div>
       <Head>
-        <title>Create Pool | SimpleGrants</title>
+        <title>Edit Pool | SimpleGrants</title>
         <meta
           name="description"
           content="Join us in making an impact through quadratic funding."
@@ -124,7 +160,7 @@ export default function CreatePool() {
         >
           <BackButton href="/pools">Back to pools</BackButton>
           <div className="w-full flex flex-col my-10 gap-y-8" id="main-div">
-            <h1 className="font-bold text-subtitle-1">Create Pool</h1>
+            <h1 className="font-bold text-subtitle-1">Edit Pool</h1>
             <div className="rounded-xl w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 md:gap-x-12 md:gap-y-14">
               <Card className="bg-white shadow-card px-4 py-6 min-h-[420px] md:min-h-[520px] cursor-default">
                 <div className="grid grid-cols-2 w-full gap-x-4 gap-y-6">
@@ -148,6 +184,10 @@ export default function CreatePool() {
                         Start Date
                       </span>
                     </label>
+                    {/* <div
+                      className="tooltip tooltip-secondary"
+                      data-tip="You cannot modify the start date of this matching round (pool)"
+                    > */}
                     {hasHydrated && (
                       <Controller
                         control={control}
@@ -156,6 +196,7 @@ export default function CreatePool() {
                           field: { onChange, onBlur, value, name },
                         }) => (
                           <DateInput
+                            disabled
                             onBlur={onBlur}
                             minDate={new Date()}
                             value={value}
@@ -166,6 +207,7 @@ export default function CreatePool() {
                         )}
                       />
                     )}
+                    {/* </div> */}
                   </div>
                   <div className="form-control w-full col-span-1">
                     <label className="label">
@@ -181,7 +223,10 @@ export default function CreatePool() {
                       }) => (
                         <DateInput
                           onBlur={onBlur}
-                          minDate={dayjs(startDate).add(1, "day").toDate()}
+                          minDate={dayjs
+                            .max(dayjs(), dayjs(startDate))
+                            .add(1, "day")
+                            .toDate()}
                           value={value}
                           errors={errors}
                           name={name}
@@ -197,7 +242,7 @@ export default function CreatePool() {
                   onClick={handleSubmit(onSubmit)}
                   disabled={loading}
                 >
-                  Create pool
+                  Save changes
                 </Button>
               </Card>
               <Card

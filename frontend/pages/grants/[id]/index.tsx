@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Head from "next/head";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import React from "react";
 import MainLayout from "../../../layouts/MainLayout";
 import Navbar from "../../../layouts/Navbar";
@@ -17,7 +17,6 @@ import Location from "../../../components/icons/Location";
 import Twitter from "../../../components/icons/Twitter";
 import Website from "../../../components/icons/Website";
 import BackButton from "../../../components/BackButton";
-import * as Tooltip from "@radix-ui/react-tooltip";
 
 export default function GrantDetails() {
   const router = useRouter();

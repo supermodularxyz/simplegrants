@@ -1,14 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import {
+  EcosystemBuilder,
+  MatchingRound,
+  Prisma,
+  Role,
+  User,
+} from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderService } from 'src/provider/provider.service';
 import {
-  BasicPoolResponse,
   CreatePoolDto,
   GetPoolDto,
   PoolFilterOptions,
   PoolResponse,
   PoolSortOptions,
+  UpdatePoolDto,
 } from './pool.interface';
 
 @Injectable()
@@ -19,6 +25,23 @@ export class PoolService {
   ) {}
 
   private paymentProvider = this.providerService.getProvider();
+
+  /**
+   * Throws error if not a member, otherwise returns true
+   * @param pool
+   * @param user
+   * @returns `true` if is a team member
+   */
+  checkPoolOwnership(
+    pool: MatchingRound & {
+      funders: (EcosystemBuilder & { user: User })[];
+    },
+    user: User,
+  ) {
+    if (!pool.funders.some((member) => member.user.id === user.id))
+      throw new HttpException('No edit rights', HttpStatus.FORBIDDEN);
+    return true;
+  }
 
   /**
    * Converts a basic sorting string to something Prisma can understand
@@ -244,5 +267,75 @@ export class PoolService {
       amountRaised: 0,
       contributions: [],
     };
+  }
+
+  /**
+   * Only an admin can execute this function
+   * The Admin role check should already be done by the guard,
+   * but adding another check here in case the guard was bypassed
+   * @param id
+   * @param user
+   * @returns
+   */
+  async reviewPool(id: string, user: User) {
+    // First we validate if the user is an admin
+    if (user.role !== Role.Admin)
+      throw new HttpException('Unauthorized Access', HttpStatus.UNAUTHORIZED);
+
+    return await this.prisma.matchingRound.update({
+      data: {
+        verified: true,
+      },
+      where: {
+        id,
+      },
+    });
+  }
+
+  /**
+   * Updates a pool
+   * @param id
+   * @param data
+   * @param user Checks if caller is a team member that can edit this pool
+   * @returns
+   */
+  async updatePool(id: string, data: UpdatePoolDto, user: User) {
+    // Ensure only a team member can edit this pool
+    const pool = await this.getPoolById(id);
+
+    if (!pool) throw new HttpException('Pool not found', HttpStatus.NOT_FOUND);
+
+    // Check if pool owner is calling this function
+    this.checkPoolOwnership(pool, user);
+
+    /**
+     * Here is the funny part:
+     * 1. We need to disconnect all of the old grants under this pool that we removed
+     * 2. We need to connect the grants that we received from the data
+     */
+    const toRemove = pool.grants.filter(
+      (grant) => !data.grants.includes(grant.id),
+    );
+
+    return await this.prisma.matchingRound.update({
+      data: {
+        ...data,
+        grants: {
+          connect: data.grants.map((grantId) => {
+            return {
+              id: grantId,
+            };
+          }),
+          disconnect: toRemove.map((grant) => {
+            return {
+              id: grant.id,
+            };
+          }),
+        },
+      },
+      where: {
+        id,
+      },
+    });
   }
 }

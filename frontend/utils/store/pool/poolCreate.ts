@@ -9,6 +9,7 @@ interface PoolState {
   savePool: (pool: PoolResponse) => void;
   clearPool: () => void;
   addGrantsToPool: (grant: GrantResponse) => void;
+  resetGrantsInPool: (grants: GrantResponse[]) => void;
   removeGrantFromPool: (grant: GrantResponse) => void;
   clearGrantsFromPool: () => void;
 }
@@ -25,6 +26,7 @@ export const usePoolStore = create<PoolState>()(
           set((state) => ({
             grants: [...state.grants, grant],
           })),
+        resetGrantsInPool: (grants) => set(() => ({ grants })),
         removeGrantFromPool: (grant) =>
           set((state) => {
             const grants = state.grants.filter((obj) => obj.id !== grant.id);

@@ -218,3 +218,35 @@ export class PoolDetailResponse extends BasicPoolResponse {
     Object.assign(this, partial);
   }
 }
+
+/**
+ * Data transfer object when updating a pool
+ *
+ * @note - fundingGoal & paymentAccount is not allowed to be changed
+ */
+export class UpdatePoolDto {
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    type: Date,
+  })
+  @IsDateString()
+  startDate: Date;
+
+  @ApiProperty({
+    type: Date,
+  })
+  @IsDateString()
+  endDate: Date;
+
+  @ApiProperty({
+    type: [String],
+  })
+  @IsString({ each: true })
+  @ArrayNotEmpty()
+  grants: string[];
+}

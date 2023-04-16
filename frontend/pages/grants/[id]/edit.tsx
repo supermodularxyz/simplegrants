@@ -277,7 +277,7 @@ export default function EditGrant() {
                 onClick={handleSubmit(onSubmit)}
                 disabled={loading}
               >
-                Edit Grant
+                Save changes
               </Button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Request,
@@ -26,12 +27,16 @@ import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { FormDataPipe } from 'src/pipes/form-data.pipe';
 import { RequestWithUser } from 'src/users/users.interface';
 import {
+  BasicPoolResponse,
   CreatePoolDto,
   GetPoolQueryDto,
   PoolDetailResponse,
   PoolResponse,
+  UpdatePoolDto,
 } from './pool.interface';
 import { Public } from 'src/auth/decorator/public.decorator';
+import { Role } from '@prisma/client';
+import { Roles } from 'src/auth/decorator/roles.decorator';
 
 @ApiTags('Matching Pools / Matching Rounds')
 @Controller('pools')
@@ -85,6 +90,25 @@ export class PoolController {
   }
 
   @ApiOperation({
+    description: 'Verify a pool',
+  })
+  @ApiCreatedResponse({
+    description: 'Pool verified state is set to `true`',
+    type: BasicPoolResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not an admin',
+  })
+  @Post('verify/:id')
+  @Roles(Role.Admin)
+  @UseGuards(NextAuthGuard)
+  async reviewPool(@Param('id') id: string, @Request() req: RequestWithUser) {
+    return new BasicPoolResponse(
+      await this.poolService.reviewPool(id, req.user),
+    );
+  }
+
+  @ApiOperation({
     description: 'Get a specific pool by ID',
   })
   @ApiOkResponse({
@@ -105,5 +129,37 @@ export class PoolController {
   @UseGuards(NextAuthGuard)
   async getPool(@Param('id') id: string, @Request() req: RequestWithUser) {
     return new PoolDetailResponse(await this.poolService.getPool(id, req.user));
+  }
+
+  /**
+   * This route is only used when editing a verified pool
+   * @param body
+   * @returns
+   */
+  @ApiOperation({
+    description:
+      "Update a pool by ID. Only works if you're a team member of the pool",
+  })
+  @ApiCreatedResponse({
+    description: 'Updated pool information',
+    type: BasicPoolResponse,
+  })
+  @ApiForbiddenResponse({
+    description: 'User is a team member of this pool',
+  })
+  @ApiNotFoundResponse({
+    description: 'Pool with given ID cannot be found',
+  })
+  @Patch(':id')
+  @FormDataRequest()
+  @UseGuards(NextAuthGuard)
+  async updatePool(
+    @Param('id') id: string,
+    @Body(FormDataPipe) body: UpdatePoolDto,
+    @Request() req: RequestWithUser,
+  ) {
+    return new BasicPoolResponse(
+      await this.poolService.updatePool(id, body, req.user),
+    );
   }
 }
