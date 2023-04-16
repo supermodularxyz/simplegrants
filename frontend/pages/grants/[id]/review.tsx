@@ -57,7 +57,7 @@ export default function ReviewGrant() {
     setLoading(true);
     axios
       .post(`/grants/verify/${id}`)
-      .then((res) => setData(res.data))
+      .then(() => router.push(`/grants/${id}`))
       .catch((err) => {
         console.error({ err });
         toast.error(err.response.data.message || "Something went wrong", {
