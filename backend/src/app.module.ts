@@ -10,6 +10,8 @@ import { AwsModule } from './aws/aws.module';
 import { QfModule } from './qf/qf.module';
 import { InvitesModule } from './invites/invites.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
+import { PoolModule } from './pool/pool.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
       ttl: 60,
       limit: 10,
     }),
+    ScheduleModule.forRoot(),
+    PoolModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,8 +3,11 @@ import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderService } from 'src/provider/provider.service';
 import {
+  BasicPoolResponse,
+  CreatePoolDto,
   GetPoolDto,
   PoolFilterOptions,
+  PoolResponse,
   PoolSortOptions,
 } from './pool.interface';
 
@@ -14,6 +17,8 @@ export class PoolService {
     private readonly prisma: PrismaService,
     private readonly providerService: ProviderService,
   ) {}
+
+  private paymentProvider = this.providerService.getProvider();
 
   /**
    * Converts a basic sorting string to something Prisma can understand
@@ -171,10 +176,10 @@ export class PoolService {
 
     return {
       ...pool,
-      grants: pool.grants.map((grant) => {
+      grants: pool.grants.map((pool) => {
         return {
-          ...grant,
-          amountRaised: grant.contributions.reduce(
+          ...pool,
+          amountRaised: pool.contributions.reduce(
             (acc, contribution) => acc + contribution.amountUsd,
             0,
           ),
@@ -185,6 +190,53 @@ export class PoolService {
         (acc, contribution) => acc + contribution.amountUsd,
         0,
       ),
+    };
+  }
+
+  /**
+   * Creates a pool with the provided data
+   * @param data
+   * @param user The owner to tie this pool to
+   * @returns
+   */
+  async createPool(data: CreatePoolDto, user: User): Promise<PoolResponse> {
+    const ecosystemBuilder = await this.prisma.ecosystemBuilder.findUnique({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!ecosystemBuilder) {
+      throw new HttpException(
+        'User is not an ecosystem builder',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const pool = await this.prisma.matchingRound.create({
+      data: {
+        ...data,
+        funders: {
+          connect: [
+            {
+              id: ecosystemBuilder.id,
+            },
+          ],
+        },
+        grants: {
+          connect: data.grants.map((grantId) => {
+            return {
+              id: grantId,
+            };
+          }),
+        },
+      },
+    });
+
+    return {
+      ...pool,
+      amountRaised: 0,
+      contributions: [],
     };
   }
 }

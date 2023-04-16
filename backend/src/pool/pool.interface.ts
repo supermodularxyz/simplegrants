@@ -1,6 +1,17 @@
-import { ApiPropertyOptional, ApiResponseProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiResponseProperty,
+} from '@nestjs/swagger';
 import { Exclude, Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsDate,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Contribution } from 'src/contributions/contributions.interface';
 import { GrantResponse } from 'src/grants/grants.interface';
 
@@ -54,6 +65,36 @@ export class GetPoolQueryDto {
  */
 export class GetPoolDto extends GetPoolQueryDto {
   isVerified?: boolean;
+}
+
+/**
+ * Data transfer object when creating a pool
+ */
+export class CreatePoolDto {
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  name: string;
+
+  @ApiProperty({
+    type: Date,
+  })
+  @IsDateString()
+  startDate: Date;
+
+  @ApiProperty({
+    type: Date,
+  })
+  @IsDateString()
+  endDate: Date;
+
+  @ApiProperty({
+    type: [String],
+  })
+  @IsString({ each: true })
+  @ArrayNotEmpty()
+  grants: string[];
 }
 
 /**

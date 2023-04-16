@@ -72,27 +72,33 @@ export default function CreatePool() {
   const startDate = watch("startDate", new Date());
 
   const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
-    setLoading(true);
+    if (grants.length > 0) {
+      setLoading(true);
 
-    axios
-      .post("/pools", {
-        ...data,
-        startDate: new Date(),
-        endDate: new Date(),
-        grants: grants.map((grant) => grant.id),
-      })
-      .then((res) => {
-        savePool(res.data);
-        toast.success("Pool created successfully!");
-        router.push("/pools/create/success");
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error(err.message);
-      })
-      .finally(() => {
-        setLoading(false);
+      axios
+        .post("/pools", {
+          ...data,
+          startDate: new Date(),
+          endDate: new Date(),
+          grants: grants.map((grant) => grant.id),
+        })
+        .then((res) => {
+          savePool(res.data);
+          toast.success("Pool created successfully!");
+          router.push("/pools/create/success");
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error(err.response.data.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      toast.error("At least one grant must be selected!", {
+        toastId: "pool-create-error",
       });
+    }
   };
 
   const onSelect = (grant: GrantResponse) => {

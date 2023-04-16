@@ -19,12 +19,14 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { FormDataRequest } from 'nestjs-form-data';
 import { NextAuthGuard } from 'src/auth/guards/nextauth.guard';
 import { FormDataPipe } from 'src/pipes/form-data.pipe';
 import { RequestWithUser } from 'src/users/users.interface';
 import {
+  CreatePoolDto,
   GetPoolQueryDto,
   PoolDetailResponse,
   PoolResponse,
@@ -63,24 +65,24 @@ export class PoolController {
     ).map((pool) => new PoolResponse(pool));
   }
 
-  //   @ApiOperation({
-  //     description: 'Create a pool',
-  //   })
-  //   @ApiCreatedResponse({
-  //     description: 'Created a pool with the submitted data',
-  //     type: PoolResponseWithTeam,
-  //   })
-  //   @Post()
-  //   @UseGuards(NextAuthGuard)
-  //   @FormDataRequest()
-  //   async createPool(
-  //     @Body(FormDataPipe) body: CreatePoolDto,
-  //     @Request() req: RequestWithUser,
-  //   ) {
-  //     return new PoolResponseWithTeam(
-  //       await this.poolService.createPool(body, req.user),
-  //     );
-  //   }
+  @ApiOperation({
+    description: 'Create a pool',
+  })
+  @ApiCreatedResponse({
+    description: 'Created a pool with the submitted data',
+    type: PoolResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not an ecosystem builder',
+  })
+  @Post()
+  @UseGuards(NextAuthGuard)
+  async createPool(
+    @Body() body: CreatePoolDto,
+    @Request() req: RequestWithUser,
+  ) {
+    return new PoolResponse(await this.poolService.createPool(body, req.user));
+  }
 
   @ApiOperation({
     description: 'Get a specific pool by ID',

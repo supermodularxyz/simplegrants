@@ -9,10 +9,12 @@ import { useGrantCartStore } from "../../utils/store";
 import Button from "../Button";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
+import Card from "../../layouts/Card";
 
 interface IGrantCardProps {
   grant: GrantResponse | GrantResponseWithContributions;
   onClick?: (e?: any) => any;
+  children?: React.ReactNode;
   hideButton?: boolean;
   hideProgress?: boolean;
   className?: string;
@@ -20,6 +22,7 @@ interface IGrantCardProps {
 
 const GrantCard = ({
   grant,
+  children,
   onClick,
   hideButton = false,
   hideProgress = false,
@@ -34,12 +37,8 @@ const GrantCard = ({
   );
 
   return (
-    <div
-      className={clsx(
-        "flex flex-col w-full min-w-[240px] lg:min-w-[350px] max-w-[350px] bg-white rounded-lg overflow-hidden cursor-pointer shadow-card",
-        className
-      )}
-      key={grant.id}
+    <Card
+      className={clsx("bg-white shadow-card cursor-pointer", className)}
       onClick={onClick}
     >
       <div className="relative w-full aspect-[5/3] h-full max-h-[210px]">
@@ -119,8 +118,9 @@ const GrantCard = ({
             </>
           )}
         </div>
+        {children}
       </div>
-    </div>
+    </Card>
   );
 };
 

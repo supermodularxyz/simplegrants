@@ -18,12 +18,9 @@ const GrantModal = ({ grant, className, onClose }: IGrantModalProps) => {
   return (
     grant && (
       <div
-        className={clsx(
-          className,
-          "flex flex-col w-full h-full px-2 py-4 lg:px-8 lg:py-6"
-        )}
+        className={clsx(className, "flex flex-col w-full h-full px-4 md:px-8")}
       >
-        <div className="flex flex-col items-start justify-center my-2 w-full">
+        <div className="flex flex-col items-start justify-center my-2 w-full py-4 md:py-8">
           <p onClick={onClose} className="cursor-pointer">
             <Close className="fill-sg-secondary" />
           </p>
