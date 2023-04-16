@@ -188,18 +188,19 @@ export default function PoolDetails() {
                     </div>
                   )}
                 </div>
-                {data.team.some(
-                  (team) => team.id === (session?.user as any).id
-                ) && (
-                  <div className="flex flex-col w-full bg-white shadow-card py-8 px-6 rounded-xl max-w-sm">
-                    <p className="font-bold mb-4">Looking to make changes?</p>
-                    <Link href={`/pools/${id}/edit`}>
-                      <Button width="full" className="">
-                        Edit Pool
-                      </Button>
-                    </Link>
-                  </div>
-                )}
+                {!hasEnded &&
+                  data.team.some(
+                    (team) => team.id === (session?.user as any).id
+                  ) && (
+                    <div className="flex flex-col w-full bg-white shadow-card py-8 px-6 rounded-xl max-w-sm">
+                      <p className="font-bold mb-4">Looking to make changes?</p>
+                      <Link href={`/pools/${id}/edit`}>
+                        <Button width="full" className="">
+                          Edit Pool
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
               </div>
             </div>
           </div>
