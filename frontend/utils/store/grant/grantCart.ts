@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { BasicGrantResponse } from "../../../types/grant";
+import { BasicGrantInfo } from "../../../types/grant";
 
 // The info about a grant that will be checked out
 interface GrantCheckoutItem {
@@ -12,7 +12,7 @@ interface GrantCheckoutItem {
 
 interface GrantCartState {
   grants: GrantCheckoutItem[];
-  addToCart: (grant: BasicGrantResponse) => void;
+  addToCart: (grant: BasicGrantInfo) => void;
   updateCart: (id: string, amount: number) => void;
   removeFromCart: (grantId: string) => void;
   clearCart: () => void;

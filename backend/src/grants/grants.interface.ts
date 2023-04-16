@@ -468,6 +468,40 @@ export class GrantResponse extends BasicGrantResponse {
 }
 
 /**
+ * Minimal grant details about a specific grant.
+ * To be used in the pool interface
+ * This includes:
+ * @param team All users under this grant
+ * @param contributions All donations to this grant
+ */
+export class PoolGrantResponse extends BasicGrantResponse {
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amountRaised: number;
+
+  @Exclude()
+  contributions: Contribution[];
+
+  @Exclude()
+  team: User[];
+
+  @Exclude()
+  twitter: string;
+
+  @Exclude()
+  website: string;
+
+  @Exclude()
+  location: string;
+
+  constructor(partial: Partial<PoolGrantResponse>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
+}
+
+/**
  * Full grant details about a specific grant
  * This includes:
  * @param team All users under this grant

@@ -3,6 +3,7 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
 } from '@nestjs/swagger';
+import { EcosystemBuilder } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
@@ -13,7 +14,8 @@ import {
   IsString,
 } from 'class-validator';
 import { Contribution } from 'src/contributions/contributions.interface';
-import { GrantResponse } from 'src/grants/grants.interface';
+import { PoolGrantResponse } from 'src/grants/grants.interface';
+import { User } from 'src/users/users.interface';
 
 export enum PoolSortOptions {
   NEWEST = 'newest',
@@ -168,6 +170,8 @@ export class PoolResponse extends BasicPoolResponse {
  * Full pool details about a specific pool
  * This includes:
  * @param amountRaised Computed value of total amount raised in this pool
+ * @param team Team who created this pool
+ * @param contributors Number of contributors in the pool
  * @param grants All grants in this pool
  */
 export class PoolDetailResponse extends BasicPoolResponse {
@@ -176,16 +180,38 @@ export class PoolDetailResponse extends BasicPoolResponse {
   })
   amountRaised: number;
 
+  @Exclude()
+  funders: EcosystemBuilder[];
+
+  @ApiResponseProperty({
+    type: [User],
+    example: [
+      {
+        id: 'clg5yxz390006rs0u6po4496g',
+        name: 'John Doe',
+        email: 'johndoe@gmail.com',
+        emailVerified: null,
+        image:
+          'https://lh3.googleusercontent.com/a/HYholaWYk79ztL_n1_AfWAXyPSr8isJUg=s96-c',
+        bio: 'Hello there',
+        twitter: 'johndoe',
+        role: 'User',
+      },
+    ],
+  })
+  @Type(() => User)
+  team: User[];
+
   @ApiResponseProperty({
     type: Number,
   })
   contributors: number;
 
   @ApiResponseProperty({
-    type: [GrantResponse],
+    type: [PoolGrantResponse],
   })
-  @Type(() => GrantResponse)
-  grants: GrantResponse[];
+  @Type(() => PoolGrantResponse)
+  grants: PoolGrantResponse[];
 
   constructor(partial: Partial<PoolDetailResponse>) {
     super(partial);

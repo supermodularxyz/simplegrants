@@ -133,6 +133,11 @@ export class PoolService {
       },
       include: {
         contributions: true,
+        funders: {
+          include: {
+            user: true,
+          },
+        },
         grants: {
           include: {
             contributions: true,
@@ -185,6 +190,7 @@ export class PoolService {
           ),
         };
       }),
+      team: pool.funders.map((funder) => funder.user),
       contributors: uniqueUserIds.size,
       amountRaised: pool.contributions.reduce(
         (acc, contribution) => acc + contribution.amountUsd,

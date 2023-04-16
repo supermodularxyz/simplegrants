@@ -2,6 +2,12 @@ import { PaymentAccount, PaymentProvider } from "@prisma/client";
 import { Contribution } from "./contributions";
 import { User } from "./user";
 
+export interface BasicGrantInfo {
+  id: string;
+  name: string;
+  image: string;
+}
+
 export interface BasicGrantResponse {
   id: string;
   name: string;
@@ -30,6 +36,16 @@ export interface GrantDetailResponse extends GrantResponse {
   paymentAccount: PaymentAccount & {
     provider: PaymentProvider;
   };
+}
+
+export interface PoolGrantResponse {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  fundingGoal: number;
+  verified: boolean;
+  amountRaised: number;
 }
 
 export const SortOptions = [

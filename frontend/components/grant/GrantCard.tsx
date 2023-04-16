@@ -3,6 +3,7 @@ import Image from "next/image";
 import {
   GrantResponse,
   GrantResponseWithContributions,
+  PoolGrantResponse,
 } from "../../types/grant";
 import FundingBar from "../FundingBar";
 import { useGrantCartStore } from "../../utils/store";
@@ -12,7 +13,7 @@ import { useSession } from "next-auth/react";
 import Card from "../../layouts/Card";
 
 interface IGrantCardProps {
-  grant: GrantResponse | GrantResponseWithContributions;
+  grant: GrantResponse | GrantResponseWithContributions | PoolGrantResponse;
   onClick?: (e?: any) => any;
   children?: React.ReactNode;
   hideButton?: boolean;
