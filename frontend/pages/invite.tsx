@@ -46,7 +46,7 @@ export default function GetStarted() {
       .post(`/invites/${inviteCode}`)
       .then(() => {
         toast.success("Account created successfully!");
-        router.push("/ecosystem-builder");
+        router.push("/pools");
       })
       .catch((err) => {
         console.error(err);
@@ -104,7 +104,7 @@ export default function GetStarted() {
           <div className="mt-8 mb-4 flex flex-col w-full items-center justify-center text-sm">
             <p className="text-center">Already an ecosystem builder?</p>
             <Link
-              href="/ecosystem-builder"
+              href="/pools"
               className="underline text-sg-secondary text-center"
             >
               Click here to access the ecosystem builder platform

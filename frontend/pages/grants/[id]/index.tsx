@@ -71,10 +71,10 @@ export default function GrantDetails() {
               <Button>Create Grant</Button>
             </Link>
           </Navbar>
-          <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
+          <div className="flex flex-col items-start justify-center px-4 md:px-8 my-2 w-full">
             <BackButton href="/grants">Back to grants</BackButton>
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
-              <div className="basis-full md:basis-3/5 px-4">
+              <div className="basis-full md:basis-3/5 md:px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
                   <div className="relative aspect-[3/2] lg:aspect-[3/1] h-full w-full rounded-lg overflow-hidden">
                     <Image
