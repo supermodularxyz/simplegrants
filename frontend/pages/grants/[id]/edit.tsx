@@ -128,7 +128,7 @@ export default function EditGrant() {
       </Head>
 
       <MainLayout>
-        <Navbar className="p-0" />
+        <Navbar className="p-0" location="grants" />
         <form
           className="flex flex-col items-start justify-center px-8 my-2 w-full"
           onSubmit={handleSubmit(onSubmit)}

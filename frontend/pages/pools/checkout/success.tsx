@@ -25,7 +25,7 @@ export default function CheckoutSuccess() {
         message: `I've just donated $${data.donated.toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        })} to ${data.numberOfPools} pools! Check it out here!🥳\n`,
+        })} to ${data.numberOfItems} pools! Check it out here!🥳\n`,
       };
     }
   }, [data]);

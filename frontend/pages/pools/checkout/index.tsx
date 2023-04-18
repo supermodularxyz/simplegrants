@@ -8,7 +8,7 @@ import Button from "../../../components/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useGrantCartStore } from "../../../utils/store";
+import { usePoolCartStore } from "../../../utils/store";
 import Divider from "../../../components/Divider";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import TextInput from "../../../components/input/TextInput";
@@ -16,9 +16,9 @@ import axios from "../../../utils/axios";
 import { toast } from "react-toastify";
 import BackButton from "../../../components/BackButton";
 
-export default function GrantsCheckout() {
+export default function PoolsCheckout() {
   const router = useRouter();
-  const { grants, addToCart, removeFromCart, updateCart } = useGrantCartStore();
+  const { pools, addToCart, removeFromCart, updateCart } = usePoolCartStore();
   const { id } = router.query;
   const { data: session, status } = useSession();
   const [data, setData] = React.useState<any>();
@@ -38,19 +38,19 @@ export default function GrantsCheckout() {
   }, [data]);
 
   const subtotal = React.useMemo(
-    () => grants.reduce((acc, grant) => acc + grant.amount, 0),
-    [grants]
+    () => pools.reduce((acc, pool) => acc + pool.amount, 0),
+    [pools]
   );
 
-  const checkoutGrants = () => {
+  const checkoutPools = () => {
     setLoading(true);
     axios
       .post(
-        "/grants/checkout",
+        "/pools/checkout",
         {
-          grants: grants.map((grant) => ({
-            id: grant.id,
-            amount: grant.amount,
+          pools: pools.map((pool) => ({
+            id: pool.id,
+            amount: pool.amount,
           })),
         },
         {
@@ -61,13 +61,13 @@ export default function GrantsCheckout() {
       .catch((err) => {
         console.error({ err });
         toast.error(err.message || "Something went wrong", {
-          toastId: "checkout-grants-error",
+          toastId: "checkout-pools-error",
         });
       })
       .finally(() => setLoading(false));
   };
 
-  const updateGrantAmount = (id: string, amount: string) => {
+  const updatePoolAmount = (id: string, amount: string) => {
     const num = parseFloat(amount);
     if (isNaN(num) || num < 0) {
       updateCart(id, 0);
@@ -79,7 +79,7 @@ export default function GrantsCheckout() {
   return (
     <div>
       <Head>
-        <title>Checkout | SimpleGrantsCheckout</title>
+        <title>Checkout | SimpleGrants</title>
         <meta
           name="description"
           content="Join us in making an impact through quadratic funding."
@@ -88,40 +88,40 @@ export default function GrantsCheckout() {
       </Head>
 
       <MainLayout>
-        <Navbar className="p-0" location="grants">
-          <Link href="/grants/create">
-            <Button>Create Grant</Button>
+        <Navbar className="p-0" location="pools">
+          <Link href="/pools/create">
+            <Button>Create Pool</Button>
           </Link>
         </Navbar>
         <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
-          <BackButton href="/grants">Back to grants</BackButton>
-          <h1 className="font-bold text-2xl my-10 px-4">Checkout Grants</h1>
+          <BackButton href="/pools">Back to pools</BackButton>
+          <h1 className="font-bold text-2xl my-10 px-4">Checkout Pools</h1>
           <div className="w-full flex flex-col md:flex-row gap-y-8">
             <div className="basis-full md:basis-3/5 px-4">
               <div className="flex flex-col bg-white shadow-card py-8 px-6 rounded-xl gap-y-6">
                 {hasHydrated &&
-                  grants.map((grant, index) => (
-                    <React.Fragment key={grant.id}>
+                  pools.map((pool, index) => (
+                    <React.Fragment key={pool.id}>
                       <div
                         className="flex flex-row w-full h-full items-center justify-between gap-x-6"
-                        key={grant.id}
+                        key={pool.id}
                       >
                         <div className="overflow-hidden rounded-lg flex-none">
                           <Image
-                            src={grant.image}
+                            src={pool.image}
                             width={132}
                             height={98}
                             className="aspect-[5/4] object-cover"
-                            alt={grant.name}
+                            alt={pool.name}
                           />
                         </div>
                         <div className="flex flex-col h-full justify-between flex-auto gap-y-6">
                           <p className="font-bold text-lg h-full">
-                            {grant.name}
+                            {pool.name}
                           </p>
                           <div className="flex flex-row items-center">
                             <TextInput
-                              value={grant.amount
+                              value={pool.amount
                                 .toString()
                                 .replace(/^0(?=\d)/, "")}
                               type="number"
@@ -129,7 +129,7 @@ export default function GrantsCheckout() {
                               onChange={(
                                 event: React.ChangeEvent<HTMLInputElement>
                               ) =>
-                                updateGrantAmount(grant.id, event.target.value)
+                                updatePoolAmount(pool.id, event.target.value)
                               }
                               className="px-4 py-2 max-w-[144px] lg:max-w-[192px] text-lg"
                             />
@@ -138,12 +138,12 @@ export default function GrantsCheckout() {
                         </div>
                         <p
                           className="cursor-pointer h-full items-center justify-center text-sg-error"
-                          onClick={() => removeFromCart(grant.id)}
+                          onClick={() => removeFromCart(pool.id)}
                         >
                           Remove
                         </p>
                       </div>
-                      {index !== grants.length - 1 && (
+                      {index !== pools.length - 1 && (
                         <Divider
                           orientation="horizontal"
                           className="bg-sg-500"
@@ -160,16 +160,16 @@ export default function GrantsCheckout() {
                 <p className="font-bold text-lg mb-3">Your Contributions</p>
                 <div className="flex flex-col mb-6 gap-y-3">
                   {hasHydrated &&
-                    grants.map((grant) => (
+                    pools.map((pool) => (
                       <div
                         className="flex flex-row w-full items-center justify-between"
-                        key={grant.id}
+                        key={pool.id}
                       >
                         <div className="flex flex-1 justify-start overflow-hidden">
-                          <p className="truncate">{grant.name}</p>
+                          <p className="truncate">{pool.name}</p>
                         </div>
                         <p className="flex flex-1 text-ellipsis truncate justify-end">
-                          {grant.amount.toLocaleString("en-US", {
+                          {pool.amount.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}{" "}
@@ -193,7 +193,7 @@ export default function GrantsCheckout() {
                   </p>
                 </div>
                 <Button
-                  onClick={checkoutGrants}
+                  onClick={checkoutPools}
                   width="full"
                   disabled={(hasHydrated && subtotal <= 1) || loading}
                 >

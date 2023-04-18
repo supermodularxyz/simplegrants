@@ -12,9 +12,14 @@ import Button from "../components/Button";
 interface INavbarProps {
   children?: ReactNode;
   className?: string;
+  location: "grants" | "pools"; // Tracks which checkout page to go to
 }
 
-export default function Navbar({ children, className }: INavbarProps) {
+export default function Navbar({
+  children,
+  className,
+  location,
+}: INavbarProps) {
   const { data: session } = useSession();
   const { grants } = useGrantCartStore();
   const hasHydrated = useHasHydrated();
@@ -67,7 +72,10 @@ export default function Navbar({ children, className }: INavbarProps) {
                       Subtotal: ${hasHydrated && subtotal}
                     </span>
                     <div className="card-actions">
-                      <Link href="/grants/checkout" className="w-full h-full">
+                      <Link
+                        href={`/${location}/checkout`}
+                        className="w-full h-full"
+                      >
                         <button className="btn btn-primary btn-block">
                           View cart
                         </button>
@@ -123,7 +131,10 @@ export default function Navbar({ children, className }: INavbarProps) {
                 className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
               >
                 <li>
-                  <Link href="/grants/checkout" className="justify-between">
+                  <Link
+                    href={`/${location}/checkout`}
+                    className="justify-between"
+                  >
                     View Cart
                   </Link>
                 </li>

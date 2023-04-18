@@ -232,7 +232,7 @@ const checkoutItems = {
 const checkoutInfo = {
   donated: 300,
   matched: 0,
-  numberOfGrants: 2,
+  numberOfItems: 2,
 };
 
 const checkoutPaymentSession = { url: 'checkoutlink' };

@@ -2,11 +2,9 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import React from "react";
 import Image from "next/image";
-import LandingNavbar from "../../layouts/landing/LandingNavbar";
 import { useRouter } from "next/router";
 import axios from "../../utils/axios";
 import { toast } from "react-toastify";
-import Fade from "react-reveal/Fade";
 import { UserProfile } from "../../types/user";
 import * as Tabs from "@radix-ui/react-tabs";
 import GrantCard from "../../components/grant/GrantCard";
@@ -53,8 +51,7 @@ export default function Home() {
       </Head>
 
       <main className="flex flex-col min-w-screen min-h-screen w-full h-full overflow-x-hidden text-sg-secondary">
-        <Navbar className="p-4 absolute">
-          {" "}
+        <Navbar className="p-4 absolute" location="grants">
           <Link href="/grants/create">
             <Button>Create Grant</Button>
           </Link>
@@ -62,9 +59,9 @@ export default function Home() {
         {loading ? (
           <></>
         ) : (
-          <>
+          <div className="w-full flex flex-col md:flex-row min-h-screen">
             {data ? (
-              <div className="w-full flex flex-col md:flex-row min-h-screen">
+              <>
                 <div className="basis-full shrink-0 md:basis-1/3 lg:basis-1/4 bg-sg-gradient px-8 sm:px-12 md:px-14 pt-24 pb-6 rounded-b-xl overflow-hidden">
                   <p className="font-bold text-2xl text-sg-accent">Profile</p>
                   <div className="max-w-[8rem] aspect-square rounded-full relative overflow-hidden my-6">
@@ -148,11 +145,13 @@ export default function Home() {
                     </Tabs.Content>
                   </Tabs.Root>
                 </div>
-              </div>
+              </>
             ) : (
-              <h1>User profile not found</h1>
+              <div className="flex w-full h-full items-center justify-center min-h-screen">
+                <h1 className="font-bold text-2xl">User profile not found</h1>
+              </div>
             )}
-          </>
+          </div>
         )}
       </main>
     </div>

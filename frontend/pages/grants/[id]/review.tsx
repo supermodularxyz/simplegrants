@@ -80,7 +80,7 @@ export default function ReviewGrant() {
         </Head>
 
         <MainLayout>
-          <Navbar className="p-0">
+          <Navbar className="p-0" location="grants">
             <Link href="/grants/create">
               <Button>Create Grant</Button>
             </Link>

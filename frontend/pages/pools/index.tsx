@@ -83,7 +83,7 @@ export default function Pools() {
       </Head>
 
       <MainLayout>
-        <Navbar className="p-0">
+        <Navbar className="p-0" location="pools">
           <Link href="/pools/create">
             <Button>Create Pool</Button>
           </Link>
