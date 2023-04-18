@@ -28,6 +28,8 @@ import { FormDataPipe } from 'src/pipes/form-data.pipe';
 import { RequestWithUser } from 'src/users/users.interface';
 import {
   BasicPoolResponse,
+  CheckoutPoolsDto,
+  CheckoutPoolsResponse,
   CreatePoolDto,
   GetPoolQueryDto,
   PoolDetailResponse,
@@ -161,5 +163,31 @@ export class PoolController {
     return new BasicPoolResponse(
       await this.poolService.updatePool(id, body, req.user),
     );
+  }
+
+  @ApiOperation({
+    description: 'Checkout selected pools',
+  })
+  @ApiCreatedResponse({
+    description: 'Checkout link/information from the payment provider',
+    type: CheckoutPoolsResponse,
+  })
+  @ApiNotFoundResponse({
+    description: 'All pools to checkout cannot be found',
+  })
+  @Post('checkout')
+  @UseGuards(NextAuthGuard)
+  async checkoutPools(
+    @Body(
+      new ValidationPipe({
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+        forbidNonWhitelisted: true,
+      }),
+    )
+    body: CheckoutPoolsDto,
+    @Request() req: RequestWithUser,
+  ) {
+    return await this.poolService.checkoutPools(body, req.user);
   }
 }

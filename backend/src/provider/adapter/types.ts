@@ -1,10 +1,11 @@
 import { PaymentProvider, User } from '@prisma/client';
+import { GrantWithFunding } from 'src/grants/grants.interface';
+import { PrismaService } from 'src/prisma/prisma.service';
 import {
   FeeAllocationMethod,
-  GrantWithFunding,
-} from 'src/grants/grants.interface';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { SuccessfulCheckoutInfo } from '../provider.interface';
+  SuccessfulCheckoutInfo,
+} from '../provider.interface';
+import { PoolWithFunding } from 'src/pool/pool.interface';
 
 export interface PaymentProviderConstructorProps {
   prisma: PrismaService;
@@ -15,8 +16,13 @@ export interface PaymentProviderConstructorProps {
 
 export interface PaymentProviderAdapter {
   getDetails(): Promise<PaymentProvider>;
-  createPayment(
+  createGrantPayment(
     grantWithFunding: GrantWithFunding[],
+    feeAllocation: FeeAllocationMethod,
+    user: User,
+  ): any;
+  createPoolPayment(
+    poolWithFunding: PoolWithFunding[],
     feeAllocation: FeeAllocationMethod,
     user: User,
   ): any;

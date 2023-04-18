@@ -5,7 +5,6 @@ import {
   CheckoutGrantsDto,
   CheckoutGrantsResponse,
   CreateGrantDto,
-  FeeAllocationMethod,
   GetGrantDto,
   GrantFilterOptions,
   GrantResponseWithTeam,
@@ -16,6 +15,7 @@ import {
 import { ProviderService } from 'src/provider/provider.service';
 import { AwsService } from 'src/aws/aws.service';
 import * as cuid from 'cuid';
+import { FeeAllocationMethod } from 'src/provider/provider.interface';
 
 @Injectable()
 export class GrantsService {
@@ -433,7 +433,7 @@ export class GrantsService {
     // Pass to the payment provider to create a payment session
     return await this.providerService.createPaymentSession(
       grantWithFunding,
-      feeAllocation || FeeAllocationMethod.PASS_TO_GRANT, // By default, we will pass the fees to grants
+      feeAllocation || FeeAllocationMethod.PASS_TO_ENTITY, // By default, we will pass the fees to grants
       user,
     );
   }

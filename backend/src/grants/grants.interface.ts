@@ -3,7 +3,7 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { Grant, MatchedFund } from '@prisma/client';
+import { MatchedFund } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -19,6 +19,7 @@ import {
 import { HasMimeType, IsFile } from 'nestjs-form-data';
 import { Contribution } from 'src/contributions/contributions.interface';
 import { PaymentAccount } from 'src/payment-accounts/payment-accounts.interface';
+import { FeeAllocationMethod } from 'src/provider/provider.interface';
 import { User } from 'src/users/users.interface';
 
 export enum GrantSortOptions {
@@ -31,11 +32,6 @@ export enum GrantSortOptions {
 export enum GrantFilterOptions {
   FUNDED = 'funded',
   UNDERFUNDED = 'underfunded',
-}
-
-export enum FeeAllocationMethod {
-  PASS_TO_CUSTOMER = 'customer',
-  PASS_TO_GRANT = 'grant',
 }
 
 /**
@@ -616,6 +612,18 @@ export class CheckoutGrantsResponse {
 /**
  * Additional computed amount field which is used when checking out
  */
-export type GrantWithFunding = Grant & {
+export class GrantWithFunding {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  twitter: string;
+  website: string;
+  location: string;
+  paymentAccountId: string;
+  fundingGoal: number;
+  verified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
   amount: number;
-};
+}

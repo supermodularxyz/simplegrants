@@ -9,6 +9,8 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProviderService } from 'src/provider/provider.service';
 import {
+  CheckoutPoolsDto,
+  CheckoutPoolsResponse,
   CreatePoolDto,
   GetPoolDto,
   PoolFilterOptions,
@@ -16,6 +18,7 @@ import {
   PoolSortOptions,
   UpdatePoolDto,
 } from './pool.interface';
+import { FeeAllocationMethod } from 'src/provider/provider.interface';
 
 @Injectable()
 export class PoolService {
@@ -337,5 +340,62 @@ export class PoolService {
         id,
       },
     });
+  }
+
+  /**
+   * Retrieve the pools that the user wants to checkout
+   * @param pools The pools to checkout
+   * @param user User making the purchase
+   */
+  async checkoutPools(
+    body: CheckoutPoolsDto,
+    user: User,
+  ): Promise<CheckoutPoolsResponse> {
+    const { pools, feeAllocation } = body;
+    /**
+     * What we should do is to actually create a payment intent for each pool.
+     * In order to do that, we need to go through each pool and receive their payment info
+     */
+    const ids = pools.map((pool) => pool.id);
+    const data = await this.prisma.matchingRound.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        endDate: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    /**
+     * We also need to check if the pools have not ended.
+     * What we can do is that we filter the ended pools & don't throw an error (for now)
+     * Then, check if there are even any pools to checkout.
+     * If no pools to checkout, throw error
+     */
+    if (data.length < 0)
+      throw new HttpException('Pools not found', HttpStatus.NOT_FOUND);
+
+    // Creating a lookup table to reduce time complexity of the pools merging to O(n)
+    const amountLookup = pools.reduce((acc, pool) => {
+      acc[pool.id] = pool.amount;
+      return acc;
+    }, {});
+
+    // Here it is only O(n) rather than O(n^2) if we have a nested loop
+    const poolWithFunding = data.map((pool) => {
+      return {
+        ...pool,
+        amount: amountLookup[pool.id] || 0,
+      };
+    });
+
+    // Pass to the payment provider to create a payment session
+    return await this.providerService.createPaymentSession(
+      poolWithFunding,
+      feeAllocation || FeeAllocationMethod.PASS_TO_ENTITY, // By default, we will pass the fees to pools
+      user,
+    );
   }
 }

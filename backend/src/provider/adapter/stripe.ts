@@ -1,7 +1,4 @@
-import {
-  FeeAllocationMethod,
-  GrantWithFunding,
-} from 'src/grants/grants.interface';
+import { GrantWithFunding } from 'src/grants/grants.interface';
 import {
   PaymentProviderAdapter,
   PaymentProviderConstructorProps,
@@ -16,7 +13,11 @@ import {
   Logger,
   LoggerService,
 } from '@nestjs/common';
-import { SuccessfulCheckoutInfo } from '../provider.interface';
+import {
+  FeeAllocationMethod,
+  SuccessfulCheckoutInfo,
+} from '../provider.interface';
+import { PoolWithFunding } from 'src/pool/pool.interface';
 
 export interface PaymentIntentEventWebhookBody {
   id: string;
@@ -54,6 +55,7 @@ export interface PaymentIntentEventWebhookBody {
       metadata: {
         userId: string;
         denomination: string;
+        type: 'grant' | 'pool';
       };
       on_behalf_of: any;
       payment_method: string;
@@ -131,10 +133,10 @@ export class StripeProvider implements PaymentProviderAdapter {
    * @param feeAllocation
    * @param totalAmount
    * @returns A lookup table for the amount each grant should receive.
-   * Minus Stripe fees if `feeAllocation` is `PASS_TO_GRANT`
+   * Minus Stripe fees if `feeAllocation` is `PASS_TO_ENTITY`
    */
-  getGrantTransferAmount(
-    grants: GrantWithFunding[],
+  getTransferAmount(
+    items: (GrantWithFunding | PoolWithFunding)[],
     feeAllocation: FeeAllocationMethod,
     totalAmount: number,
   ): { [key: string]: number } {
@@ -143,13 +145,13 @@ export class StripeProvider implements PaymentProviderAdapter {
     const totalFee = totalAmount * percentFee + fixedFee;
 
     // If the fee allocation method is to pass to grant, we calculate the amount after fees
-    return grants.reduce((acc, grant) => {
-      acc[grant.id] =
-        feeAllocation === FeeAllocationMethod.PASS_TO_GRANT
+    return items.reduce((acc, item) => {
+      acc[item.id] =
+        feeAllocation === FeeAllocationMethod.PASS_TO_ENTITY
           ? this.roundNumber(
-              grant.amount - (grant.amount / totalAmount) * totalFee,
+              item.amount - (item.amount / totalAmount) * totalFee,
             )
-          : grant.amount;
+          : item.amount;
       return acc;
     }, {});
   }
@@ -163,12 +165,12 @@ export class StripeProvider implements PaymentProviderAdapter {
   }
 
   /**
-   * Initiate a payment process with Stripe
+   * Initiate a payment process with Stripe for grants
    * @param grantWithFunding
    * @param user
    * @returns
    */
-  async createPayment(
+  async createGrantPayment(
     grantWithFunding: GrantWithFunding[],
     feeAllocation: FeeAllocationMethod,
     user: User,
@@ -179,7 +181,7 @@ export class StripeProvider implements PaymentProviderAdapter {
       (acc, grant) => acc + grant.amount,
       0,
     );
-    const grantAmountLookup = this.getGrantTransferAmount(
+    const grantAmountLookup = this.getTransferAmount(
       grantWithFunding,
       feeAllocation,
       totalDonation,
@@ -246,10 +248,102 @@ export class StripeProvider implements PaymentProviderAdapter {
         metadata: {
           userId: user.id,
           denomination: provider.denominations[0],
+          type: 'grant',
         },
       },
       success_url: `${process.env.FRONTEND_URL}/grants/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/grants/checkout`,
+    });
+
+    return session;
+  }
+
+  /**
+   * Initiate a payment process with Stripe for pools
+   * @param poolWithFunding
+   * @param user
+   * @returns
+   */
+  async createPoolPayment(
+    poolWithFunding: PoolWithFunding[],
+    feeAllocation: FeeAllocationMethod,
+    user: User,
+  ) {
+    const provider = await this.getDetails();
+    const transferGroup = cuid();
+    const totalDonation = poolWithFunding.reduce(
+      (acc, pool) => acc + pool.amount,
+      0,
+    );
+
+    const poolAmountLookup = this.getTransferAmount(
+      poolWithFunding,
+      feeAllocation,
+      totalDonation,
+    );
+
+    for await (const pool of poolWithFunding) {
+      if (pool.amount > 0) {
+        await this.prisma.checkout.create({
+          data: {
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+            amount: poolAmountLookup[pool.id],
+            denomination: provider.denominations[0],
+            matchingRound: {
+              connect: {
+                id: pool.id,
+              },
+            },
+            groupId: transferGroup,
+          },
+        });
+      }
+    }
+
+    const session = await this.stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [
+        ...poolWithFunding.map((pool) => {
+          return {
+            price_data: {
+              currency: provider.denominations[0],
+              product_data: {
+                name: pool.name,
+              },
+              unit_amount: this.roundNumber(pool.amount) * 100,
+            },
+            quantity: 1,
+          };
+        }),
+        feeAllocation === FeeAllocationMethod.PASS_TO_CUSTOMER
+          ? {
+              price_data: {
+                currency: provider.denominations[0],
+                product_data: {
+                  name: 'Stripe Fees',
+                  description: 'Processing fees taken by Stripe',
+                },
+                unit_amount: this.getCustomerFee(totalDonation) * 100,
+              },
+              quantity: 1,
+            }
+          : undefined,
+      ],
+      payment_intent_data: {
+        transfer_group: transferGroup,
+        metadata: {
+          userId: user.id,
+          denomination: provider.denominations[0],
+          type: 'pool',
+        },
+      },
+      success_url: `${process.env.FRONTEND_URL}/pools/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/pools/checkout`,
     });
 
     return session;
@@ -339,39 +433,63 @@ export class StripeProvider implements PaymentProviderAdapter {
             paymentAccount: true,
           },
         },
+        matchingRound: true,
       },
     });
 
     this.logger.log(`${checkoutsToProcess.length} items to process`);
-    this.logger.log('Creating transfers...');
-
-    for await (const checkout of checkoutsToProcess) {
-      await this.stripe.transfers.create({
-        amount: checkout.amount * 100, // multiply 100 because of the way stripe calculates
-        currency: checkout.denomination,
-        destination: checkout.grant.paymentAccount.recipientAddress,
-        transfer_group: transferGroup,
-      });
-    }
-
-    this.logger.log('Transfers made!');
 
     /**
-     * Store contributions
+     * We only need to do transfers if its a checkout to grants
      */
-    await this.prisma.contribution.createMany({
-      data: checkoutsToProcess.map((checkout) => {
-        return {
-          userId: data.metadata.userId,
-          amount: checkout.amount,
-          denomination: checkout.denomination,
-          amountUsd: checkout.amount,
-          paymentMethodId: userPaymentMethod.id,
-          grantId: checkout.grantId,
-          flagged: false,
-        };
-      }),
-    });
+    if (data.metadata.type === 'grant') {
+      this.logger.log('Creating transfers...');
+
+      for await (const checkout of checkoutsToProcess) {
+        await this.stripe.transfers.create({
+          amount: checkout.amount * 100, // multiply 100 because of the way stripe calculates
+          currency: checkout.denomination,
+          destination: checkout.grant.paymentAccount.recipientAddress,
+          transfer_group: transferGroup,
+        });
+      }
+
+      this.logger.log('Transfers made!');
+
+      /**
+       * Store contributions
+       */
+      await this.prisma.contribution.createMany({
+        data: checkoutsToProcess.map((checkout) => {
+          return {
+            userId: data.metadata.userId,
+            amount: checkout.amount,
+            denomination: checkout.denomination,
+            amountUsd: checkout.amount,
+            paymentMethodId: userPaymentMethod.id,
+            grantId: checkout.grantId,
+            flagged: false,
+          };
+        }),
+      });
+    } else {
+      /**
+       * Store contributions
+       */
+      await this.prisma.contribution.createMany({
+        data: checkoutsToProcess.map((checkout) => {
+          return {
+            userId: data.metadata.userId,
+            amount: checkout.amount,
+            denomination: checkout.denomination,
+            amountUsd: checkout.amount,
+            paymentMethodId: userPaymentMethod.id,
+            matchingRoundId: checkout.matchingRoundId,
+            flagged: false,
+          };
+        }),
+      });
+    }
 
     this.logger.log('Contributions saved to database!');
     this.logger.log('Webhook run complete ✅');

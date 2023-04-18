@@ -1,6 +1,11 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
+export enum FeeAllocationMethod {
+  PASS_TO_CUSTOMER = 'customer',
+  PASS_TO_ENTITY = 'entity',
+}
+
 /**
  * Information about a specific checkout session
  *

@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PaymentProvider, User } from '@prisma/client';
-import {
-  FeeAllocationMethod,
-  GrantWithFunding,
-} from 'src/grants/grants.interface';
+import { GrantWithFunding } from 'src/grants/grants.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { StripeProvider } from './adapter/stripe';
 import { PaymentProviderAdapter } from './adapter/types';
+import { PoolWithFunding } from 'src/pool/pool.interface';
+import { FeeAllocationMethod } from './provider.interface';
 
 @Injectable()
 export class ProviderService {
@@ -29,17 +28,23 @@ export class ProviderService {
 
   /**
    * Create a payment session using the payment provider
-   * @param grantWithFunding
+   * @param itemWithFunding
    * @param user
    * @returns
    */
   async createPaymentSession(
-    grantWithFunding: GrantWithFunding[],
+    itemWithFunding: (GrantWithFunding | PoolWithFunding)[],
     feeAllocation: FeeAllocationMethod,
     user: User,
   ) {
-    return await this.paymentProvider.createPayment(
-      grantWithFunding,
+    if (itemWithFunding instanceof GrantWithFunding)
+      return await this.paymentProvider.createGrantPayment(
+        itemWithFunding as GrantWithFunding[],
+        feeAllocation,
+        user,
+      );
+    return await this.paymentProvider.createPoolPayment(
+      itemWithFunding as PoolWithFunding[],
       feeAllocation,
       user,
     );

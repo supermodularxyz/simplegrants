@@ -6,15 +6,19 @@ import {
 import { EcosystemBuilder } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   ArrayNotEmpty,
-  IsDate,
+  IsArray,
   IsDateString,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { Contribution } from 'src/contributions/contributions.interface';
 import { PoolGrantResponse } from 'src/grants/grants.interface';
+import { FeeAllocationMethod } from 'src/provider/provider.interface';
 import { User } from 'src/users/users.interface';
 
 export enum PoolSortOptions {
@@ -27,11 +31,6 @@ export enum PoolSortOptions {
 export enum PoolFilterOptions {
   ENDED = 'ended',
   NOT_ENDED = 'not_ended',
-}
-
-export enum FeeAllocationMethod {
-  PASS_TO_CUSTOMER = 'customer',
-  PASS_TO_POOL = 'pool',
 }
 
 /**
@@ -249,4 +248,65 @@ export class UpdatePoolDto {
   @IsString({ each: true })
   @ArrayNotEmpty()
   grants: string[];
+}
+
+/**
+ * Helper class for pools checkout process
+ */
+export class PoolCheckout {
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  id: string;
+
+  @ApiProperty({
+    type: Number,
+  })
+  @IsNumber()
+  amount: number;
+}
+
+/**
+ * DTO for checking out one or more pools
+ */
+export class CheckoutPoolsDto {
+  @ApiProperty({
+    type: [PoolCheckout],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  @Type(() => PoolCheckout)
+  pools: PoolCheckout[];
+
+  @ApiProperty({
+    enum: FeeAllocationMethod,
+  })
+  @IsEnum(FeeAllocationMethod)
+  @IsOptional()
+  feeAllocation?: FeeAllocationMethod;
+}
+
+// TODO: Make it agnostic to whichever payment provider
+export class CheckoutPoolsResponse {
+  @ApiResponseProperty({
+    type: String,
+  })
+  url: string;
+}
+
+/**
+ * Additional computed amount field which is used when checking out
+ */
+export class PoolWithFunding {
+  id: string;
+  name: string;
+  paid: boolean;
+  verified: boolean;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  amount: number;
 }

@@ -87,7 +87,7 @@ export default function ReviewPool() {
     data && (
       <div>
         <Head>
-          <title>{data.name} | SimplePools</title>
+          <title>{data.name} | SimpleGrants</title>
           <meta
             name="description"
             content="Join us in making an impact through quadratic funding."

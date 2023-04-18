@@ -91,10 +91,10 @@ model Grant {
   fundingGoal      Int
   contributions    Contribution[]
   matchedFund      MatchedFund[]
+  checkoutSessions Checkout[]
   verified         Boolean
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
-  checkoutSessions Checkout[]
 }
 
 model PaymentAccount {
@@ -158,18 +158,19 @@ model Contribution {
 }
 
 model MatchingRound {
-  id            String             @id @default(cuid())
-  name          String
-  funders       EcosystemBuilder[]
-  contributions Contribution[]
-  grants        Grant[]
-  matchedFunds  MatchedFund[]
-  paid          Boolean            @default(false)
-  verified      Boolean            @default(false)
-  startDate     DateTime
-  endDate       DateTime
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id               String             @id @default(cuid())
+  name             String
+  funders          EcosystemBuilder[]
+  contributions    Contribution[]
+  grants           Grant[]
+  matchedFunds     MatchedFund[]
+  checkoutSessions Checkout[]
+  paid             Boolean            @default(false)
+  verified         Boolean            @default(false)
+  startDate        DateTime
+  endDate          DateTime
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
 model EcosystemBuilder {
@@ -208,14 +209,16 @@ model MatchedFund {
 }
 
 model Checkout {
-  id           Int      @id @default(autoincrement())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  amount       Float
-  denomination String
-  grantId      String?
-  grant        Grant?   @relation(fields: [grantId], references: [id])
-  groupId      String //transfer_group for Stripe or tx ID or any other 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              Int            @id @default(autoincrement())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  amount          Float
+  denomination    String
+  grantId         String?
+  grant           Grant?         @relation(fields: [grantId], references: [id])
+  matchingRoundId String?
+  matchingRound   MatchingRound? @relation(fields: [matchingRoundId], references: [id])
+  groupId         String //transfer_group for Stripe or tx ID or any other 
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
