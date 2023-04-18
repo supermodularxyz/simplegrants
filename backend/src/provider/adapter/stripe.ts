@@ -505,11 +505,11 @@ export class StripeProvider implements PaymentProviderAdapter {
         (acc, item) => {
           if (item.description !== 'Stripe Fees') {
             acc.donated += item.amount_total / 100;
-            acc.numberOfGrants += 1;
+            acc.numberOfItems += 1;
           }
           return acc;
         },
-        { donated: 0, matched: 0, numberOfGrants: 0 },
+        { donated: 0, matched: 0, numberOfItems: 0 },
       );
 
       return checkoutInfo;

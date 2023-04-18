@@ -11,7 +11,7 @@ export enum FeeAllocationMethod {
  *
  * @param donated The amount donated
  * @param matched The **estimated** amount matched. This may not be 100% accurate
- * @param numberOfGrants The number of grants this user donated to
+ * @param numberOfItems The number of items this user donated to
  */
 export class SuccessfulCheckoutInfo {
   @ApiResponseProperty({
@@ -27,7 +27,7 @@ export class SuccessfulCheckoutInfo {
   @ApiResponseProperty({
     type: Number,
   })
-  numberOfGrants: number;
+  numberOfItems: number;
 }
 
 /**
