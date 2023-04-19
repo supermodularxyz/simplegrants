@@ -160,6 +160,8 @@ model Contribution {
 model MatchingRound {
   id               String             @id @default(cuid())
   name             String
+  description      String?
+  image            String?
   funders          EcosystemBuilder[]
   contributions    Contribution[]
   grants           Grant[]
