@@ -49,9 +49,12 @@ export default function Home() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-grants-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-grants-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };

@@ -60,9 +60,12 @@ export default function GrantsCheckout() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "checkout-grants-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "checkout-grants-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };

@@ -114,9 +114,13 @@ export class UsersService {
       0,
     );
 
-    let contributions, pools, totalContributed, totalPooled;
+    let contributions,
+      pools,
+      totalContributed,
+      totalPooled = undefined;
 
     if (user.ecosystemBuilder) {
+      this.logger.log('User is an ecosystem builder 🌲');
       contributions = user.contributions
         .filter((contribution) => contribution.matchingRound)
         .reduce((prev, contribution) => {

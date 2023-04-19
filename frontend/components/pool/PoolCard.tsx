@@ -80,9 +80,9 @@ const PoolCard = ({
           <p className="my-2">
             <b className="font-bold text-xl">
               ~USD${" "}
-              {pool.amountRaised.toLocaleString("en-US", {
+              {pool.amountRaised?.toLocaleString("en-US", {
                 maximumFractionDigits: 0,
-              })}
+              }) || 0}
             </b>{" "}
             raised
           </p>

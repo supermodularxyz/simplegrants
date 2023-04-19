@@ -44,9 +44,12 @@ export default function Pools() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-pools-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-pools-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
@@ -143,10 +146,10 @@ export default function Pools() {
               </ToggleGroup.Root>
             </div>
           </div>
-          {view === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-y-8 gap-x-10 w-full my-6 justify-items-center">
-              {data &&
-                data.map((pool) => (
+          {data && data.length > 0 ? (
+            view === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-y-8 gap-x-10 w-full my-6 justify-items-center">
+                {data.map((pool) => (
                   <PoolCard
                     hideButton={!session}
                     pool={pool}
@@ -154,17 +157,23 @@ export default function Pools() {
                     key={pool.id}
                   />
                 ))}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-y-8 gap-x-10 w-full max-w-7xl my-6">
-              {data &&
-                data.map((pool) => (
+              </div>
+            ) : (
+              <div className="flex flex-col gap-y-8 gap-x-10 w-full max-w-7xl my-6">
+                {data.map((pool) => (
                   <PoolList
                     pool={pool}
                     onClick={() => router.push(`/pools/${pool.id}`)}
                     key={pool.id}
                   />
                 ))}
+              </div>
+            )
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              <p className="font-bold text-xl text-center my-8">
+                No pools found
+              </p>
             </div>
           )}
         </div>

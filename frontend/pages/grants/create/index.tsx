@@ -76,7 +76,9 @@ export default function CreateGrant() {
       })
       .catch((err) => {
         console.error(err);
-        toast.error(err.message);
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong"
+        );
       })
       .finally(() => {
         setLoading(false);

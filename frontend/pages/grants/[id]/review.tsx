@@ -30,9 +30,12 @@ export default function ReviewGrant() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-grant-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-grant-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
@@ -60,33 +63,36 @@ export default function ReviewGrant() {
       .then(() => router.push(`/grants/${id}`))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.response.data.message || "Something went wrong", {
-          toastId: "review-grant",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "review-grant",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
 
   return (
-    data && (
-      <div>
-        <Head>
-          <title>{data.name} | SimpleGrants</title>
-          <meta
-            name="description"
-            content="Join us in making an impact through quadratic funding."
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+    <div>
+      <Head>
+        <title>{data?.name || "Grant not found"} | SimpleGrants</title>
+        <meta
+          name="description"
+          content="Join us in making an impact through quadratic funding."
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-        <MainLayout>
-          <Navbar className="p-0" location="grants">
-            <Link href="/grants/create">
-              <Button>Create Grant</Button>
-            </Link>
-          </Navbar>
-          <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
-            <BackButton href="/grants">Back to grants</BackButton>
+      <MainLayout>
+        <Navbar className="p-0" location="grants">
+          <Link href="/grants/create">
+            <Button>Create Grant</Button>
+          </Link>
+        </Navbar>
+        <div className="flex flex-col items-start justify-center px-8 my-2 w-full">
+          <BackButton href="/grants">Back to grants</BackButton>
+          {data ? (
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
               <div className="basis-full md:basis-3/5 px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
@@ -148,9 +154,13 @@ export default function ReviewGrant() {
                 </div>
               </div>
             </div>
-          </div>
-        </MainLayout>
-      </div>
-    )
+          ) : (
+            <div className="w-full flex flex-col md:flex-row my-10 gap-y-8 items-center justify-center">
+              <p className="font-bold text-xl text-center">Grant not found</p>
+            </div>
+          )}
+        </div>
+      </MainLayout>
+    </div>
   );
 }

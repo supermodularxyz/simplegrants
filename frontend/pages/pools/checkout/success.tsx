@@ -11,6 +11,7 @@ import { usePoolCartStore } from "../../../utils/store";
 import Image from "next/image";
 import Copy from "../../../components/icons/Copy";
 import { FacebookShareButton, TwitterShareButton } from "react-share";
+import { toast } from "react-toastify";
 
 export default function CheckoutSuccess() {
   const [loading, setLoading] = React.useState(false);
@@ -31,25 +32,30 @@ export default function CheckoutSuccess() {
   }, [data]);
 
   React.useEffect(() => {
-    setLoading(true);
     // If we have a session ID, we can make a call to the backend
     if (router.query.session_id) {
+      setLoading(true);
       axios
         .get(`/checkout/${router.query.session_id}`)
         .then((res) => {
           setData(res.data);
           // TODO: Ensure that this only runs if your checkout succeeds, not when you hit this page
-          clearCart();
+          if (!res.data) clearCart();
         })
         .catch((err) => {
           console.log(err);
-          // router.push("/pools");
+          toast.error(
+            err.response?.data?.message ||
+              err.message ||
+              "Something went wrong",
+            {
+              toastId: "retrieve-grant-error",
+            }
+          );
+          router.push("/pools");
         })
         .finally(() => setLoading(false));
     }
-    // if (hasHydrated && !loading && !router.query.session_id) {
-    //   router.push("/pools");
-    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query, hasHydrated, router]);
 
@@ -100,13 +106,17 @@ export default function CheckoutSuccess() {
                     url={shareInformation.url}
                     title={shareInformation.message}
                   >
-                    <Button style="outline">Share on Twitter</Button>
+                    <p className="btn font-bold lg:text-lg px-4 md:px-12 py-3 h-max rounded-full normal-case btn-outline btn-secondary w-max">
+                      Share on Twitter
+                    </p>
                   </TwitterShareButton>
                   <FacebookShareButton
                     url={shareInformation.url}
                     quote={shareInformation.message}
                   >
-                    <Button style="outline">Share on Facebook</Button>
+                    <p className="btn font-bold lg:text-lg px-4 md:px-12 py-3 h-max rounded-full normal-case btn-outline btn-secondary w-max">
+                      Share on Facebook
+                    </p>
                   </FacebookShareButton>
                 </div>
               </>

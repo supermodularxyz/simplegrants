@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { GrantDetailResponse } from "../../types/grant";
+import { GrantDetailResponse } from "../../../types/grant";
 
 interface GrantState {
   grant?: GrantDetailResponse;

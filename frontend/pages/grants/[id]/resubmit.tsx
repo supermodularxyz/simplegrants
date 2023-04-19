@@ -57,6 +57,10 @@ export default function ResubmitGrant() {
   } = useForm<ValidationSchema>({
     resolver: zodResolver(validationSchema),
   });
+  const [error, setError] = React.useState<{
+    message: string;
+    statusCode: number;
+  }>();
 
   const getGrant = () => {
     setLoading(true);
@@ -72,9 +76,13 @@ export default function ResubmitGrant() {
       })
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-grant-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-grant-error",
+          }
+        );
+        setError(err.response?.data);
       })
       .finally(() => setLoading(false));
   };
@@ -115,7 +123,9 @@ export default function ResubmitGrant() {
       })
       .catch((err) => {
         console.error(err);
-        toast.error(err.message);
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong"
+        );
       })
       .finally(() => {
         setLoading(false);
@@ -280,7 +290,7 @@ export default function ResubmitGrant() {
               <Button
                 className="mt-6"
                 onClick={handleSubmit(onSubmit)}
-                disabled={loading}
+                disabled={loading || !!error}
               >
                 Resubmit Grant
               </Button>

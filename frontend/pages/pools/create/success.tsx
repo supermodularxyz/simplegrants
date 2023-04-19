@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import PoolCard from "../../../components/pool/PoolCard";
 import { usePoolStore } from "../../../utils/store";
 import Copy from "../../../components/icons/Copy";
-import { PoolDetailResponse, PoolResponse } from "../../../types/pool";
+import { PoolResponse } from "../../../types/pool";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
@@ -17,7 +17,7 @@ import { TwitterShareButton, FacebookShareButton } from "react-share";
 export default function CreatePoolSuccess() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { pool, clearGrantsFromPool } = usePoolStore();
+  const { pool } = usePoolStore();
   const [createdPool, setCreatedPool] = React.useState<PoolResponse>();
   const shareInformation = React.useMemo(() => {
     if (typeof window !== undefined && createdPool) {
@@ -43,7 +43,6 @@ export default function CreatePoolSuccess() {
       router.push("/pools");
     }
     setCreatedPool(pool);
-    clearGrantsFromPool();
   }, []);
 
   return (
@@ -107,13 +106,17 @@ export default function CreatePoolSuccess() {
                 url={shareInformation.url}
                 title={shareInformation.message}
               >
-                <Button style="outline">Share on Twitter</Button>
+                <p className="btn font-bold lg:text-lg px-4 md:px-12 py-3 h-max rounded-full normal-case btn-outline btn-secondary w-max">
+                  Share on Twitter
+                </p>
               </TwitterShareButton>
               <FacebookShareButton
                 url={shareInformation.url}
                 quote={shareInformation.message}
               >
-                <Button style="outline">Share on Facebook</Button>
+                <p className="btn font-bold lg:text-lg px-4 md:px-12 py-3 h-max rounded-full normal-case btn-outline btn-secondary w-max">
+                  Share on Facebook
+                </p>
               </FacebookShareButton>
             </div>
           </div>

@@ -14,6 +14,7 @@ import { PaymentAccount } from 'src/payment-accounts/payment-accounts.interface'
 import { UserProfile } from 'src/users/users.interface';
 
 // Creating a mock result
+// TODO: Change & fix types
 const users: UserProfile[] = [...Array(3)].map((_, index) => {
   const userData = randUser();
 

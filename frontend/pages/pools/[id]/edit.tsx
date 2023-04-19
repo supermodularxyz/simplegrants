@@ -68,6 +68,10 @@ export default function EditPool() {
     clearGrantsFromPool,
     resetGrantsInPool,
   } = usePoolStore();
+  const [error, setError] = React.useState<{
+    message: string;
+    statusCode: number;
+  }>();
 
   const startDate = watch("startDate", new Date());
 
@@ -87,7 +91,9 @@ export default function EditPool() {
         })
         .catch((err) => {
           console.error(err);
-          toast.error(err.response.data.message);
+          toast.error(
+            err.response?.data?.message || err.message || "Something went wrong"
+          );
         })
         .finally(() => {
           setLoading(false);
@@ -122,9 +128,16 @@ export default function EditPool() {
       })
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-pool-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-pool-error",
+          }
+        );
+        setError(err.response?.data);
+        if (err.response?.status === 404) {
+          clearGrantsFromPool();
+        }
       })
       .finally(() => setLoading(false));
   };
@@ -227,6 +240,7 @@ export default function EditPool() {
                             .max(dayjs(), dayjs(startDate))
                             .add(1, "day")
                             .toDate()}
+                          disabled={!!error}
                           value={value}
                           errors={errors}
                           name={name}
@@ -240,14 +254,19 @@ export default function EditPool() {
                   width="full"
                   className="mt-6"
                   onClick={handleSubmit(onSubmit)}
-                  disabled={loading}
+                  disabled={loading || !!error}
                 >
                   Save changes
                 </Button>
               </Card>
               <Card
-                className="border-sg-secondary border px-4 py-6 flex flex-col items-center justify-center group min-h-[420px] md:min-h-[520px] cursor-pointer"
-                onClick={() => setIsOpen(true)}
+                className={clsx(
+                  "border-sg-secondary border px-4 py-6 flex flex-col items-center justify-center min-h-[420px] md:min-h-[520px]",
+                  !!error
+                    ? "opacity-50 cursor-default"
+                    : "opacity-100 group cursor-pointer"
+                )}
+                onClick={() => (!!error ? undefined : setIsOpen(true))}
               >
                 <Add className="group-hover:scale-110 transition-all duration-200" />
                 <p className="text-center mt-2 font-bold text-2xl">Add Grant</p>

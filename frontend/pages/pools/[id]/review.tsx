@@ -33,9 +33,12 @@ export default function ReviewPool() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-pool-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-pool-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
@@ -50,9 +53,12 @@ export default function ReviewPool() {
       })
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-grant-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-grant-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
@@ -76,33 +82,36 @@ export default function ReviewPool() {
       .then(() => router.push(`/pools/${id}`))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.response.data.message || "Something went wrong", {
-          toastId: "review-pool",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "review-pool",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
 
   return (
-    data && (
-      <div>
-        <Head>
-          <title>{data.name} | SimpleGrants</title>
-          <meta
-            name="description"
-            content="Join us in making an impact through quadratic funding."
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+    <div>
+      <Head>
+        <title>{data?.name || "Pool not found"} | SimpleGrants</title>
+        <meta
+          name="description"
+          content="Join us in making an impact through quadratic funding."
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
-        <MainLayout>
-          <Navbar className="p-0" location="pools">
-            <Link href="/pools/create">
-              <Button>Create Pool</Button>
-            </Link>
-          </Navbar>
-          <div className="flex flex-col items-start justify-center px-4 md:px-8 my-2 w-full">
-            <BackButton href="/pools">Back to pools</BackButton>
+      <MainLayout>
+        <Navbar className="p-0" location="pools">
+          <Link href="/pools/create">
+            <Button>Create Pool</Button>
+          </Link>
+        </Navbar>
+        <div className="flex flex-col items-start justify-center px-4 md:px-8 my-2 w-full">
+          <BackButton href="/pools">Back to pools</BackButton>
+          {data ? (
             <div className="w-full flex flex-col md:flex-row my-10 gap-y-8">
               <div className="basis-full md:basis-3/5 md:px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
@@ -143,7 +152,7 @@ export default function ReviewPool() {
                   <div className="flex flex-col col-span-1">
                     <p className="">
                       <b className="text-2xl">
-                        {dayjs(data.endDate).diff(dayjs(), "days")}
+                        {Math.max(dayjs(data.endDate).diff(dayjs(), "days"))}
                       </b>
                       <br />
                       days to go
@@ -167,27 +176,31 @@ export default function ReviewPool() {
                 </div>
               </div>
             </div>
-          </div>
-        </MainLayout>
-        <Dialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          className="relative z-50"
-        >
-          {/* The backdrop, rendered as a fixed sibling to the panel container */}
-          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+          ) : (
+            <div className="w-full flex flex-col md:flex-row my-10 gap-y-8 items-center justify-center">
+              <p className="font-bold text-xl text-center">Pool not found</p>
+            </div>
+          )}
+        </div>
+      </MainLayout>
+      <Dialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        className="relative z-50"
+      >
+        {/* The backdrop, rendered as a fixed sibling to the panel container */}
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
-          {/* Full-screen container to center the panel */}
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            {/* The actual dialog panel  */}
-            <Dialog.Panel className="max-w-7xl rounded bg-white h-max">
-              {grant && (
-                <GrantModal grant={grant} onClose={() => setIsOpen(false)} />
-              )}
-            </Dialog.Panel>
-          </div>
-        </Dialog>
-      </div>
-    )
+        {/* Full-screen container to center the panel */}
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          {/* The actual dialog panel  */}
+          <Dialog.Panel className="max-w-7xl rounded bg-white h-max">
+            {grant && (
+              <GrantModal grant={grant} onClose={() => setIsOpen(false)} />
+            )}
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+    </div>
   );
 }

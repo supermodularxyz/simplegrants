@@ -31,9 +31,14 @@ export default function Home() {
         })
         .catch((err) => {
           console.error(err);
-          toast.error(err.response?.data?.message || err.message, {
-            toastId: "user-profile",
-          });
+          toast.error(
+            err.response?.data?.message ||
+              err.message ||
+              "Something went wrong",
+            {
+              toastId: "user-profile",
+            }
+          );
         })
         .finally(() => {
           setLoading(false);
@@ -94,7 +99,7 @@ export default function Home() {
                     })}{" "}
                     USD
                   </p>
-                  {data.totalContributed && (
+                  {data.totalContributed ? (
                     <>
                       <p className="font-bold text-xl text-sg-accent">
                         Total Contributed Amount (To Pools)
@@ -107,8 +112,10 @@ export default function Home() {
                         USD
                       </p>
                     </>
+                  ) : (
+                    <></>
                   )}
-                  {data.totalPooled && (
+                  {data.totalPooled ? (
                     <>
                       <p className="font-bold text-xl text-sg-accent">
                         Total Raised Amount (From Pools)
@@ -121,9 +128,11 @@ export default function Home() {
                         USD
                       </p>
                     </>
+                  ) : (
+                    <></>
                   )}
                 </div>
-                <div className="basis-full shrink-0 md:basis-2/3 lg:basis-3/4 px-8 sm:px-12 md:px-14 py-20 md:pt-24 pb-6">
+                <div className="basis-full shrink-0 md:basis-2/3 lg:basis-3/4 px-8 sm:px-12 md:px-14 py-20 md:pt-24">
                   <Tabs.Root
                     className="flex flex-col w-full items-center md:items-start"
                     defaultValue="donations"
@@ -165,35 +174,47 @@ export default function Home() {
                       className="flex flex-col gap-10"
                       value="donations"
                     >
-                      {data.donations.map((donation) => (
-                        <DonationList
-                          grant={donation.grant}
-                          contribution={donation}
-                          key={donation.id}
-                          onClick={() =>
-                            router.push(`/grants/${donation.grantId}`)
-                          }
-                        />
-                      ))}
+                      {data.donations.length > 0 ? (
+                        data.donations.map((donation) => (
+                          <DonationList
+                            grant={donation.grant}
+                            contribution={donation}
+                            key={donation.id}
+                            onClick={() =>
+                              router.push(`/grants/${donation.grantId}`)
+                            }
+                          />
+                        ))
+                      ) : (
+                        <p className="text-xl text-center">
+                          No donations to grants have been made
+                        </p>
+                      )}
                     </Tabs.Content>
                     <Tabs.Content
                       className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10"
                       value="grants"
                     >
-                      {data.grants.map((grant) => (
-                        <GrantCard
-                          grant={grant}
-                          key={grant.id}
-                          onClick={() => router.push(`/grants/${grant.id}`)}
-                          hideButton
-                        />
-                      ))}
+                      {data.grants.length > 0 ? (
+                        data.grants.map((grant) => (
+                          <GrantCard
+                            grant={grant}
+                            key={grant.id}
+                            onClick={() => router.push(`/grants/${grant.id}`)}
+                            hideButton
+                          />
+                        ))
+                      ) : (
+                        <p className="text-xl text-center">
+                          No grants have been created
+                        </p>
+                      )}
                     </Tabs.Content>
                     <Tabs.Content
                       className="flex flex-col gap-10"
                       value="contributions"
                     >
-                      {data.contributions &&
+                      {data.contributions ? (
                         data.contributions.map((contribution) => (
                           <PoolDonationList
                             contribution={contribution}
@@ -204,13 +225,18 @@ export default function Home() {
                               )
                             }
                           />
-                        ))}
+                        ))
+                      ) : (
+                        <p className="text-xl text-center">
+                          No contributions to matching pools found
+                        </p>
+                      )}
                     </Tabs.Content>
                     <Tabs.Content
                       className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10"
                       value="pools"
                     >
-                      {data.pools &&
+                      {data.pools ? (
                         data.pools.map((pool) => (
                           <PoolCard
                             pool={pool as any}
@@ -218,7 +244,12 @@ export default function Home() {
                             onClick={() => router.push(`/pools/${pool.id}`)}
                             hideButton
                           />
-                        ))}
+                        ))
+                      ) : (
+                        <p className="text-xl text-center">
+                          No matching pools have been created
+                        </p>
+                      )}
                     </Tabs.Content>
                   </Tabs.Root>
                 </div>

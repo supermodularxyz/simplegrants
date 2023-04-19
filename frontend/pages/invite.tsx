@@ -50,9 +50,12 @@ export default function GetStarted() {
       })
       .catch((err) => {
         console.error(err);
-        toast.error(err.response.data.message, {
-          toastId: "ecosystem-builder",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "ecosystem-builder",
+          }
+        );
       })
       .finally(() => {
         setLoading(false);

@@ -1,7 +1,3 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { getProviders, signIn } from "next-auth/react";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "./api/auth/[...nextauth]";
 import Head from "next/head";
 import React from "react";
 import MainLayout from "../layouts/MainLayout";
@@ -44,7 +40,7 @@ export default function GetStarted() {
             <Button
               style="outline"
               className="min-w-[180px] text-base"
-              onClick={() => router.push("/grants/")}
+              onClick={() => router.push("/pools/")}
             >
               Contribute
             </Button>

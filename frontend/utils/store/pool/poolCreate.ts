@@ -4,7 +4,7 @@ import { PoolResponse } from "../../../types/pool";
 import { GrantResponse } from "../../../types/grant";
 
 interface PoolState {
-  pool?: PoolResponse;
+  pool?: PoolResponse; // This is the information about the pool after the user has created it
   grants: GrantResponse[];
   savePool: (pool: PoolResponse) => void;
   clearPool: () => void;

@@ -60,9 +60,12 @@ export default function PoolsCheckout() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "checkout-pools-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "checkout-pools-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };

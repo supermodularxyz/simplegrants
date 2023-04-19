@@ -44,9 +44,12 @@ export default function Grants() {
       .then((res) => setData(res.data))
       .catch((err) => {
         console.error({ err });
-        toast.error(err.message || "Something went wrong", {
-          toastId: "retrieve-grants-error",
-        });
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+          {
+            toastId: "retrieve-grants-error",
+          }
+        );
       })
       .finally(() => setLoading(false));
   };
@@ -143,28 +146,36 @@ export default function Grants() {
               </ToggleGroup.Root>
             </div>
           </div>
-          {view === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-y-8 gap-x-10 w-full my-6 justify-items-center">
-              {data &&
-                data.map((grant) => (
-                  <GrantCard
-                    hideButton={!session}
-                    grant={grant}
-                    onClick={() => router.push(`/grants/${grant.id}`)}
-                    key={grant.id}
-                  />
-                ))}
-            </div>
+          {data && data.length > 0 ? (
+            view === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-y-8 gap-x-10 w-full my-6 justify-items-center">
+                {data &&
+                  data.map((grant) => (
+                    <GrantCard
+                      hideButton={!session}
+                      grant={grant}
+                      onClick={() => router.push(`/grants/${grant.id}`)}
+                      key={grant.id}
+                    />
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-y-8 gap-x-10 w-full max-w-7xl my-6">
+                {data &&
+                  data.map((grant) => (
+                    <GrantList
+                      grant={grant}
+                      onClick={() => router.push(`/grants/${grant.id}`)}
+                      key={grant.id}
+                    />
+                  ))}
+              </div>
+            )
           ) : (
-            <div className="flex flex-col gap-y-8 gap-x-10 w-full max-w-7xl my-6">
-              {data &&
-                data.map((grant) => (
-                  <GrantList
-                    grant={grant}
-                    onClick={() => router.push(`/grants/${grant.id}`)}
-                    key={grant.id}
-                  />
-                ))}
+            <div className="flex flex-col items-center justify-center">
+              <p className="font-bold text-xl text-center my-8">
+                No grants found
+              </p>
             </div>
           )}
         </div>

@@ -107,13 +107,17 @@ export default function CreateGrantSuccess() {
                 url={shareInformation.url}
                 title={shareInformation.message}
               >
-                <Button style="outline">Share on Twitter</Button>
+                <p className="btn font-bold lg:text-lg px-4 md:px-12 py-3 h-max rounded-full normal-case btn-outline btn-secondary w-max">
+                  Share on Twitter
+                </p>
               </TwitterShareButton>
               <FacebookShareButton
                 url={shareInformation.url}
                 quote={shareInformation.message}
               >
-                <Button style="outline">Share on Facebook</Button>
+                <p className="btn font-bold lg:text-lg px-4 md:px-12 py-3 h-max rounded-full normal-case btn-outline btn-secondary w-max">
+                  Share on Facebook
+                </p>
               </FacebookShareButton>
             </div>
           </div>
