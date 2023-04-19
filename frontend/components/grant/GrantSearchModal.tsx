@@ -91,10 +91,12 @@ const GrantSearchModal = ({
 
   React.useEffect(() => {
     getGrants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
     getGrants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort, filter, search]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
