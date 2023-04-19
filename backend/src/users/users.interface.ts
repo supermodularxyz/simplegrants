@@ -1,9 +1,13 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { EcosystemBuilder, Role } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 import { IsString } from 'class-validator';
-import { UserProfileContributionInfo } from 'src/contributions/contributions.interface';
+import {
+  UserProfileContributionInfo,
+  UserProfileDonationInfo,
+} from 'src/contributions/contributions.interface';
 import { GrantResponseWithContributions } from 'src/grants/grants.interface';
+import { UserProfilePoolResponse } from 'src/pool/pool.interface';
 
 /**
  * Typed interface for `@Request()` calls protected by NextAuthGuard
@@ -89,16 +93,29 @@ export class User {
  */
 export class UserProfile extends User {
   @ApiResponseProperty({
-    type: [UserProfileContributionInfo],
+    type: [UserProfileDonationInfo],
   })
-  @Type(() => UserProfileContributionInfo)
-  contributions: UserProfileContributionInfo[];
+  @Type(() => UserProfileDonationInfo)
+  donations: UserProfileDonationInfo[];
 
   @ApiResponseProperty({
     type: [GrantResponseWithContributions],
   })
   @Type(() => GrantResponseWithContributions)
   grants: GrantResponseWithContributions[];
+
+  // These two fields only exist if you're an ecosystem builder
+  @ApiResponseProperty({
+    type: [UserProfileContributionInfo],
+  })
+  @Type(() => UserProfileContributionInfo)
+  contributions?: UserProfileContributionInfo[];
+
+  @ApiResponseProperty({
+    type: [UserProfilePoolResponse],
+  })
+  @Type(() => UserProfilePoolResponse)
+  pools?: UserProfilePoolResponse[];
 
   @ApiResponseProperty({
     type: Number,
@@ -109,6 +126,19 @@ export class UserProfile extends User {
     type: Number,
   })
   totalRaised: number;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  totalContributed?: number;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  totalPooled?: number;
+
+  @Exclude()
+  ecosystemBuilder: EcosystemBuilder;
 
   constructor(partial: Partial<UserProfile>) {
     super(partial);

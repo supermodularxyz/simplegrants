@@ -166,6 +166,74 @@ export class PoolResponse extends BasicPoolResponse {
 }
 
 /**
+ * Minimal pool details about a specific pool
+ *
+ * This includes:
+ * @param amountRaised Computed value of total amount raised in this pool
+ */
+export class MinimalPoolResponse {
+  @ApiResponseProperty({
+    type: String,
+  })
+  id: string;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  name: string;
+
+  @ApiResponseProperty({
+    type: Boolean,
+  })
+  paid: boolean;
+
+  @ApiResponseProperty({
+    type: Boolean,
+  })
+  verified: boolean;
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  startDate: Date;
+
+  @ApiResponseProperty({
+    type: Date,
+  })
+  endDate: Date;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+
+  constructor(partial: Partial<MinimalPoolResponse>) {
+    Object.assign(this, partial);
+  }
+}
+
+/**
+ * Minimal pool details about a specific pool
+ *
+ * Used in User Profile
+ *
+ * This includes:
+ * @param amountRaised Computed value of total amount raised in this pool
+ */
+export class UserProfilePoolResponse extends MinimalPoolResponse {
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amountRaised: number;
+
+  constructor(partial: Partial<UserProfilePoolResponse>) {
+    super(partial);
+    Object.assign(this, partial);
+  }
+}
+
+/**
  * Full pool details about a specific pool
  * This includes:
  * @param amountRaised Computed value of total amount raised in this pool

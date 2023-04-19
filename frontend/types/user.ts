@@ -1,6 +1,10 @@
 import { GrantResponseWithContributions } from "./grant";
-import { UserProfileContributionInfo } from "./contributions";
+import {
+  UserProfileContributionInfo,
+  UserProfileDonationInfo,
+} from "./contributions";
 import { Role } from "@prisma/client";
+import { MinimalPoolResponse } from "./pool";
 
 export interface User {
   id: string;
@@ -14,8 +18,10 @@ export interface User {
 }
 
 export interface UserProfile extends User {
-  contributions: UserProfileContributionInfo[];
+  donations: UserProfileDonationInfo[];
   grants: GrantResponseWithContributions[];
+  contributions: UserProfileContributionInfo[];
+  pools: MinimalPoolResponse[];
   totalDonated: number;
   totalRaised: number;
 }

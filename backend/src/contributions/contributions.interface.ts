@@ -1,6 +1,7 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 import { Exclude, Type } from 'class-transformer';
 import { BasicGrantResponse } from 'src/grants/grants.interface';
+import { MinimalPoolResponse } from 'src/pool/pool.interface';
 
 /**
  * Information about a specific contribution
@@ -58,11 +59,11 @@ export class Contribution {
 }
 
 /**
- * Contribution info for user profile
+ * Donation info for user profile
  *
  * Includes `Grant` but shows minimal information, just enough for frontend rendering
  */
-export class UserProfileContributionInfo {
+export class UserProfileDonationInfo {
   @ApiResponseProperty({
     type: String,
   })
@@ -112,6 +113,69 @@ export class UserProfileContributionInfo {
 
   @Exclude()
   matchingRoundId: string | null;
+
+  @Exclude()
+  flagged: boolean;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+
+  constructor(partial: Partial<UserProfileDonationInfo>) {
+    Object.assign(this, partial);
+  }
+}
+
+/**
+ * Pool contribution info for user profile
+ *
+ * Includes `MatchingRound` but shows minimal information, just enough for frontend rendering
+ */
+export class UserProfileContributionInfo {
+  @ApiResponseProperty({
+    type: String,
+  })
+  id: string;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amount: number;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  denomination: string;
+
+  @ApiResponseProperty({
+    type: Number,
+  })
+  amountUsd: number;
+
+  @Exclude()
+  grantId: string;
+
+  @Exclude()
+  grant: any;
+
+  @Exclude()
+  userId: string;
+
+  @Exclude()
+  paymentMethodId: string;
+
+  @ApiResponseProperty({
+    type: String,
+  })
+  matchingRoundId: string | null;
+
+  @ApiResponseProperty({
+    type: MinimalPoolResponse,
+  })
+  @Type(() => MinimalPoolResponse)
+  matchingRound: MinimalPoolResponse;
 
   @Exclude()
   flagged: boolean;

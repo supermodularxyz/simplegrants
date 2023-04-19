@@ -15,6 +15,15 @@ export interface PoolResponse extends BasicPoolResponse {
   amountRaised: number;
 }
 
+export interface MinimalPoolResponse {
+  id: string;
+  name: string;
+  paid: boolean;
+  verified: boolean;
+  startDate: Date;
+  endDate: Date;
+}
+
 export interface PoolDetailResponse extends BasicPoolResponse {
   amountRaised: number;
   team: User[];
