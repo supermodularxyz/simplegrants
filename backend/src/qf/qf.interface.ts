@@ -1,3 +1,20 @@
+import { Contribution, EcosystemBuilder, Grant } from '@prisma/client';
+import { MatchedFund } from 'src/matched-funds/matched-funds.interface';
+
+export class MatchingRound {
+  id: string;
+  name: string;
+  funders: EcosystemBuilder[];
+  contributions: Contribution[];
+  grants: Grant[];
+  matchedFunds: MatchedFund[];
+  verified: boolean;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
  * The amount contributed per unique user and the qfValue of each contribution
  * The qfValue is defined as the square root of the contribution amount
@@ -36,5 +53,20 @@ interface GrantQfValues {
 export interface PoolQfInformation {
   grants: GrantQfInformation;
   qfValues: GrantQfValues;
+  recipients: {
+    [grantId: string]: string;
+  };
   sumOfQfValues: number;
+}
+
+export interface PoolMatchInformation {
+  grants: {
+    [grantId: string]: {
+      qfValue: number;
+      qfAmount: number;
+      recipientAddress: string;
+    };
+  };
+  sumOfQfValues: number;
+  totalFundsInPool: number;
 }

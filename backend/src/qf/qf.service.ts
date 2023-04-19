@@ -1,10 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, LoggerService } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PoolQfInformation } from './qf.interface';
+import { PoolMatchInformation, PoolQfInformation } from './qf.interface';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { ProviderService } from 'src/provider/provider.service';
 
 @Injectable()
 export class QfService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly providerService: ProviderService,
+  ) {}
+
+  private logger: LoggerService = new Logger(QfService.name);
 
   /**
    * Get the latest active matching round the grant is part of
@@ -73,6 +80,7 @@ export class QfService {
         grants: {
           include: {
             contributions: true, // Contributions to grant
+            paymentAccount: true,
           },
         },
       },
@@ -87,6 +95,7 @@ export class QfService {
     const qfInfo: PoolQfInformation = {
       grants: {},
       qfValues: {},
+      recipients: {},
       sumOfQfValues: 0,
     };
 
@@ -116,6 +125,7 @@ export class QfService {
 
       // Then now we can store the unique contributions under the grant
       qfInfo.grants[grant.id] = grantContributionInfo;
+      qfInfo.recipients[grant.id] = grant.paymentAccount.recipientAddress;
     });
 
     /**
@@ -145,13 +155,11 @@ export class QfService {
         const qfValue = qfInfo.qfValues[grantId];
         const qfPercentage = qfValue / qfInfo.sumOfQfValues;
         const qfAmount = qfPercentage * totalFundsInPool;
-        console.log(
-          `Grant: ${grantId} will be getting $${qfAmount} in matched funds!`,
-        );
 
         grants[grantId] = {
           qfValue,
           qfAmount,
+          recipientAddress: qfInfo.recipients[grantId],
         };
 
         return {
@@ -165,11 +173,94 @@ export class QfService {
         grants: {},
         sumOfQfValues: 0,
         totalFundsInPool: 0,
-      },
+      } as PoolMatchInformation,
     );
   }
 
+  @Cron(CronExpression.EVERY_HOUR)
   async distributeMatchedFunds() {
-    // Find every ended pool & distribute the funds
+    // Find every ended pool
+    const endedPools = await this.prismaService.matchingRound.findMany({
+      where: {
+        endDate: {
+          lte: new Date(),
+        },
+        paid: false,
+      },
+    });
+
+    this.logger.log(`${endedPools.length} pools found to process`);
+
+    // Once we found a pool that has ended, we will need to calculate the qf amount
+    for (let i = 0; i < endedPools.length; i++) {
+      const pool = endedPools[i];
+      const qfInfo = await this.calculateQuadraticFundingAmount(pool.id);
+
+      // Within this pool, we now need to transfer the match amount to each grant & store the info
+      // First, we set the pool as paid. This is an extra security step
+      await this.prismaService.matchingRound.update({
+        where: {
+          id: pool.id,
+        },
+        data: {
+          paid: true,
+        },
+      });
+
+      // Payout funds
+      const payoutPromise = Object.keys(qfInfo.grants).map(async (grantId) => {
+        const info = qfInfo.grants[grantId];
+
+        this.logger.log(
+          `✈️ Sending ${info.qfAmount} to ${info.recipientAddress}...`,
+        );
+
+        // For each grant, we will get the payment account and initiate a fund transfer
+        await this.providerService.initiateTransfer(
+          info.recipientAddress,
+          info.qfAmount,
+        );
+
+        this.logger.log(`✅ Funds sent to ${info.recipientAddress}`);
+
+        // Once it is done, we return the info
+        return {
+          amount: info.qfAmount,
+          denomination: 'USD',
+          amountUsd: info.qfAmount,
+          matchingRoundId: pool.id,
+          grantId,
+          payoutAt: new Date(),
+        };
+      });
+
+      const promises = await Promise.allSettled(payoutPromise);
+
+      // Only successful payouts are saved
+      const payout = promises
+        .filter((promise) => promise.status === 'fulfilled')
+        .map((promise: PromiseFulfilledResult<any>) => promise.value);
+
+      if (payout.length > 0) {
+        // Save matched fund info
+        await this.prismaService.matchedFund.createMany({
+          data: payout,
+        });
+
+        this.logger.log(
+          `🤑 Success! Paid out matching funds for pool ID: ${pool.id}`,
+        );
+      } else {
+        this.logger.error(
+          `❌ Failed! Unable to payout matching funds for pool ID: ${pool.id}`,
+        );
+
+        promises
+          .filter((promise) => promise.status === 'rejected')
+          .forEach((failed: PromiseRejectedResult) =>
+            this.logger.error(failed.reason),
+          );
+      }
+    }
   }
 }

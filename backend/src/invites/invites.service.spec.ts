@@ -3,7 +3,6 @@ import { InvitesService } from './invites.service';
 import { CacheModule, HttpException, HttpStatus } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import {
-  claimedCode,
   claimedInviteCode,
   inviteCode,
   prismaService,
@@ -11,7 +10,6 @@ import {
 } from 'test/fixtures';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserProfile } from 'src/users/users.interface';
-import { GrantSortOptions } from 'src/grants/grants.interface';
 
 describe('InvitesService', () => {
   let service: InvitesService;

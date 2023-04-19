@@ -51,6 +51,15 @@ export class ProviderService {
   }
 
   /**
+   * Transfers funds to a destination address
+   *
+   * This is used by the QF matching cron function
+   */
+  async initiateTransfer(to: string, amount: number) {
+    return await this.paymentProvider.initiateTransfer(to, amount);
+  }
+
+  /**
    * Call the function to handle the payment webhook
    * If the adapter doesn't have a webhook, it just skips this function
    * @param data

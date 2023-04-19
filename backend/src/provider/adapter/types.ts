@@ -26,6 +26,7 @@ export interface PaymentProviderAdapter {
     feeAllocation: FeeAllocationMethod,
     user: User,
   ): any;
+  initiateTransfer(to: string, amount: number): Promise<any>;
   handleWebhook?(data: any): Promise<void>;
   retrieveCheckoutInfo?(sessionId: string): Promise<SuccessfulCheckoutInfo>;
 }

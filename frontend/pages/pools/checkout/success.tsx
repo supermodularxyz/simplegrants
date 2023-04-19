@@ -40,7 +40,7 @@ export default function CheckoutSuccess() {
         .then((res) => {
           setData(res.data);
           // TODO: Ensure that this only runs if your checkout succeeds, not when you hit this page
-          if (!res.data) clearCart();
+          clearCart();
         })
         .catch((err) => {
           console.log(err);

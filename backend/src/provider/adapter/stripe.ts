@@ -349,6 +349,17 @@ export class StripeProvider implements PaymentProviderAdapter {
     return session;
   }
 
+  async initiateTransfer(to: string, amount: number): Promise<any> {
+    const provider = await this.getDetails();
+    const transfer = await this.stripe.transfers.create({
+      amount: Math.round(this.roundNumber(amount) * 100),
+      currency: provider.denominations[0],
+      destination: to,
+    });
+
+    return transfer;
+  }
+
   /**
    * We need to retrieve all checkout items tied to the specific transfer_group
    * Also need to retrieve & store the payment method to the table
@@ -447,7 +458,7 @@ export class StripeProvider implements PaymentProviderAdapter {
 
       for await (const checkout of checkoutsToProcess) {
         await this.stripe.transfers.create({
-          amount: checkout.amount * 100, // multiply 100 because of the way stripe calculates
+          amount: Math.round(checkout.amount * 100), // multiply 100 because of the way stripe calculates
           currency: checkout.denomination,
           destination: checkout.grant.paymentAccount.recipientAddress,
           transfer_group: transferGroup,
