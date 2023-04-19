@@ -7,8 +7,18 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto, UserProfile } from './users.interface';
-import { Contribution, Grant, MatchedFund, User } from '@prisma/client';
-import { UserProfileContributionInfo } from 'src/contributions/contributions.interface';
+import {
+  Contribution,
+  EcosystemBuilder,
+  Grant,
+  MatchedFund,
+  MatchingRound,
+  User,
+} from '@prisma/client';
+import {
+  UserProfileContributionInfo,
+  UserProfileDonationInfo,
+} from 'src/contributions/contributions.interface';
 
 @Injectable()
 export class UsersService {
@@ -17,21 +27,25 @@ export class UsersService {
 
   calculateUserDonationMetrics(
     user: User & {
-      grants: (Grant & {
-        contributions: Contribution[];
-      })[];
       contributions: (Contribution & {
         grant: Grant & {
-          contributions: Contribution[];
           matchedFund: MatchedFund[];
+          contributions: Contribution[];
         };
+        matchingRound: MatchingRound;
       })[];
+      grants: (Grant & { contributions: Contribution[] })[];
+      ecosystemBuilder: EcosystemBuilder & {
+        matchingRounds: (MatchingRound & { contributions: Contribution[] })[];
+      };
     },
   ): UserProfile {
     /**
-     * Now we need to calculate total donated amount and total raised amount
+     * Now we need to calculate a few things
      * 1. Total donated amount - Amount they have contributed to all grants
      * 2. Total raised amount - Amount they have raised from all their owned grants
+     * 3. Total contributed amount - Amount they have contributed to all pools
+     * 4. Total pooled amount - Amount they have raised from all their owned pools
      *
      * Since we need to display the donations and grants in the frontend,
      * we might as well calculate them manually here
@@ -43,37 +57,39 @@ export class UsersService {
      * 3. Divide the values to get an approximation of how much the user's
      *    contribution was matched to
      */
-    const contributions = user.contributions.reduce((prev, contribution) => {
-      const grantIndex = prev.findIndex(
-        (cont) => cont.grantId === contribution.grantId,
-      );
-      if (grantIndex === -1) {
-        return [
-          ...prev,
-          {
-            ...contribution,
-            totalMatched: contribution.grant.matchedFund.reduce(
-              (prev, fund) => prev + fund.amountUsd,
-              0,
-            ),
-            totalDonated: contribution.grant.contributions.reduce(
-              (prev, cont) => prev + cont.amountUsd,
-              0,
-            ),
-          },
-        ];
-      } else {
-        const temp = prev[grantIndex];
+    const donations = user.contributions
+      .filter((contribution) => contribution.grant)
+      .reduce((prev, contribution) => {
+        const grantIndex = prev.findIndex(
+          (cont) => cont.grantId === contribution.grantId,
+        );
+        if (grantIndex === -1) {
+          return [
+            ...prev,
+            {
+              ...contribution,
+              totalMatched: contribution.grant.matchedFund.reduce(
+                (prev, fund) => prev + fund.amountUsd,
+                0,
+              ),
+              totalDonated: contribution.grant.contributions.reduce(
+                (prev, fund) => prev + fund.amountUsd,
+                0,
+              ),
+            },
+          ];
+        } else {
+          const temp = prev[grantIndex];
 
-        prev[grantIndex] = {
-          ...temp,
-          amountUsd: temp.amountUsd + contribution.amountUsd,
-          amount: temp.amount + contribution.amount,
-        };
+          prev[grantIndex] = {
+            ...temp,
+            amountUsd: temp.amountUsd + contribution.amountUsd,
+            amount: temp.amount + contribution.amount,
+          };
 
-        return [...prev];
-      }
-    }, [] as UserProfileContributionInfo[]);
+          return [...prev];
+        }
+      }, [] as UserProfileDonationInfo[]);
 
     const grants = user.grants.map((grant) => {
       return {
@@ -86,10 +102,10 @@ export class UsersService {
     });
 
     /**
-     * Now that we have both of these items, we can calculate the sum
+     * Now that we have all of these items, we can calculate the sum
      */
-    const totalDonated = contributions.reduce(
-      (prev, contribution) => prev + contribution.amountUsd,
+    const totalDonated = donations.reduce(
+      (prev, donation) => prev + donation.amountUsd,
       0,
     );
 
@@ -98,12 +114,58 @@ export class UsersService {
       0,
     );
 
+    let contributions, pools, totalContributed, totalPooled;
+
+    if (user.ecosystemBuilder) {
+      contributions = user.contributions
+        .filter((contribution) => contribution.matchingRound)
+        .reduce((prev, contribution) => {
+          const matchingRoundIndex = prev.findIndex(
+            (cont) => cont.matchingRoundId === contribution.matchingRoundId,
+          );
+          if (matchingRoundIndex === -1) {
+            return [...prev, contribution];
+          } else {
+            const temp = prev[matchingRoundIndex];
+
+            prev[matchingRoundIndex] = {
+              ...temp,
+              amountUsd: temp.amountUsd + contribution.amountUsd,
+              amount: temp.amount + contribution.amount,
+            };
+
+            return [...prev];
+          }
+        }, [] as UserProfileContributionInfo[]);
+
+      pools = user.ecosystemBuilder.matchingRounds.map((pool) => {
+        return {
+          ...pool,
+          amountRaised: pool.contributions.reduce(
+            (acc, contribution) => acc + contribution.amountUsd,
+            0,
+          ),
+        };
+      });
+
+      totalContributed = contributions.reduce(
+        (prev, contribution) => prev + contribution.amountUsd,
+        0,
+      );
+
+      totalPooled = pools.reduce((prev, pool) => prev + pool.amountRaised, 0);
+    }
+
     return {
       ...user,
       grants,
+      donations,
       contributions,
+      pools,
       totalDonated,
       totalRaised,
+      totalContributed,
+      totalPooled,
     };
   }
 
@@ -113,19 +175,34 @@ export class UsersService {
         id,
       },
       include: {
+        // Items I've donated to
         contributions: {
           include: {
+            // Grants I've dontated to, we need to know how much we got matched
             grant: {
               include: {
                 matchedFund: true,
-                contributions: true,
+                contributions: true, // This is to get all contributions by EVERYONE including myself
               },
             },
+            // Pools I've donated to
+            matchingRound: true,
           },
         },
+        // Grants I've created
         grants: {
           include: {
-            contributions: true,
+            contributions: true, // How much they raised
+          },
+        },
+        ecosystemBuilder: {
+          include: {
+            // Pools I've created
+            matchingRounds: {
+              include: {
+                contributions: true, // How much they raised
+              },
+            },
           },
         },
       },
@@ -156,11 +233,21 @@ export class UsersService {
                 contributions: true,
               },
             },
+            matchingRound: true,
           },
         },
         grants: {
           include: {
             contributions: true,
+          },
+        },
+        ecosystemBuilder: {
+          include: {
+            matchingRounds: {
+              include: {
+                contributions: true,
+              },
+            },
           },
         },
       },

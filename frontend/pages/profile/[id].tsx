@@ -11,7 +11,9 @@ import GrantCard from "../../components/grant/GrantCard";
 import Link from "next/link";
 import Button from "../../components/Button";
 import Navbar from "../../layouts/Navbar";
-import DonationList from "../../components/DonationList";
+import DonationList from "../../components/grant/DonationList";
+import PoolDonationList from "../../components/pool/DonationList";
+import PoolCard from "../../components/pool/PoolCard";
 
 export default function Home() {
   const router = useRouter();
@@ -85,13 +87,41 @@ export default function Home() {
                   <p className="font-bold text-xl text-sg-accent">
                     Total Raised Amount
                   </p>
-                  <p className="text-xl">
+                  <p className="text-xl mb-5">
                     ${" "}
                     {data.totalRaised.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                     })}{" "}
                     USD
                   </p>
+                  {data.totalContributed && (
+                    <>
+                      <p className="font-bold text-xl text-sg-accent">
+                        Total Contributed Amount (To Pools)
+                      </p>
+                      <p className="text-xl mb-5">
+                        ${" "}
+                        {data.totalContributed.toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        USD
+                      </p>
+                    </>
+                  )}
+                  {data.totalPooled && (
+                    <>
+                      <p className="font-bold text-xl text-sg-accent">
+                        Total Raised Amount (From Pools)
+                      </p>
+                      <p className="text-xl mb-5">
+                        ${" "}
+                        {data.totalPooled.toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        USD
+                      </p>
+                    </>
+                  )}
                 </div>
                 <div className="basis-full shrink-0 md:basis-2/3 lg:basis-3/4 px-8 sm:px-12 md:px-14 py-20 md:pt-24 pb-6">
                   <Tabs.Root
@@ -114,18 +144,34 @@ export default function Home() {
                       >
                         Grants
                       </Tabs.Trigger>
+                      {data.contributions && data.contributions.length > 0 && (
+                        <Tabs.Trigger
+                          className="data-[state=active]:text-sg-accent data-[state=active]:underline"
+                          value="contributions"
+                        >
+                          Contributions
+                        </Tabs.Trigger>
+                      )}
+                      {data.pools && data.pools.length > 0 && (
+                        <Tabs.Trigger
+                          className="data-[state=active]:text-sg-accent data-[state=active]:underline"
+                          value="pools"
+                        >
+                          Matching Pools
+                        </Tabs.Trigger>
+                      )}
                     </Tabs.List>
                     <Tabs.Content
                       className="flex flex-col gap-10"
                       value="donations"
                     >
-                      {data.contributions.map((contribution) => (
+                      {data.donations.map((donation) => (
                         <DonationList
-                          grant={contribution.grant}
-                          contribution={contribution}
-                          key={contribution.id}
+                          grant={donation.grant}
+                          contribution={donation}
+                          key={donation.id}
                           onClick={() =>
-                            router.push(`/grants/${contribution.grantId}`)
+                            router.push(`/grants/${donation.grantId}`)
                           }
                         />
                       ))}
@@ -142,6 +188,37 @@ export default function Home() {
                           hideButton
                         />
                       ))}
+                    </Tabs.Content>
+                    <Tabs.Content
+                      className="flex flex-col gap-10"
+                      value="contributions"
+                    >
+                      {data.contributions &&
+                        data.contributions.map((contribution) => (
+                          <PoolDonationList
+                            contribution={contribution}
+                            key={contribution.id}
+                            onClick={() =>
+                              router.push(
+                                `/pools/${contribution.matchingRoundId}`
+                              )
+                            }
+                          />
+                        ))}
+                    </Tabs.Content>
+                    <Tabs.Content
+                      className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10"
+                      value="pools"
+                    >
+                      {data.pools &&
+                        data.pools.map((pool) => (
+                          <PoolCard
+                            pool={pool as any}
+                            key={pool.id}
+                            onClick={() => router.push(`/pools/${pool.id}`)}
+                            hideButton
+                          />
+                        ))}
                     </Tabs.Content>
                   </Tabs.Root>
                 </div>

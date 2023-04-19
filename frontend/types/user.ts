@@ -24,4 +24,6 @@ export interface UserProfile extends User {
   pools: MinimalPoolResponse[];
   totalDonated: number;
   totalRaised: number;
+  totalContributed: number;
+  totalPooled: number;
 }
