@@ -55,9 +55,9 @@ model VerificationToken {
 
 // NextAuth User model, but with our additional extensions
 model User {
-  id               String             @id @default(cuid())
+  id               String            @id @default(cuid())
   name             String?
-  email            String?            @unique
+  email            String?           @unique
   emailVerified    DateTime?
   image            String?
   accounts         Account[]
@@ -68,11 +68,11 @@ model User {
   paymentMethods   PaymentMethod[]
   grants           Grant[]
   contributions    Contribution[]
-  role             Role               @default(User)
-  ecosystemBuilder EcosystemBuilder[]
-  flagged          Boolean            @default(false) // To track if a user is flagged for malicious activity
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  role             Role              @default(User)
+  ecosystemBuilder EcosystemBuilder?
+  flagged          Boolean           @default(false) // To track if a user is flagged for malicious activity
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   checkoutSessions Checkout[]
 }
 
