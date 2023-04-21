@@ -5,12 +5,14 @@ import { ErrorMessage } from "@hookform/error-message";
 import ErrorMessageText from "./ErrorMessageText";
 
 interface IInputProps extends React.HTMLProps<HTMLInputElement> {
+  rows?: number;
   className?: string;
   register?: UseFormRegister<any>;
   errors?: FieldErrors<any>;
 }
 
 export default function TextAreaInput({
+  rows = 8,
   className,
   required,
   register,
@@ -22,7 +24,7 @@ export default function TextAreaInput({
   return (
     <>
       <textarea
-        rows={8}
+        rows={rows}
         className={clsx(
           "border border-sg-200 w-full h-full focus:border-sg-primary rounded-lg px-5 py-4 outline-none",
           errors && !!errors[id || ""] ? "border-sg-error" : "border-sg-500"
