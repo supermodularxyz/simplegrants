@@ -17,7 +17,7 @@ import { TwitterShareButton, FacebookShareButton } from "react-share";
 export default function CreatePoolSuccess() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { pool } = usePoolStore();
+  const { pool, clearGrantsFromPool, clearPool } = usePoolStore();
   const [createdPool, setCreatedPool] = React.useState<PoolResponse>();
   const shareInformation = React.useMemo(() => {
     if (typeof window !== undefined && createdPool) {
@@ -43,6 +43,8 @@ export default function CreatePoolSuccess() {
       router.push("/pools");
     }
     setCreatedPool(pool);
+    clearGrantsFromPool();
+    clearPool();
   }, []);
 
   return (

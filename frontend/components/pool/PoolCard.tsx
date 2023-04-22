@@ -69,7 +69,7 @@ const PoolCard = ({
       <div className="relative w-full aspect-[5/3] h-full max-h-[210px]">
         <Image
           alt={pool.name}
-          src="/assets/pool-placeholder-image.png"
+          src={pool.image || "/assets/pool-placeholder-image.png"}
           fill
           className="aspect-[5/3] object-cover"
         />

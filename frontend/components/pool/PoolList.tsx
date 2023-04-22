@@ -57,7 +57,7 @@ const PoolList = ({ pool, onClick }: IPoolListProps) => {
     >
       <div className="overflow-hidden rounded-lg aspect-[5/3] h-full max-w-xs w-full relative flex-none mb-4 md:mb-0">
         <Image
-          src="/assets/pool-placeholder-image.png"
+          src={pool.image || "/assets/pool-placeholder-image.png"}
           fill
           className="aspect-[5/3] object-cover"
           alt={pool.name}

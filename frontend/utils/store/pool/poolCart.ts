@@ -29,7 +29,7 @@ export const usePoolCartStore = create<PoolCartState>()(
               ...state.pools,
               {
                 id: pool.id,
-                image: "/assets/pool-placeholder-image.png",
+                image: pool.image || "/assets/pool-placeholder-image.png",
                 name: pool.name,
                 amount: 0,
               },

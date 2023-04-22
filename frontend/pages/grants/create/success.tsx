@@ -17,7 +17,7 @@ import { TwitterShareButton, FacebookShareButton } from "react-share";
 export default function CreateGrantSuccess() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { grant } = useGrantStore();
+  const { grant, clearGrant } = useGrantStore();
   const [createdGrant, setCreatedGrant] = React.useState<GrantDetailResponse>();
   const shareInformation = React.useMemo(() => {
     if (typeof window !== undefined && createdGrant) {
@@ -43,6 +43,7 @@ export default function CreateGrantSuccess() {
       router.push("/grants");
     }
     setCreatedGrant(grant);
+    clearGrant();
   }, []);
 
   return (

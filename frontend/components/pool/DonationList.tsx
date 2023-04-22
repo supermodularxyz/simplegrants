@@ -18,7 +18,7 @@ const DonationList = ({ contribution, onClick }: IDonationListProps) => {
         <div className="flex flex-row gap-x-4 md:gap-x-10 basis-full md:basis-2/3">
           <div className="overflow-hidden rounded-lg aspect-[3/2] md:aspect-[5/3] h-max max-w-[128px] w-full relative flex-none mb-4 md:mb-0">
             <Image
-              src="/assets/pool-placeholder-image.png"
+              src={matchingRound.image || "/assets/pool-placeholder-image.png"}
               fill
               className="aspect-[3/2] md:aspect-[5/3]"
               alt={matchingRound.name}
