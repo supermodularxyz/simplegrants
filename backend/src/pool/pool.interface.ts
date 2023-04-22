@@ -82,13 +82,7 @@ export class CreatePoolDto {
     type: String,
   })
   @IsString()
-  description: string | null;
-
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  image: string | null;
+  description: string;
 
   @ApiProperty({
     type: Date,
@@ -338,13 +332,7 @@ export class UpdatePoolDto {
     type: String,
   })
   @IsString()
-  description: string | null;
-
-  @ApiProperty({
-    type: String,
-  })
-  @IsString()
-  image: string | null;
+  description: string;
 
   @ApiProperty({
     type: Date,

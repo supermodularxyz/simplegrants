@@ -19,15 +19,17 @@ import {
   UpdatePoolDto,
 } from './pool.interface';
 import { FeeAllocationMethod } from 'src/provider/provider.interface';
+import { Image, createCanvas, loadImage } from 'canvas';
+import { AwsService } from 'src/aws/aws.service';
+import * as cuid from 'cuid';
 
 @Injectable()
 export class PoolService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly providerService: ProviderService,
+    private readonly awsService: AwsService,
   ) {}
-
-  private paymentProvider = this.providerService.getProvider();
 
   /**
    * Throws error if not a member, otherwise returns true
@@ -226,6 +228,139 @@ export class PoolService {
   }
 
   /**
+   * Draws an image with the appropriate dimensions like `object-fit: cover` in CSS
+   * @param ctx
+   * @param img
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   */
+  drawImg(
+    ctx: any,
+    img: Image,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ) {
+    const aspectRatio = img.width / img.height;
+    const targetAspectRatio = width / height;
+    let targetWidth = width;
+    let targetHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    // calculate scaling factor based on larger dimension of image and target area
+    const scale =
+      aspectRatio > targetAspectRatio ? height / img.height : width / img.width;
+
+    // calculate target width and height based on scaling factor
+    targetWidth = width / scale;
+    targetHeight = height / scale;
+
+    // calculate offsets to center image in target area
+    offsetX = Math.max(0, (img.width - targetWidth) / 2);
+    offsetY = Math.max(0, (img.height - targetHeight) / 2);
+
+    // draw image with modified dimensions and centered in target area
+    ctx.drawImage(
+      img,
+      offsetX,
+      offsetY,
+      targetWidth,
+      targetHeight,
+      x,
+      y,
+      width,
+      height,
+    );
+  }
+
+  /**
+   * Generates a collage based on the grant images
+   *
+   * @param grantImages Array of image URLs
+   * @returns
+   */
+  async generateCollage(grantImages: string[]) {
+    const canvas = createCanvas(350, 210);
+    const ctx = canvas.getContext('2d');
+    const images: Image[] = [];
+
+    for await (const image of grantImages) {
+      images.push(await loadImage(image));
+    }
+
+    switch (grantImages.length) {
+      case 1:
+        this.drawImg(ctx, images[0], 0, 0, canvas.width, canvas.height);
+        break;
+      case 2:
+        this.drawImg(ctx, images[0], 0, 0, canvas.width / 2, canvas.height);
+        this.drawImg(
+          ctx,
+          images[1],
+          canvas.width / 2,
+          0,
+          canvas.width / 2,
+          canvas.height,
+        );
+        break;
+      case 3:
+        this.drawImg(ctx, images[0], 0, 0, canvas.width / 2, canvas.height);
+        this.drawImg(
+          ctx,
+          images[1],
+          canvas.width / 2,
+          0,
+          canvas.width / 2,
+          canvas.height / 2,
+        );
+        this.drawImg(
+          ctx,
+          images[2],
+          canvas.width / 2,
+          canvas.height / 2,
+          canvas.width / 2,
+          canvas.height / 2,
+        );
+        break;
+      case 4:
+        this.drawImg(ctx, images[0], 0, 0, canvas.width / 2, canvas.height / 2);
+        this.drawImg(
+          ctx,
+          images[1],
+          canvas.width / 2,
+          0,
+          canvas.width / 2,
+          canvas.height / 2,
+        );
+        this.drawImg(
+          ctx,
+          images[2],
+          0,
+          canvas.height / 2,
+          canvas.width / 2,
+          canvas.height / 2,
+        );
+        this.drawImg(
+          ctx,
+          images[3],
+          canvas.width / 2,
+          canvas.height / 2,
+          canvas.width / 2,
+          canvas.height / 2,
+        );
+        break;
+      default:
+        throw new Error('Unsupported number of grants.');
+    }
+
+    return canvas.toBuffer();
+  }
+
+  /**
    * Creates a pool with the provided data
    * @param data
    * @param user The owner to tie this pool to
@@ -245,9 +380,39 @@ export class PoolService {
       );
     }
 
+    /**
+     * At this point, we can automatically generate the image of the pool based on the grants
+     * This is done using node-canvas
+     *
+     * 1. Get the grants with the specified ID
+     * 2. Get only the image URLs
+     * 3. Pass it to the collage function
+     * 4. Upload the image buffer to AWS
+     * 5. Save the image URL into the database
+     */
+
+    const id = cuid();
+
+    const grants = await this.prisma.grant.findMany({
+      where: {
+        id: {
+          in: data.grants,
+        },
+      },
+    });
+
+    const grantImages = grants.map((grant) => grant.image).slice(0, 4);
+    let image = undefined;
+    if (grantImages.length > 0) {
+      const imageBuffer = await this.generateCollage(grantImages);
+      image = await this.awsService.uploadBuffer(imageBuffer, id);
+    }
+
     const pool = await this.prisma.matchingRound.create({
       data: {
         ...data,
+        id,
+        image,
         funders: {
           connect: [
             {

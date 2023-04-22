@@ -4,7 +4,8 @@ FROM node:18-slim AS builder
 RUN apt-get update && \
     apt-get install -y procps && \
     apt-get install -y openssl && \
-    apt-get install -y libc6
+    apt-get install -y libc6 && \
+    apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 # Create app directory
 WORKDIR /app
@@ -26,7 +27,8 @@ FROM node:18-slim
 RUN apt-get update && \
     apt-get install -y procps && \
     apt-get install -y openssl && \
-    apt-get install -y libc6
+    apt-get install -y libc6 && \
+    apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 ENV NODE_ENV production
 

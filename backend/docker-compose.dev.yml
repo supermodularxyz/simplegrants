@@ -8,6 +8,7 @@ services:
     restart: always
     volumes:
       - ./:/app
+      - /app/node_modules
     env_file:
       - .env
     ports:
