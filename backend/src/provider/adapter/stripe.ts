@@ -314,6 +314,10 @@ export class StripeProvider implements PaymentProviderAdapter {
               currency: provider.denominations[0],
               product_data: {
                 name: pool.name,
+                description:
+                  pool.description?.length > 80
+                    ? pool.description.slice(0, 80) + '...'
+                    : pool.description || undefined,
               },
               unit_amount: this.roundNumber(pool.amount) * 100,
             },

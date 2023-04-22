@@ -4,6 +4,8 @@ import { User } from "./user";
 export interface BasicPoolResponse {
   id: string;
   name: string;
+  description: string | null;
+  image: string | null;
   paid: boolean;
   verified: boolean;
   startDate: Date;
@@ -18,6 +20,8 @@ export interface PoolResponse extends BasicPoolResponse {
 export interface MinimalPoolResponse {
   id: string;
   name: string;
+  description: string | null;
+  image: string | null;
   paid: boolean;
   verified: boolean;
   startDate: Date;

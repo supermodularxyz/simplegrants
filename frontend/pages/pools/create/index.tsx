@@ -24,10 +24,12 @@ import GrantSearchModal from "../../../components/grant/GrantSearchModal";
 import dayjs from "dayjs";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import DateInput from "../../../components/input/DateInput";
+import TextAreaInput from "../../../components/input/TextAreaInput";
 
 const validationSchema = z
   .object({
     name: z.string().min(1, { message: "Pool name is required" }),
+    description: z.string().min(1, { message: "Pool description is required" }),
     startDate: z.date({ required_error: "Start date is required" }),
     endDate: z
       .date({ required_error: "End date is required" })
@@ -190,6 +192,19 @@ export default function CreatePool() {
                           onChange={onChange}
                         />
                       )}
+                    />
+                  </div>
+                  <div className="form-control w-full col-span-2">
+                    <label className="label">
+                      <span className="label-text font-bold text-lg">
+                        Pool Description
+                      </span>
+                    </label>
+                    <TextAreaInput
+                      rows={3}
+                      id="description"
+                      register={register}
+                      errors={errors}
                     />
                   </div>
                 </div>

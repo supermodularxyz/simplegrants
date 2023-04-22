@@ -66,6 +66,9 @@ const PoolList = ({ pool, onClick }: IPoolListProps) => {
       <div className="flex flex-col flex-grow w-full justify-between mb-4 md:mb-0">
         <div className="flex flex-col mb-4">
           <p className="font-bold text-xl">{pool.name}</p>
+          <p className="text-sm mt-4 overflow-hidden text-ellipsis line-clamp-3">
+            {pool.description}
+          </p>
           <p className="my-2">
             <b className="font-bold text-xl">
               ~USD${" "}

@@ -77,6 +77,9 @@ const PoolCard = ({
       <div className="flex flex-col px-8 py-6 h-full items-start justify-between">
         <div className="flex flex-col">
           <p className="font-bold text-[22px]">{pool.name}</p>
+          <p className="text-sm mt-4 overflow-hidden text-ellipsis line-clamp-3">
+            {pool.description}
+          </p>
           <p className="my-2">
             <b className="font-bold text-xl">
               ~USD${" "}

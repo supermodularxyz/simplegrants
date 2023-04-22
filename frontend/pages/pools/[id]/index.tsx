@@ -107,6 +107,7 @@ export default function PoolDetails() {
               <div className="basis-full md:basis-3/5 md:px-4">
                 <div className=" bg-white shadow-card py-8 px-6 rounded-xl ">
                   <p className="font-bold text-2xl my-6">{data.name}</p>
+                  <p className="text-sm my-4">{data.description}</p>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-11 gap-y-8 justify-items-center">
                     {data.grants.map((grant) => (
                       <GrantCard

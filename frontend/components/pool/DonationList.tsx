@@ -28,6 +28,9 @@ const DonationList = ({ contribution, onClick }: IDonationListProps) => {
             <p className="font-bold text-base md:text-xl">
               {matchingRound.name}
             </p>
+            <p className="leading-relaxed text-sm line-clamp-3">
+              {matchingRound.description}
+            </p>
           </div>
         </div>
         <div className="flex flex-row gap-x-4 md:gap-x-10 basis-full md:basis-1/3">

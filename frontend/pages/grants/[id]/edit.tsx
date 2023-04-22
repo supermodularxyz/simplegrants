@@ -18,6 +18,7 @@ import axios from "../../../utils/axios";
 import { useGrantStore } from "../../../utils/store";
 import { toast } from "react-toastify";
 import { GrantDetailResponse } from "../../../types/grant";
+import { User } from "../../../types/user";
 
 const validationSchema = z.object({
   name: z.string().min(1, { message: "Grant name is required" }).optional(),
@@ -67,12 +68,28 @@ export default function EditGrant() {
     axios
       .get(`/grants/${id}`)
       .then((res) => {
-        setData(res.data);
-        const { image, ...dataWithoutImage } = res.data;
-        reset({
-          ...dataWithoutImage,
-          paymentAccount: res.data.paymentAccount.recipientAddress,
-        });
+        const data = res.data;
+        setData(data);
+
+        // Once we receive the data, we will check if user is a team member
+        // If not, we will redirect them to the grant page
+        if (data) {
+          if (
+            !data.team.some((user: User) => user.email === session?.user?.email)
+          ) {
+            toast.error("User is not part of this grant!", {
+              toastId: "user-unauthorized-error",
+            });
+            router.push(`/grants/${id}`);
+          }
+
+          // Otherwise, we continue
+          const { image, ...dataWithoutImage } = data;
+          reset({
+            ...dataWithoutImage,
+            paymentAccount: data.paymentAccount.recipientAddress,
+          });
+        }
       })
       .catch((err) => {
         console.error({ err });
@@ -88,10 +105,10 @@ export default function EditGrant() {
   };
 
   React.useEffect(() => {
-    if (id) {
+    if (id && session) {
       getGrant();
     }
-  }, [id]);
+  }, [id, session]);
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
@@ -274,10 +291,15 @@ export default function EditGrant() {
               </div>
               <div className="flex flex-col flex-1 w-full gap-y-5">
                 <p className="font-bold text-lg">Team Members</p>
-                <div className="flex flex-row w-full items-center justify-between">
-                  <p>{session && session.user?.email}</p>
-                  <p>Owner</p>
-                </div>
+                {data?.team.map((member, index) => (
+                  <div
+                    className="flex flex-row w-full items-center justify-between"
+                    key={member.id}
+                  >
+                    <p>{member.email}</p>
+                    <p>{index === 0 ? "Owner" : ""}</p>
+                  </div>
+                ))}
                 <p className="font-bold text-lg">+ Add a team member</p>
               </div>
             </div>

@@ -79,6 +79,18 @@ export class CreatePoolDto {
   name: string;
 
   @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  description: string | null;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  image: string | null;
+
+  @ApiProperty({
     type: Date,
   })
   @IsDateString()
@@ -113,6 +125,18 @@ export class BasicPoolResponse {
     type: String,
   })
   name: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  description: string | null;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  image: string | null;
 
   @ApiResponseProperty({
     type: Boolean,
@@ -181,6 +205,18 @@ export class MinimalPoolResponse {
     type: String,
   })
   name: string;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  description: string | null;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  image: string | null;
 
   @ApiResponseProperty({
     type: Boolean,
@@ -299,6 +335,18 @@ export class UpdatePoolDto {
   name: string;
 
   @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  description: string | null;
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  image: string | null;
+
+  @ApiProperty({
     type: Date,
   })
   @IsDateString()
@@ -370,6 +418,8 @@ export class CheckoutPoolsResponse {
 export class PoolWithFunding {
   id: string;
   name: string;
+  description: string | null;
+  image: string | null;
   paid: boolean;
   verified: boolean;
   startDate: Date;

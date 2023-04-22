@@ -25,11 +25,14 @@ import DateInput from "../../../components/input/DateInput";
 import Card from "../../../layouts/Card";
 import { useHasHydrated } from "../../../utils/useHydrated";
 import minMax from "dayjs/plugin/minMax";
+import TextAreaInput from "../../../components/input/TextAreaInput";
+import { User } from "../../../types/user";
 dayjs.extend(minMax);
 
 const validationSchema = z
   .object({
     name: z.string().min(1, { message: "Pool name is required" }),
+    description: z.string().min(1, { message: "Pool description is required" }),
     startDate: z.date({ required_error: "Start date is required" }),
     endDate: z
       .date({ required_error: "End date is required" })
@@ -48,7 +51,7 @@ export default function EditPool() {
   const router = useRouter();
   const { id } = router.query;
   const hasHydrated = useHasHydrated();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const [loading, setLoading] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
   const {
@@ -118,13 +121,26 @@ export default function EditPool() {
     axios
       .get(`/pools/${id}`)
       .then((res) => {
-        const { grants, ...data } = res.data;
-        resetGrantsInPool(grants);
-        reset({
-          name: data.name,
-          startDate: new Date(data.startDate),
-          endDate: new Date(data.endDate),
-        });
+        if (res.data) {
+          const { grants, ...data } = res.data;
+
+          // Check if user owns the pool
+          if (
+            !data.team.some((user: User) => user.email === session?.user?.email)
+          ) {
+            toast.error("User is not part of this pool!", {
+              toastId: "user-unauthorized-error",
+            });
+            router.push(`/pools/${id}`);
+          }
+
+          resetGrantsInPool(grants);
+          reset({
+            ...data,
+            startDate: new Date(data.startDate),
+            endDate: new Date(data.endDate),
+          });
+        }
       })
       .catch((err) => {
         console.error({ err });
@@ -143,10 +159,10 @@ export default function EditPool() {
   };
 
   React.useEffect(() => {
-    if (id) {
+    if (id && session) {
       getPool();
     }
-  }, [id]);
+  }, [id, session]);
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
@@ -247,6 +263,19 @@ export default function EditPool() {
                           onChange={onChange}
                         />
                       )}
+                    />
+                  </div>
+                  <div className="form-control w-full col-span-2">
+                    <label className="label">
+                      <span className="label-text font-bold text-lg">
+                        Pool Description
+                      </span>
+                    </label>
+                    <TextAreaInput
+                      rows={3}
+                      id="description"
+                      register={register}
+                      errors={errors}
                     />
                   </div>
                 </div>
