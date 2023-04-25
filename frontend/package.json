@@ -42,6 +42,7 @@
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.43.1",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-reveal": "^1.2.2",
     "react-share": "^4.4.1",
     "react-toastify": "^9.1.1",

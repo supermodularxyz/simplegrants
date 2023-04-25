@@ -20,8 +20,15 @@ const nextConfig = {
         protocol: "https",
         hostname: "**googleusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "**fbsbx.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**twimg.com",
+      },
     ],
-    domains: ["picsum.photos", "fastify.picsum.photos", "amazonaws.com"],
   },
 };
 
