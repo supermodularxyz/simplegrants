@@ -18,7 +18,10 @@ import {
   PoolSortOptions,
   UpdatePoolDto,
 } from './pool.interface';
-import { FeeAllocationMethod } from 'src/provider/provider.interface';
+import {
+  CheckoutType,
+  FeeAllocationMethod,
+} from 'src/provider/provider.interface';
 import { Image, createCanvas, loadImage } from 'canvas';
 import { AwsService } from 'src/aws/aws.service';
 import * as cuid from 'cuid';
@@ -561,6 +564,7 @@ export class PoolService {
       poolWithFunding,
       feeAllocation || FeeAllocationMethod.PASS_TO_ENTITY, // By default, we will pass the fees to pools
       user,
+      CheckoutType.POOL,
     );
   }
 }

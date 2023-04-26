@@ -15,7 +15,10 @@ import {
 import { ProviderService } from 'src/provider/provider.service';
 import { AwsService } from 'src/aws/aws.service';
 import * as cuid from 'cuid';
-import { FeeAllocationMethod } from 'src/provider/provider.interface';
+import {
+  CheckoutType,
+  FeeAllocationMethod,
+} from 'src/provider/provider.interface';
 
 @Injectable()
 export class GrantsService {
@@ -435,6 +438,7 @@ export class GrantsService {
       grantWithFunding,
       feeAllocation || FeeAllocationMethod.PASS_TO_ENTITY, // By default, we will pass the fees to grants
       user,
+      CheckoutType.GRANT,
     );
   }
 }

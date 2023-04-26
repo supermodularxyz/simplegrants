@@ -78,3 +78,8 @@ export class ProviderResponse {
     Object.assign(this, partial);
   }
 }
+
+export enum CheckoutType {
+  GRANT,
+  POOL,
+}

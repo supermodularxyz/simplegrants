@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { StripeProvider } from './adapter/stripe';
 import { PaymentProviderAdapter } from './adapter/types';
 import { PoolWithFunding } from 'src/pool/pool.interface';
-import { FeeAllocationMethod } from './provider.interface';
+import { CheckoutType, FeeAllocationMethod } from './provider.interface';
 
 @Injectable()
 export class ProviderService {
@@ -36,8 +36,9 @@ export class ProviderService {
     itemWithFunding: (GrantWithFunding | PoolWithFunding)[],
     feeAllocation: FeeAllocationMethod,
     user: User,
+    type: CheckoutType,
   ) {
-    if (itemWithFunding instanceof GrantWithFunding)
+    if (type === CheckoutType.GRANT)
       return await this.paymentProvider.createGrantPayment(
         itemWithFunding as GrantWithFunding[],
         feeAllocation,
