@@ -128,7 +128,7 @@ export const seedGrants = async (seed: Seed) => {
       paymentAccount: {
         connectOrCreate: {
           create: {
-            recipientAddress: 'acct_1MdDqePwtixIFqie',
+            recipientAddress: 'acct_1Mycv9Q7g93UqeuK',
             provider: {
               connect: {
                 id: seed.paymentProvider.id,
@@ -137,7 +137,7 @@ export const seedGrants = async (seed: Seed) => {
           },
           where: {
             recipientAddress_providerId: {
-              recipientAddress: 'acct_1MdDqePwtixIFqie',
+              recipientAddress: 'acct_1Mycv9Q7g93UqeuK',
               providerId: seed.paymentProvider.id,
             },
           },
@@ -188,7 +188,7 @@ export const seedGrants = async (seed: Seed) => {
       paymentAccount: {
         connectOrCreate: {
           create: {
-            recipientAddress: 'acct_1MdDqePwtixIFqie',
+            recipientAddress: 'acct_1MydI2PrHJrNYNi5',
             provider: {
               connect: {
                 id: seed.paymentProvider.id,
@@ -197,7 +197,7 @@ export const seedGrants = async (seed: Seed) => {
           },
           where: {
             recipientAddress_providerId: {
-              recipientAddress: 'acct_1MdDqePwtixIFqie',
+              recipientAddress: 'acct_1MydI2PrHJrNYNi5',
               providerId: seed.paymentProvider.id,
             },
           },

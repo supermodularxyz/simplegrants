@@ -224,7 +224,7 @@ export class StripeProvider implements PaymentProviderAdapter {
                     ? grant.description.slice(0, 80) + '...'
                     : grant.description,
               },
-              unit_amount: this.roundNumber(grant.amount) * 100,
+              unit_amount: Math.round(this.roundNumber(grant.amount) * 100),
             },
             quantity: 1,
           };
@@ -237,7 +237,9 @@ export class StripeProvider implements PaymentProviderAdapter {
                   name: 'Stripe Fees',
                   description: 'Processing fees taken by Stripe',
                 },
-                unit_amount: this.getCustomerFee(totalDonation) * 100,
+                unit_amount: Math.round(
+                  this.getCustomerFee(totalDonation) * 100,
+                ),
               },
               quantity: 1,
             }
@@ -319,7 +321,7 @@ export class StripeProvider implements PaymentProviderAdapter {
                     ? pool.description.slice(0, 80) + '...'
                     : pool.description || undefined,
               },
-              unit_amount: this.roundNumber(pool.amount) * 100,
+              unit_amount: Math.round(this.roundNumber(pool.amount) * 100),
             },
             quantity: 1,
           };
@@ -332,7 +334,9 @@ export class StripeProvider implements PaymentProviderAdapter {
                   name: 'Stripe Fees',
                   description: 'Processing fees taken by Stripe',
                 },
-                unit_amount: this.getCustomerFee(totalDonation) * 100,
+                unit_amount: Math.round(
+                  this.getCustomerFee(totalDonation) * 100,
+                ),
               },
               quantity: 1,
             }
