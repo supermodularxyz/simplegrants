@@ -14,7 +14,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
     "generate": "npx prisma generate && rsync prisma/schema.prisma ../frontend/prisma && npx --prefix ../frontend prisma generate",
-    "migrate": "npx prisma migrate deploy",
+    "migrate": "./prisma-helper.sh 'npx prisma migrate deploy'",
     "migrate:dev": "./prisma-helper.sh 'npx prisma migrate dev'",
     "setup": "./prisma-helper.sh 'npx prisma migrate deploy && npx prisma db seed'",
     "studio": "./prisma-helper.sh 'npx prisma studio'",
