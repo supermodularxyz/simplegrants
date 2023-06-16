@@ -12,6 +12,8 @@ import { GrantResponse } from "../types/grant";
 import axios from "../utils/axios";
 import { toast } from "react-toastify";
 import Fade from "react-reveal/Fade";
+import Github from "../components/icons/Github";
+import Link from "next/link";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -275,7 +277,7 @@ export default function Home() {
           />
         </div>
         <footer className="w-full flex flex-col md:flex-row px-6 py-8 md:px-28 md:py-16 gap-x-14 justify-between items-start">
-          <div className="w-full">
+          <div className="w-full flex-col">
             <Image
               src="/logo.svg"
               alt="SimpleGrants"
@@ -283,6 +285,12 @@ export default function Home() {
               height={50}
               className="mb-8"
             />
+            <Link
+              href={"https://github.com/supermodularxyz/simplegrants"}
+              target="_blank"
+            >
+              <Github className="w-8 fill-sg-secondary cursor-pointer" />
+            </Link>
           </div>
           <div className="flex flex-row flex-wrap lg:flex-nowrap gap-x-8 w-full justify-between">
             <div className="flex flex-col gap-y-3 mb-6">
