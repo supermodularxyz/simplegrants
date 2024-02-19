@@ -1,4 +1,4 @@
-AS OF FEB 2024, this has been depcreated. Please see https://github.com/gitcoinco/simplegrants.xyz for the next build.
+⚠️⚠️⚠️  AS OF FEB 2024, this has been depcreated. Please see https://github.com/gitcoinco/simplegrants.xyz for the next build. ⚠️⚠️⚠️
 
 # SimpleGrants 💰
 
