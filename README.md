@@ -1,3 +1,5 @@
+AS OF FEB 2024, this has been depcreated. Please see https://github.com/gitcoinco/simplegrants.xyz for the next build.
+
 # SimpleGrants 💰
 
 A super modular, plug-and-play Web2 grants funding system.
